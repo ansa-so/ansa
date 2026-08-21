@@ -1,0 +1,349 @@
+---
+title: Leads & Form Submissions
+description: "Capture and manage leads from your AI agent"
+---
+
+When users submit forms through your agent, the data is captured as leads (form submissions). You can view, filter, and export this data, as well as set up automations to send leads to your CRM or other tools.
+
+## How Leads Are Captured
+
+1. **User interacts** with your agent
+2. **Agent presents a form** based on conversation context
+3. **User fills out the form** naturally in chat
+4. **Data is submitted** and stored
+5. **Post-actions run** (webhooks, emails, etc.)
+
+### Automatic Context
+
+Each lead submission includes:
+- Form data (fields the user filled)
+- Conversation ID (link to full chat)
+- Agent ID
+- Timestamp
+- Submission status
+
+## Viewing Leads
+
+### In Conversations
+
+1. Go to **Conversations**
+2. Open a conversation
+3. Scroll to **Form Submissions** section
+
+Each submission shows:
+- Form name
+- Fields and values
+- Submission status
+- Timestamp
+
+### Form Analytics
+
+1. Go to **Analytics**
+2. View the **Forms** section:
+   - **Submissions** — Total form completions
+   - **Conversion rate** — Impressions to submissions
+   - **Drop-off** — Started but not completed
+   - **Field completion** — Which fields get filled
+
+## Lead Status
+
+Each submission has a status:
+
+| Status | Meaning |
+|--------|---------|
+| `pending` | Just submitted, processing |
+| `completed` | Successfully processed |
+| `failed` | Post-action failed |
+| `retrying` | Retrying failed action |
+
+### Automatic Retries
+
+Failed webhooks are automatically retried:
+- Immediate retry
+- After 1 minute
+- After 5 minutes
+
+Up to 3 retry attempts before marking as failed.
+
+## Setting Up Lead Capture
+
+### 1. Create a Form Tool
+
+1. Go to **Tools**
+2. Click **Add Tool**
+3. Select **Form** type
+4. Define your fields:
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "title": "Full Name"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "title": "Email Address"
+    },
+    "company": {
+      "type": "string",
+      "title": "Company Name"
+    },
+    "interest": {
+      "type": "string",
+      "enum": ["Demo", "Pricing", "Support"],
+      "title": "What are you interested in?"
+    }
+  },
+  "required": ["name", "email"]
+}
+```
+
+### 2. Configure Post-Actions
+
+Set up what happens after submission:
+
+<CardGroup cols={2}>
+  <Card title="Webhook" icon="globe">
+    Send data to your CRM or backend
+  </Card>
+  <Card title="Email" icon="envelope">
+    Notify your team of new leads
+  </Card>
+</CardGroup>
+
+### 3. Train the Agent
+
+Add instructions so your agent knows when to show the form:
+
+```
+When a user expresses interest in a demo or pricing,
+use the lead_capture form to collect their information.
+```
+
+## Webhook Integration
+
+Send leads to external systems in real-time.
+
+### Setup
+
+1. Edit your form tool
+2. Set **Execution Mode** to `webhook`
+3. Enter your **Webhook URL**
+4. Save
+
+### Payload Format
+
+Your endpoint receives:
+
+```json
+{
+  "submissionId": "sub_123abc",
+  "toolId": "tool_456def",
+  "toolName": "Lead Capture Form",
+  "agentId": "agent_789ghi",
+  "conversationId": "conv_012jkl",
+  "formData": {
+    "name": "Jane Smith",
+    "email": "jane@example.com",
+    "company": "Acme Corp",
+    "interest": "Demo"
+  },
+  "timestamp": "2024-01-15T10:30:00Z"
+}
+```
+
+### Response
+
+Return a success status:
+
+```json
+{
+  "success": true,
+  "message": "Lead created in CRM"
+}
+```
+
+The message is optionally shown to the user.
+
+## Email Notifications
+
+Get notified when leads come in.
+
+### Setup
+
+1. Edit your form tool
+2. Add **Email** post-action
+3. Enter recipient email addresses
+4. Save
+
+### Email Contents
+
+Notification emails include:
+- Form name
+- All submitted data
+- Link to conversation
+- Timestamp
+
+## CRM Integrations
+
+Connect leads to your existing tools:
+
+### Zapier / Make
+
+1. Create a webhook in Zapier/Make
+2. Add the webhook URL to your form
+3. Map fields to your CRM
+
+### Direct Integration
+
+Build a webhook handler:
+
+```javascript
+app.post("/webhook/leads", async (req, res) => {
+  const { formData, conversationId } = req.body;
+
+  // Create lead in your CRM
+  await crm.leads.create({
+    name: formData.name,
+    email: formData.email,
+    company: formData.company,
+    source: "Ansa Chat",
+    metadata: { conversationId }
+  });
+
+  res.json({ success: true });
+});
+```
+
+## Lead Qualification
+
+Use your agent to qualify leads before capturing.
+
+### Qualification Flow
+
+1. **Initial questions** — Agent asks about needs
+2. **Scoring** — Based on responses
+3. **Conditional form** — Only show to qualified leads
+4. **Routing** — Send to appropriate team
+
+### Example Instructions
+
+```
+Before showing the demo request form:
+1. Ask what problem they're trying to solve
+2. Ask about their company size
+3. If company size > 50 employees, show the enterprise_demo form
+4. Otherwise, show the standard_demo form
+```
+
+## Exporting Leads
+
+### Via API
+
+```bash
+# Get form submissions for an agent
+curl "https://api.ansa.so/form-submissions?agentId=xxx" \
+  -H "Authorization: Bearer $ANSA_API_KEY"
+```
+
+### Bulk Export
+
+```javascript
+import { AnsaClient } from "@ansa-so/sdk";
+
+const client = new AnsaClient({ apiKey: "xxx" });
+
+// Get all submissions for a specific form
+const submissions = await client.listFormSubmissions({
+  agentId: "agent_123",
+  toolId: "tool_456", // Optional: filter by form
+});
+
+// Export to CSV
+const csv = submissions.map(s => ({
+  id: s.id,
+  ...s.formData,
+  submittedAt: s.createdAt,
+}));
+```
+
+## Lead Analytics
+
+Track form performance in **Analytics**:
+
+### Key Metrics
+
+| Metric | Description |
+|--------|-------------|
+| Impressions | Times form was shown |
+| Starts | Times user started filling |
+| Submissions | Completed submissions |
+| Conversion Rate | Submissions / Impressions |
+| Avg Completion Time | Time from start to submit |
+
+### Field Analysis
+
+See which fields:
+- Are most often completed
+- Cause drop-offs
+- Take longest to fill
+
+Use this to optimize your forms.
+
+## Best Practices
+
+<Tip>
+Keep forms short. Each additional field reduces conversion by 5-10%.
+</Tip>
+
+### Form Design
+
+1. **Minimize required fields** — Only ask what's essential
+2. **Use progressive disclosure** — Show more fields as needed
+3. **Provide context** — Explain why you need each field
+4. **Use smart defaults** — Pre-fill when possible
+
+### Qualification
+
+1. **Qualify before forms** — Ask questions first
+2. **Segment leads** — Different forms for different needs
+3. **Score leads** — Prioritize follow-up
+
+### Follow-up
+
+1. **Respond quickly** — Set up instant notifications
+2. **Include context** — Review conversation history
+3. **Track outcomes** — Close the loop on lead quality
+
+## Troubleshooting
+
+### Webhook Failures
+
+**Check:**
+- Webhook URL is accessible
+- Endpoint returns 2xx status
+- Response is valid JSON
+- No timeout (30 second limit)
+
+**View failed submissions** in the conversation details.
+
+### Missing Leads
+
+**Verify:**
+- Form tool is properly configured
+- Agent is trained to use the form
+- User completed all required fields
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Form Tools" icon="rectangle-list" href="/tools/form-tools">
+    Learn to build effective forms
+  </Card>
+  <Card title="Webhooks" icon="webhook" href="/developer-guides/webhooks">
+    Set up integrations
+  </Card>
+</CardGroup>

@@ -1,0 +1,360 @@
+---
+title: "Submission Actions"
+description: "Configure what happens after form submission: webhooks, Slack notifications, and email alerts."
+---
+
+import { Screenshot } from '/snippets/screenshot.mdx'
+
+## Overview
+
+Submission actions (post-actions) run automatically after a form is submitted. Use them to:
+
+- Send data to your CRM or backend
+- Notify your team via Slack
+- Send email alerts to team members
+- Trigger automation workflows
+
+## Action Types
+
+| Type | Description |
+|------|-------------|
+| `webhook` | POST data to any URL |
+| `slack` | Send Slack channel message |
+| `email` | Email team members |
+
+## Webhook Action
+
+Send form data to any HTTP endpoint:
+
+```json
+{
+  "formPostActions": [
+    {
+      "type": "webhook",
+      "url": "https://api.yourcrm.com/leads",
+      "headers": {
+        "Authorization": "Bearer YOUR_API_KEY",
+        "Content-Type": "application/json"
+      }
+    }
+  ]
+}
+```
+
+### Webhook Payload
+
+The webhook receives a POST request with this JSON body:
+
+```json
+{
+  "submissionId": "sub_abc123",
+  "toolId": "tool_xyz789",
+  "toolName": "contact_form",
+  "conversationId": "conv_def456",
+  "formData": {
+    "email": "user@example.com",
+    "message": "I need help with..."
+  },
+  "submittedAt": "2024-01-15T10:30:00.000Z"
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `submissionId` | Unique ID for this submission |
+| `toolId` | The form tool's ID |
+| `toolName` | The form tool's name |
+| `conversationId` | Chat conversation ID |
+| `formData` | All form field values |
+| `submittedAt` | ISO timestamp |
+
+### Custom Headers
+
+Add authentication or custom headers:
+
+```json
+{
+  "type": "webhook",
+  "url": "https://hooks.zapier.com/hooks/catch/123/abc",
+  "headers": {
+    "Authorization": "Bearer ${API_KEY}",
+    "X-Custom-Header": "value"
+  }
+}
+```
+
+### Retry Logic
+
+Webhooks automatically retry on failure:
+
+| Attempt | Delay |
+|---------|-------|
+| 1st retry | Immediate |
+| 2nd retry | 1 minute |
+| 3rd retry | 5 minutes |
+
+Status tracking:
+- `pending` — Initial state
+- `webhook_success` — Delivered successfully
+- `webhook_failed` — Failed after all retries
+
+## Slack Action
+
+Send notifications to Slack channels:
+
+```json
+{
+  "formPostActions": [
+    {
+      "type": "slack",
+      "webhookUrl": "https://hooks.slack.com/services/T00/B00/XXX",
+      "messageTemplate": "🎯 *New Lead!*\n\n*Name:* {{name}}\n*Email:* {{email}}\n*Message:* {{message}}"
+    }
+  ]
+}
+```
+
+### Getting a Slack Webhook URL
+
+1. Go to [Slack API Apps](https://api.slack.com/apps)
+2. Create or select an app
+3. Navigate to **Incoming Webhooks**
+4. Activate and create a new webhook
+5. Choose the channel to post to
+6. Copy the webhook URL
+
+### Message Templates
+
+Use `{{fieldName}}` to include form values:
+
+```
+🎯 *New Lead Captured!*
+
+*Contact:* {{firstName}} {{lastName}}
+*Email:* {{email}}
+*Company:* {{company}}
+*Message:* {{message}}
+
+_Submitted via Ansa chat widget_
+```
+
+Special variables:
+- `{{fieldName}}` — Any form field value
+- `{{_toolName}}` — The form tool's name
+
+<Tip>
+Slack messages support markdown formatting: `*bold*`, `_italic_`, `` `code` ``, and line breaks with `\n`.
+</Tip>
+
+### Max Length
+
+Message templates have a maximum length of 2,000 characters.
+
+## Email Action
+
+Email team members when forms are submitted:
+
+```json
+{
+  "formPostActions": [
+    {
+      "type": "email",
+      "recipientIds": ["user_id_1", "user_id_2"],
+      "subject": "New Lead: {{name}} from {{company}}"
+    }
+  ]
+}
+```
+
+### Configuration
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `recipientIds` | Yes | Array of team member user IDs |
+| `subject` | No | Email subject (supports templates) |
+
+### Finding User IDs
+
+User IDs are the team members in your account. Find them in:
+- **Settings → Team** — View team members
+- Each member has a unique ID
+
+### Email Content
+
+The email includes:
+- Form name and submission time
+- All form field values
+- Link to conversation history
+- Conversation context
+
+## Multiple Actions
+
+Combine multiple post-actions:
+
+```json
+{
+  "formPostActions": [
+    {
+      "type": "webhook",
+      "url": "https://api.hubspot.com/contacts/v1/contact",
+      "headers": { "Authorization": "Bearer ${HUBSPOT_KEY}" }
+    },
+    {
+      "type": "slack",
+      "webhookUrl": "https://hooks.slack.com/services/...",
+      "messageTemplate": "📥 New HubSpot lead: {{email}}"
+    },
+    {
+      "type": "email",
+      "recipientIds": ["sales_manager_id"],
+      "subject": "New Lead: {{company}}"
+    }
+  ]
+}
+```
+
+Actions run in parallel for speed.
+
+## Form Execution Modes
+
+Control how form submissions are processed:
+
+### Webhook Mode (Default)
+
+```json
+{
+  "formExecutionMode": "webhook"
+}
+```
+
+Form data is sent to your server/webhook only.
+
+### Client Mode
+
+```json
+{
+  "formExecutionMode": "client"
+}
+```
+
+Form is handled entirely by client-side JavaScript. No data sent to Ansa.
+
+See [Triggering Forms in Code](/developer-guides/triggering-forms) for client handlers.
+
+### Both Mode
+
+```json
+{
+  "formExecutionMode": "both"
+}
+```
+
+Data is sent to webhook AND processed by client-side handler.
+
+## Complete Example
+
+Full form with all post-action types:
+
+```json
+{
+  "name": "demo_request",
+  "description": "Capture demo requests when visitor wants to see the product.",
+  "executionType": "form",
+  "formSchema": {
+    "fields": [
+      { "name": "name", "label": "Name", "type": "text", "validation": { "required": { "value": true, "message": "Required" } } },
+      { "name": "email", "label": "Work Email", "type": "email", "validation": { "required": { "value": true, "message": "Required" } } },
+      { "name": "company", "label": "Company", "type": "text" },
+      { "name": "size", "label": "Company Size", "type": "select", "options": [
+        { "label": "1-10", "value": "small" },
+        { "label": "11-100", "value": "medium" },
+        { "label": "100+", "value": "enterprise" }
+      ]}
+    ],
+    "submitLabel": "Request Demo",
+    "successMessage": "Thanks! We'll reach out within 24 hours."
+  },
+  "formExecutionMode": "webhook",
+  "formPostActions": [
+    {
+      "type": "webhook",
+      "url": "https://hooks.zapier.com/hooks/catch/123/abc",
+      "headers": {
+        "Content-Type": "application/json"
+      }
+    },
+    {
+      "type": "slack",
+      "webhookUrl": "https://hooks.slack.com/services/T00/B00/XXX",
+      "messageTemplate": "🎉 *Demo Request*\n\n*Name:* {{name}}\n*Email:* {{email}}\n*Company:* {{company}} ({{size}})"
+    },
+    {
+      "type": "email",
+      "recipientIds": ["sales_lead_user_id"],
+      "subject": "Demo Request: {{name}} from {{company}}"
+    }
+  ]
+}
+```
+
+## Popular Integrations
+
+### Zapier
+
+```json
+{
+  "type": "webhook",
+  "url": "https://hooks.zapier.com/hooks/catch/YOUR_ID/YOUR_HOOK"
+}
+```
+
+### Make (Integromat)
+
+```json
+{
+  "type": "webhook",
+  "url": "https://hook.make.com/YOUR_WEBHOOK_ID"
+}
+```
+
+### HubSpot
+
+```json
+{
+  "type": "webhook",
+  "url": "https://api.hubapi.com/contacts/v1/contact",
+  "headers": {
+    "Authorization": "Bearer YOUR_ACCESS_TOKEN",
+    "Content-Type": "application/json"
+  }
+}
+```
+
+### Salesforce
+
+Use Zapier or a middleware to transform the payload:
+
+```json
+{
+  "type": "webhook",
+  "url": "https://hooks.zapier.com/hooks/catch/123/salesforce-lead"
+}
+```
+
+## Monitoring Submissions
+
+View all form submissions in the **Leads** dashboard:
+
+<Screenshot src="/screenshots/history.png" alt="Leads dashboard" />
+
+- Filter by form/tool
+- View submission status (pending, success, failed)
+- See full conversation context
+- Export data for analysis
+
+## See Also
+
+- [Form Tools](/tools/form-tools) — Field types and validation
+- [Webhooks](/developer-guides/webhooks) — Developer webhook documentation
+- [Leads & Forms](/user-guides/leads) — Managing submissions
+- [Triggering Forms in Code](/developer-guides/triggering-forms) — Client-side handling

@@ -1,0 +1,351 @@
+---
+title: Forms API
+description: "Submit forms and retrieve form analytics"
+---
+
+The Forms API handles form submissions from the widget and provides analytics on form performance.
+
+## Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/form-submissions/submit` | Submit a form |
+| `POST` | `/form-submissions/client-result` | Report client handler result |
+| `GET` | `/form-submissions/analytics` | Get form analytics |
+
+## Submit Form
+
+```bash
+POST /form-submissions/submit
+```
+
+Submit form data collected from a user. This endpoint is typically called by the widget.
+
+### Request Body
+
+```json
+{
+  "toolId": "tool_abc123",
+  "conversationId": "conv_xyz789",
+  "formData": {
+    "name": "Jane Smith",
+    "email": "jane@example.com",
+    "message": "I'd like to learn more about pricing"
+  },
+  "fieldsCompleted": ["name", "email", "message"],
+  "impressionAt": 1703347200000,
+  "startedAt": 1703347205000
+}
+```
+
+### Parameters
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `toolId` | `string` | Yes | The form tool ID |
+| `conversationId` | `string` | No | Associated conversation ID |
+| `formData` | `object` | Yes | Key-value pairs of form field values |
+| `fieldsCompleted` | `string[]` | Yes | List of fields that were filled |
+| `impressionAt` | `number` | No | Timestamp when form was shown (ms) |
+| `startedAt` | `number` | No | Timestamp when user started filling (ms) |
+
+### Response
+
+```json
+{
+  "success": true,
+  "submissionId": "sub_def456",
+  "executionMode": "webhook",
+  "webhookResult": {
+    "success": true,
+    "error": null
+  },
+  "postActionResults": [
+    { "type": "slack", "success": true },
+    { "type": "email", "success": true }
+  ],
+  "clientHandler": null
+}
+```
+
+### Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `success` | `boolean` | Whether submission was recorded |
+| `submissionId` | `string` | Unique submission ID |
+| `executionMode` | `string` | `webhook`, `client`, or `both` |
+| `webhookResult` | `object` | Result of webhook delivery |
+| `postActionResults` | `array` | Results of post-submission actions |
+| `clientHandler` | `string` | Name of client handler (if applicable) |
+
+### Errors
+
+| Status | Description |
+|--------|-------------|
+| 400 | Invalid request body or file too large |
+| 404 | Tool not found |
+
+### File Uploads
+
+Files are submitted as base64-encoded data URLs:
+
+```json
+{
+  "formData": {
+    "document": "data:application/pdf;base64,JVBERi0xLjQKJ..."
+  }
+}
+```
+
+Maximum file size: **5MB** per file.
+
+## Report Client Result
+
+```bash
+POST /form-submissions/client-result
+```
+
+Report the result of a client-side form handler execution.
+
+### Request Body
+
+```json
+{
+  "submissionId": "sub_def456",
+  "success": true,
+  "message": "Successfully created lead",
+  "data": {
+    "leadId": "lead_123"
+  }
+}
+```
+
+### Parameters
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `submissionId` | `string` | Yes | The submission ID |
+| `success` | `boolean` | Yes | Whether client handler succeeded |
+| `message` | `string` | No | Status message |
+| `data` | `object` | No | Additional result data |
+
+### Response
+
+```json
+{
+  "success": true
+}
+```
+
+## Get Form Analytics
+
+```bash
+GET /form-submissions/analytics?agentId={agentId}
+```
+
+Get analytics for all forms belonging to an agent.
+
+### Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `agentId` | `string` | Yes | The agent ID |
+
+### Response
+
+```json
+{
+  "analytics": [
+    {
+      "toolId": "tool_abc123",
+      "toolName": "contact_form",
+      "impressions": 1500,
+      "started": 850,
+      "submitted": 320,
+      "successful": 315,
+      "failed": 5,
+      "conversionRate": 21.33,
+      "completionRate": 37.65,
+      "fieldCompletionRates": {
+        "name": 98.5,
+        "email": 100,
+        "phone": 45.2,
+        "message": 92.3
+      }
+    }
+  ]
+}
+```
+
+### Analytics Fields
+
+| Field | Description |
+|-------|-------------|
+| `toolId` | Form tool ID |
+| `toolName` | Form tool name |
+| `impressions` | Times form was shown |
+| `started` | Times user began filling |
+| `submitted` | Total submissions |
+| `successful` | Successful submissions |
+| `failed` | Failed submissions |
+| `conversionRate` | `submitted / impressions × 100` |
+| `completionRate` | `submitted / started × 100` |
+| `fieldCompletionRates` | Completion % per field |
+
+## Submission Status
+
+Form submissions progress through these statuses:
+
+| Status | Description |
+|--------|-------------|
+| `pending` | Just created, processing |
+| `submitted` | Recorded (client-only mode) |
+| `webhook_success` | Webhook delivered successfully |
+| `webhook_failed` | Webhook delivery failed |
+| `client_success` | Client handler succeeded |
+| `client_failed` | Client handler failed |
+| `success` | All actions completed |
+| `failed` | One or more actions failed |
+
+## Execution Modes
+
+| Mode | Behavior |
+|------|----------|
+| `webhook` | Send to configured webhook URL only |
+| `client` | Handle with client-side JavaScript only |
+| `both` | Send to webhook AND notify client handler |
+
+## Webhook Payload
+
+When execution mode includes webhook, data is sent as:
+
+```json
+{
+  "submissionId": "sub_def456",
+  "toolId": "tool_abc123",
+  "toolName": "contact_form",
+  "conversationId": "conv_xyz789",
+  "formData": {
+    "name": "Jane Smith",
+    "email": "jane@example.com",
+    "message": "Hello!"
+  },
+  "submittedAt": "2024-12-23T10:30:00.000Z"
+}
+```
+
+### Retry Logic
+
+Failed webhooks are automatically retried:
+
+| Attempt | Delay |
+|---------|-------|
+| 1 | Immediate |
+| 2 | 1 minute |
+| 3 | 5 minutes |
+
+Maximum of 3 attempts.
+
+## Post Actions
+
+After the primary webhook, additional actions are processed:
+
+### Slack Notification
+
+```json
+{
+  "type": "slack",
+  "webhookUrl": "https://hooks.slack.com/services/...",
+  "messageTemplate": "New {{_toolName}} submission!\nEmail: {{email}}"
+}
+```
+
+### Additional Webhook
+
+```json
+{
+  "type": "webhook",
+  "url": "https://your-server.com/api/leads",
+  "headers": {
+    "Authorization": "Bearer xxx"
+  }
+}
+```
+
+### Email Notification
+
+```json
+{
+  "type": "email",
+  "recipientIds": ["user_123", "user_456"],
+  "subject": "New Form Submission"
+}
+```
+
+## Examples
+
+### Submit Contact Form
+
+```bash
+curl -X POST https://api.ansa.so/form-submissions/submit \
+  -H "Content-Type: application/json" \
+  -d '{
+    "toolId": "tool_contact_form",
+    "formData": {
+      "name": "Jane Smith",
+      "email": "jane@example.com",
+      "message": "I would like to schedule a demo"
+    },
+    "fieldsCompleted": ["name", "email", "message"],
+    "impressionAt": 1703347200000,
+    "startedAt": 1703347205000
+  }'
+```
+
+### Report Client Handler Success
+
+```bash
+curl -X POST https://api.ansa.so/form-submissions/client-result \
+  -H "Content-Type: application/json" \
+  -d '{
+    "submissionId": "sub_def456",
+    "success": true,
+    "message": "Lead created in CRM",
+    "data": {
+      "crmLeadId": "crm_lead_789"
+    }
+  }'
+```
+
+### Get Analytics
+
+```bash
+curl https://api.ansa.so/form-submissions/analytics?agentId=agent_xyz789 \
+  -H "Authorization: Bearer $ANSA_API_KEY"
+```
+
+## Integration with Widget
+
+The widget handles form submission automatically:
+
+1. User fills out form in widget
+2. Widget calls `/form-submissions/submit`
+3. Server processes webhook/post-actions
+4. If `executionMode` includes `client`, widget calls registered handler
+5. Widget calls `/form-submissions/client-result` with handler result
+
+```javascript
+// Register client handler
+ansa.registerFormHandler("custom_form", {
+  onSubmit: async (context) => {
+    // Your custom logic
+    await saveToDatabase(context.formData);
+
+    return {
+      success: true,
+      message: "Saved successfully"
+    };
+  }
+});
+```

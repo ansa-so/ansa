@@ -1,0 +1,244 @@
+---
+title: Conversation History
+description: "Review and manage your agent's conversations"
+---
+
+The conversation history gives you complete visibility into every interaction your agent has with users. Use it to review responses, identify training opportunities, and understand how users engage with your agent.
+
+## Accessing Conversations
+
+1. Go to **Conversations** in the sidebar
+2. Select an agent from the dropdown
+3. Browse conversations in the list
+
+Each conversation shows:
+- **Title** — Auto-generated from the first message
+- **Channel** — Widget, email, or API
+- **Timestamp** — When the conversation occurred
+- **Confidence** — How confident the agent was
+
+## Conversation Details
+
+Click any conversation to see:
+
+### Messages
+
+The full message history between user and agent, including:
+- User messages (questions)
+- Agent responses
+- Confidence scores per response
+- Feedback (thumbs up/down)
+- Human responses (if escalated)
+
+### Form Submissions
+
+If the user submitted any forms during the conversation:
+- Which form was submitted
+- The data they provided
+- Submission status
+- Timestamp
+
+### Metadata
+
+- Conversation ID
+- User ID (if identified)
+- Channel source
+- Start and end times
+
+## Filtering Conversations
+
+Find specific conversations using filters:
+
+### By Feedback
+
+| Filter | Shows |
+|--------|-------|
+| Thumbs Up | Conversations with positive feedback |
+| Thumbs Down | Conversations with negative feedback |
+
+<Tip>
+Review thumbs-down conversations weekly to identify gaps in your knowledge base.
+</Tip>
+
+### By Channel
+
+Filter by source:
+- **Widget** — Website chat widget
+- **Email** — Email channel responses
+- **API** — Direct API integrations
+
+### By Confidence
+
+Filter by response confidence level:
+- **High** — 80-100% confidence
+- **Medium** — 60-79% confidence
+- **Low** — Below 60% confidence
+
+## Common Workflows
+
+### Weekly Review Routine
+
+1. Filter by **Thumbs Down**
+2. Review each negative-feedback conversation
+3. Identify what went wrong:
+   - Missing information → Add to knowledge base
+   - Incorrect response → Update documentation
+   - Poor formatting → Adjust system prompt
+4. Make improvements and track changes
+
+### Finding Training Data
+
+1. Filter by **Low Confidence**
+2. Look for common question patterns
+3. Add missing content to knowledge base
+4. Monitor if confidence improves
+
+### Monitoring Channels
+
+1. Filter by **Email** channel
+2. Review auto-responses sent
+3. Check confidence on each response
+4. Adjust email threshold if needed
+
+## Message Feedback
+
+Users can provide feedback on responses:
+
+| Feedback | Meaning |
+|----------|---------|
+| 👍 Thumbs Up | Response was helpful |
+| 👎 Thumbs Down | Response was unhelpful |
+
+### Where Feedback Appears
+
+- **Conversations** — Filter by feedback
+- **Analytics** — Feedback trends over time
+- **Message level** — Each message shows its feedback
+
+### Using Feedback Data
+
+Feedback helps you:
+1. **Prioritize improvements** — Fix thumbs-down patterns first
+2. **Validate changes** — Did thumbs-up increase after updates?
+3. **Train the team** — Show examples of good/bad responses
+
+## Human Responses
+
+When agents escalate to humans (via email or takeover):
+
+- Messages are marked with "Human Response" badge
+- Human responses are excluded from confidence calculations
+- You can review how humans handled edge cases
+
+## Deleting Conversations
+
+To delete a conversation:
+
+1. Open the conversation
+2. Click the **Delete** button
+3. Confirm deletion
+
+<Warning>
+Deletion is permanent and cannot be undone. Consider exporting important conversations first.
+</Warning>
+
+### When to Delete
+
+- Test conversations
+- Spam or irrelevant messages
+- Privacy/compliance requests
+- Duplicate conversations
+
+## Exporting Conversations
+
+### Via API
+
+Export conversation data programmatically:
+
+```bash
+# Get all conversations for an agent
+curl "https://api.ansa.so/conversations?agentId=xxx" \
+  -H "Authorization: Bearer $ANSA_API_KEY"
+
+# Get a specific conversation with messages
+curl "https://api.ansa.so/conversations/{id}" \
+  -H "Authorization: Bearer $ANSA_API_KEY"
+```
+
+### Bulk Export
+
+For large exports:
+
+```javascript
+import { AnsaClient } from "@ansa-so/sdk";
+
+const client = new AnsaClient({ apiKey: "xxx" });
+
+async function exportAllConversations(agentId) {
+  const conversations = [];
+  let offset = 0;
+  const limit = 100;
+
+  while (true) {
+    const response = await client.listConversations({
+      agentId,
+      limit,
+      offset,
+    });
+
+    conversations.push(...response.conversations);
+
+    if (!response.hasMore) break;
+    offset += limit;
+  }
+
+  return conversations;
+}
+```
+
+## Understanding User Journeys
+
+Conversations reveal how users interact:
+
+### Common Patterns
+
+1. **Quick answers** — Single question, immediate resolution
+2. **Multi-turn** — Follow-up questions to drill down
+3. **Form completion** — Questions leading to form submission
+4. **Escalation** — Complex issues handed to humans
+
+### Identifying Issues
+
+Look for:
+- **Repeated questions** — User didn't get answer first time
+- **Abandoned conversations** — User left without resolution
+- **Low confidence chains** — Multiple uncertain responses
+- **Form drop-offs** — Started but didn't complete forms
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Review Regularly" icon="calendar">
+    Check conversations weekly to stay on top of issues
+  </Card>
+  <Card title="Follow Feedback" icon="thumbs-up">
+    Prioritize fixing thumbs-down patterns
+  </Card>
+  <Card title="Track Patterns" icon="chart-line">
+    Note recurring questions and topics
+  </Card>
+  <Card title="Update Content" icon="book">
+    Add missing info to knowledge base
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Confidence Scores" icon="gauge" href="/user-guides/confidence-scores">
+    Understand response confidence
+  </Card>
+  <Card title="Analytics" icon="chart-bar" href="/user-guides/analytics">
+    View aggregated insights
+  </Card>
+</CardGroup>

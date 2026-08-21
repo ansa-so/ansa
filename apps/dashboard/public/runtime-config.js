@@ -1,0 +1,1 @@
+window.__ANSA_CONFIG__={"apiUrl":"https://api.customer-b.test","docsUrl":"http://localhost:3003","dashboardUrl":"http://localhost:3000","widgetUrl":"http://localhost:3002","cdnUrl":"http://localhost:3002","dashboardAgentId":"","emailInboundDomain":"","projectName":"Ansa","shopifyClientId":"","posthogKey":"","posthogHost":"https://us.i.posthog.com"};

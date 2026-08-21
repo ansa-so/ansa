@@ -1,0 +1,292 @@
+---
+title: Team Management
+description: "Invite team members and manage access to your account"
+---
+
+Ansa supports team collaboration so multiple people can manage your agents, review conversations, and access analytics. Invite team members, assign roles, and control access from your settings.
+
+## Team Roles
+
+| Role | Permissions |
+|------|-------------|
+| **Owner** | Full access, billing, team management |
+| **Member** | Access agents, conversations, analytics |
+
+### Owner Permissions
+
+- Create and delete agents
+- Manage knowledge bases
+- Configure tools and triggers
+- View all conversations
+- Access analytics
+- Manage billing and subscription
+- Invite and remove team members
+
+### Member Permissions
+
+- View and edit agents
+- Manage knowledge bases
+- Configure tools and triggers
+- View conversations
+- Access analytics
+
+<Warning>
+Only the account owner can manage billing and team membership.
+</Warning>
+
+## Inviting Team Members
+
+### Send an Invitation
+
+1. Go to **Settings** → **Team**
+2. Click **Invite Member**
+3. Enter their email address
+4. Select a role
+5. Click **Send Invitation**
+
+The invitee receives an email with a link to join your team.
+
+### Invitation Details
+
+Invitations include:
+- Link to accept the invitation
+- Your name and email (as inviter)
+- Role they'll be assigned
+- Expiration (7 days)
+
+### Invitation Status
+
+| Status | Meaning |
+|--------|---------|
+| `pending` | Waiting for recipient |
+| `accepted` | Member joined team |
+| `expired` | Link expired (7 days) |
+| `cancelled` | Invitation revoked |
+
+## Accepting Invitations
+
+When someone invites you:
+
+1. Open the email invitation
+2. Click **Accept Invitation**
+3. Sign in or create an account
+4. You're now part of the team
+
+<Tip>
+If you already have a Ansa account, you can accept invitations from multiple teams.
+</Tip>
+
+## Managing Team Members
+
+### View Team
+
+1. Go to **Settings** → **Team**
+2. See all current members and pending invitations
+
+For each member, you'll see:
+- Name and email
+- Role
+- When they joined
+
+### Remove a Member
+
+1. Go to **Settings** → **Team**
+2. Find the member
+3. Click **Remove**
+4. Confirm removal
+
+The member immediately loses access to your account.
+
+### Cancel an Invitation
+
+1. Go to **Settings** → **Team**
+2. Find the pending invitation
+3. Click **Cancel**
+
+The invitation link becomes invalid.
+
+## Shared Resources
+
+Team members share access to:
+
+### Agents
+- All agents are visible to all members
+- Any member can create, edit, or delete agents
+- Changes are immediately visible to everyone
+
+### Knowledge Bases
+- Shared across the team
+- Any member can add or remove content
+- All members benefit from improvements
+
+### Conversations
+- All team members can view conversations
+- Helpful for support handoffs
+- Review each other's work
+
+### Analytics
+- Everyone sees the same data
+- Useful for team reporting
+- Track collective progress
+
+## Team Workflows
+
+### Support Team
+
+Multiple support agents can:
+1. Monitor incoming conversations
+2. Review agent responses
+3. Update knowledge base with new info
+4. Track metrics together
+
+### Marketing + Support
+
+- Marketing creates lead capture forms
+- Support reviews and follows up
+- Both track form submissions
+
+### Development + Operations
+
+- Developers set up tools and integrations
+- Operations monitors conversations
+- Both improve the knowledge base
+
+## Email Notifications
+
+Team members can be added to:
+
+### Form Notifications
+
+When forms are submitted:
+1. Go to **Tools** → select a form
+2. Add post-action: **Email**
+3. Select team members as recipients
+
+### Channel Forwarding
+
+For email channel low-confidence responses:
+1. Go to **Channels** → **Email**
+2. Configure forward-to addresses
+3. Add team member emails
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Start Small" icon="users">
+    Add team members as needed
+  </Card>
+  <Card title="Document Processes" icon="book">
+    Create guidelines for your team
+  </Card>
+  <Card title="Review Regularly" icon="calendar">
+    Audit team access periodically
+  </Card>
+  <Card title="Communicate Changes" icon="message">
+    Notify team of major updates
+  </Card>
+</CardGroup>
+
+### Access Management
+
+1. **Audit regularly** — Review who has access quarterly
+2. **Remove promptly** — Remove access when people leave
+3. **Use email aliases** — For team-wide notifications
+
+### Collaboration
+
+1. **Assign areas** — Different people own different agents
+2. **Review together** — Weekly conversation reviews
+3. **Share learnings** — Document what works
+
+## API Access
+
+### Get Team Context
+
+```bash
+curl "https://api.ansa.so/team/context" \
+  -H "Authorization: Bearer $ANSA_API_KEY"
+```
+
+Response:
+```json
+{
+  "role": "owner",
+  "isOwner": true,
+  "owner": {
+    "id": "user_123",
+    "email": "owner@example.com",
+    "name": "Account Owner"
+  },
+  "members": [
+    {
+      "id": "tm_456",
+      "memberId": "user_789",
+      "role": "member",
+      "email": "member@example.com",
+      "name": "Team Member",
+      "createdAt": "2024-01-15T10:00:00Z"
+    }
+  ]
+}
+```
+
+### List Team Members
+
+```bash
+curl "https://api.ansa.so/team/members" \
+  -H "Authorization: Bearer $ANSA_API_KEY"
+```
+
+### Send Invitation
+
+```bash
+curl -X POST "https://api.ansa.so/team/invite" \
+  -H "Authorization: Bearer $ANSA_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "newmember@example.com",
+    "role": "member"
+  }'
+```
+
+### Remove Member
+
+```bash
+curl -X DELETE "https://api.ansa.so/team/members/{memberId}" \
+  -H "Authorization: Bearer $ANSA_API_KEY"
+```
+
+## Troubleshooting
+
+### Invitation Not Received
+
+**Check:**
+- Email address is correct
+- Check spam/junk folder
+- Invitation hasn't expired
+
+**Solution:** Cancel and resend the invitation.
+
+### Can't Access Features
+
+**Check:**
+- You're signed into the right account
+- You've accepted the invitation
+- The owner hasn't removed your access
+
+### Wrong Role
+
+Currently, roles cannot be changed after invitation. To change a role:
+1. Remove the member
+2. Send a new invitation with the correct role
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Billing" icon="credit-card" href="/user-guides/billing">
+    Manage your subscription
+  </Card>
+  <Card title="Analytics" icon="chart-bar" href="/user-guides/analytics">
+    Track team performance
+  </Card>
+</CardGroup>

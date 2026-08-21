@@ -1,0 +1,143 @@
+---
+title: "Customer Support"
+description: "Build an AI-powered support agent that answers questions from your help docs, escalates complex issues, and learns from human responses."
+---
+
+import { Screenshot } from '/snippets/screenshot.mdx'
+
+## Overview
+
+Ansa is ideal for customer support teams who want to:
+- Deflect repetitive questions with instant, accurate answers
+- Escalate complex issues to human agents seamlessly
+- Build a growing knowledge base from real support interactions
+- Provide 24/7 support without scaling headcount
+
+<Screenshot src="/screenshots/chat.png" alt="Customer support chat" />
+
+## Recommended Configuration
+
+### 1. Knowledge Base Setup
+
+Index your existing help documentation to give your agent comprehensive knowledge:
+
+**Recommended sources:**
+- Help center articles (web crawl or upload)
+- FAQ documents
+- Product documentation
+- Troubleshooting guides
+
+<Screenshot src="/screenshots/web-sources.png" alt="Web sources configuration" />
+
+<Tip>
+Use the **auto-detect feature** during onboarding to automatically discover and index your help pages. Ansa will probe common paths like `/help`, `/support`, `/faq`, and `/docs`.
+</Tip>
+
+### 2. Agent Settings
+
+| Setting | Recommended Value | Why |
+|---------|-------------------|-----|
+| **Model** | Claude 3.5 Sonnet or GPT-4o | Best balance of accuracy and speed |
+| **Temperature** | 0.3 - 0.5 | Lower temperature for more consistent, factual responses |
+| **System Prompt** | Include tone, escalation rules, and boundaries | See example below |
+
+**Example System Prompt:**
+```
+You are a helpful customer support agent for [Company Name].
+
+Your role:
+- Answer questions accurately based on the knowledge base
+- Be friendly, professional, and concise
+- If you don't know the answer, say so honestly
+- For billing issues, account access, or complex technical problems, offer to connect the user with a human agent
+
+Never:
+- Make up information not in the knowledge base
+- Share internal processes or confidential information
+- Make promises about refunds or credits without escalating
+```
+
+### 3. Escalation with Confidence Thresholds
+
+Use confidence scores to automatically escalate low-confidence responses:
+
+<Screenshot src="/screenshots/analytics.png" alt="Analytics showing confidence scores" />
+
+| Confidence Level | Action |
+|------------------|--------|
+| **High (80%+)** | Respond automatically |
+| **Medium (50–79%)** | Respond but offer human escalation |
+| **Low (below 50%)** | Show contact form or escalate immediately |
+
+### 4. Escalation Form Tool
+
+Create a form tool for human escalation:
+
+```json
+{
+  "name": "contact_support",
+  "description": "Use this when the user needs human assistance, has a billing issue, or when you cannot answer their question confidently.",
+  "executionType": "form",
+  "formSchema": {
+    "fields": [
+      { "name": "email", "label": "Email", "type": "email", "validation": { "required": { "value": true, "message": "Email is required" } } },
+      { "name": "issue", "label": "Describe your issue", "type": "textarea" }
+    ],
+    "submitLabel": "Contact Support",
+    "successMessage": "We've received your request. A support agent will reach out within 24 hours."
+  },
+  "formPostActions": [
+    { "type": "email", "recipientIds": ["support-team-user-id"], "subject": "Support Escalation" },
+    { "type": "slack", "webhookUrl": "https://hooks.slack.com/...", "messageTemplate": "🚨 New escalation from {{email}}: {{issue}}" }
+  ]
+}
+```
+
+### 5. Widget Triggers
+
+Set up proactive engagement to help users before they get frustrated:
+
+| Trigger | When | Action |
+|---------|------|--------|
+| **Time on support page** | 30 seconds on `/help/*` | Open chat with "Need help finding something?" |
+| **Scroll depth** | 75% scroll on troubleshooting article | Show bubble "Still having issues?" |
+| **Exit intent** | About to leave support page | Show form for feedback |
+
+<Screenshot src="/screenshots/widget.png" alt="Widget builder" />
+
+## Email Channel for Async Support
+
+Enable the email channel to handle support emails with AI:
+
+1. Forward support emails to your agent's inbound address
+2. Set confidence threshold (recommended: 70%)
+3. Configure low-confidence action to "forward" to human reviewers
+4. Enable **Auto Learn** to automatically create Q&A entries from human responses
+
+<Screenshot src="/screenshots/integrations-email.png" alt="Email channel settings" />
+
+## Monitoring & Improvement
+
+### Review Conversation History
+
+Regularly review conversations to identify:
+- Common questions that need better documentation
+- Low-confidence responses that need knowledge base updates
+- Patterns in escalated issues
+
+<Screenshot src="/screenshots/history.png" alt="Conversation history" />
+
+### Track Key Metrics
+
+Monitor these analytics:
+- **Average confidence score** — Target 75%+
+- **Escalation rate** — Track form submissions vs. resolved chats
+- **Response quality** — Review feedback ratings
+
+## See Also
+
+- [Confidence Scores](/user-guides/confidence-scores) — Understanding confidence levels
+- [Triggers](/widget/triggers) — Setting up proactive engagement
+- [Form Tools](/tools/form-tools) — Creating escalation forms
+- [Email Channel](/integrations/email) — Handling email support with AI
+- [Conversation History](/user-guides/history) — Reviewing and improving responses

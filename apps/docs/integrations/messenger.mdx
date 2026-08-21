@@ -1,0 +1,185 @@
+---
+title: Facebook Messenger
+description: "Let your AI agent respond to Facebook Messenger messages automatically"
+---
+
+The Facebook Messenger channel allows your AI agent to receive and respond to messages sent to your Facebook Pages. Customers can message your Page, and your agent responds using your knowledge base—just like the chat widget but through Messenger.
+
+## How It Works
+
+1. **Message arrives** via Facebook Messenger to your connected Page
+2. **Agent processes** the message using your knowledge base
+3. **Response sent** back to the customer through Messenger
+4. **Conversation tracked** in your dashboard
+
+All Messenger conversations appear alongside widget chats and emails, so you have a unified view of all customer interactions.
+
+## Prerequisites
+
+Before you can use the Messenger channel, you'll need:
+
+- An Ansa account on **Growth plan or higher**
+- A Facebook Page (business or personal)
+- A Facebook Developer account
+- A Facebook App with Messenger permissions
+
+## Facebook Developer Setup
+
+### Step 1: Create a Facebook App
+
+1. Go to [Facebook Developers](https://developers.facebook.com/)
+2. Click **My Apps** → **Create App**
+3. Select **Business** as the app type
+4. Enter your app name and contact email
+5. Click **Create App**
+
+### Step 2: Add Messenger Product
+
+1. In your app dashboard, find **Add Products to Your App**
+2. Click **Set Up** on the Messenger card
+3. Accept the Messenger Platform terms
+
+### Step 3: Configure Permissions
+
+Your app needs these permissions:
+
+| Permission | Purpose |
+|------------|---------|
+| `pages_messaging` | Send and receive messages |
+| `pages_manage_metadata` | Access Page metadata |
+| `pages_show_list` | List your Pages during OAuth |
+| `pages_read_engagement` | Read Page engagement data |
+
+To request these permissions:
+
+1. Go to **App Review** → **Permissions and Features**
+2. Request each permission
+3. For live mode, submit for App Review
+
+<Note>
+For testing, you can use Development Mode which allows your app to work with Pages you manage without App Review.
+</Note>
+
+## Connecting Your Pages
+
+### Step 1: Enable Messenger Channel
+
+1. Go to **Channels** → **Messenger** in your Ansa dashboard
+2. Click **Connect Pages**
+3. Log in with Facebook and authorize the app
+4. Select which Pages to connect (multi-select supported)
+5. Click **Connect**
+
+### Step 2: Configure Webhook in Facebook
+
+After connecting your Pages, you need to set up the webhook in Facebook:
+
+1. Click the **External Link** icon next to a connected Page
+2. Copy the **Callback URL** and **Verify Token**
+3. In your Facebook App, go to **Messenger** → **Settings**
+4. Under **Webhooks**, click **Add Callback URL**
+5. Paste the Callback URL and Verify Token
+6. Click **Verify and Save**
+7. Subscribe to these webhook events:
+   - `messages`
+   - `messaging_postbacks`
+
+### Step 3: Subscribe Your Page
+
+1. In Facebook App → Messenger → Settings
+2. Under **Webhooks**, find your Page
+3. Click **Add Subscriptions**
+4. Select `messages` and `messaging_postbacks`
+5. Click **Save**
+
+## Configuration Options
+
+### Basic Settings
+
+| Setting | Description |
+|---------|-------------|
+| **Enabled** | Master toggle for the Messenger channel |
+
+### AI Confidence Settings
+
+| Setting | Description |
+|---------|-------------|
+| **Confidence Threshold** | Minimum confidence required (0-100%) |
+| **Low Confidence Action** | What to do when confidence is low |
+| **Forward Email** | Email address for forwarded messages |
+
+### Low Confidence Actions
+
+| Action | Description |
+|--------|-------------|
+| **Do Nothing** | Send the AI response regardless |
+| **Escalate** | Create a ticket for human review |
+| **Forward** | Forward to a specified email |
+
+## Multiple Pages
+
+You can connect multiple Facebook Pages to a single agent. This is useful if you:
+
+- Manage multiple brands under one account
+- Have regional Pages for different markets
+- Run separate Pages for different products
+
+Each Page gets its own webhook verify token for security.
+
+## Testing
+
+### Send a Test Message
+
+1. Go to your Facebook Page
+2. Click **Send Message** (or visit `m.me/your-page-id`)
+3. Send a test message
+4. Check your Ansa dashboard for the conversation
+
+### Troubleshooting
+
+**No response received:**
+- Check that the Messenger channel is enabled
+- Verify the webhook is correctly configured
+- Check that your Page is subscribed to message events
+- Ensure your agent has AI enabled
+
+**Webhook verification failing:**
+- Make sure you're using the correct verify token from Ansa
+- Check that the callback URL is exactly as shown
+- Ensure your Facebook App is in Development or Live mode
+
+**Messages not appearing in dashboard:**
+- Verify the Page is connected in Ansa
+- Check that the Page's webhook subscription is active
+- Look for errors in the webhook delivery logs
+
+## Security
+
+### Signature Verification
+
+All incoming webhooks from Facebook are verified using HMAC-SHA256 signatures. This ensures that messages are genuinely from Facebook and haven't been tampered with.
+
+### Page Access Tokens
+
+When you connect a Page, Ansa stores a long-lived Page Access Token. This token:
+
+- Is automatically refreshed
+- Is encrypted at rest
+- Is only used to send messages on behalf of your Page
+
+### Data Handling
+
+- Messages are processed in real-time
+- Conversation history is stored in your Ansa account
+- You can delete conversations at any time
+- Ansa doesn't share your data with third parties
+
+## Limitations
+
+- **Text only**: Currently only text messages are supported. Attachments, images, and rich media are not processed.
+- **No quick replies**: Quick reply buttons are not yet supported.
+- **24-hour window**: Facebook's 24-hour messaging window applies. Messages sent outside this window require a message tag.
+
+## Pricing
+
+The Messenger channel is included in **Growth**, **Pro**, and **Enterprise** plans at no additional cost. Message usage counts toward your monthly message quota.

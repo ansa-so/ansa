@@ -1,0 +1,255 @@
+---
+title: Escalations & Human Handoff
+description: "Route conversations to human agents when AI isn't enough"
+---
+
+Escalations allow your AI agent to seamlessly hand off conversations to human support when needed. This ensures customers always have a path to human assistance while maximizing the efficiency of your AI agent.
+
+## How Escalations Work
+
+When a conversation is escalated:
+
+1. **Ticket created** — An escalation ticket is logged in your dashboard
+2. **Team notified** — Configured notification channels are triggered (email, Slack, webhook)
+3. **Customer informed** — The user sees a confirmation message
+4. **Agent paused** — AI responses are held until a human responds or the escalation is resolved
+
+## Escalation Triggers
+
+Conversations can be escalated in several ways:
+
+### User-Initiated Escalation
+
+Users can request human support by:
+
+- Clicking the **escalation button** (if enabled in widget settings)
+- Typing phrases like "talk to a human" or "speak to support"
+- Submitting a form that triggers escalation
+
+### AI-Initiated Escalation
+
+The AI can automatically escalate when:
+
+- **Low confidence** — Response confidence falls below your threshold
+- **Tool failure** — A critical tool fails repeatedly
+- **Specific topics** — Keywords or intents trigger escalation (configured in system prompt)
+
+### Programmatic Escalation
+
+Escalate via API or webhook when external conditions are met:
+
+```bash
+curl -X POST "https://api.ansa.so/conversations/{conversationId}/escalate" \
+  -H "Authorization: Bearer $ANSA_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "reason": "VIP customer flagged for priority support"
+  }'
+```
+
+## Configuring Escalation Settings
+
+Navigate to **Settings** → **Escalations** in your agent dashboard.
+
+### Auto-Escalation on Low Confidence
+
+| Setting | Description |
+|---------|-------------|
+| **Enable Auto-Escalate** | Automatically create tickets when confidence is low |
+| **Confidence Threshold** | Minimum confidence score (0-100%) before escalation |
+| **Delay** | Wait time before escalating (allows user to clarify) |
+
+<Tip>
+  Set the confidence threshold to 40-50% to catch genuinely uncertain responses without over-escalating.
+</Tip>
+
+### SLA Configuration
+
+Define response time expectations:
+
+| Setting | Description |
+|---------|-------------|
+| **Target Response Time** | Expected time for first human response |
+| **Escalation Priority** | Default priority level (low, medium, high, urgent) |
+| **Business Hours** | When human support is available |
+
+### Notification Channels
+
+Configure how your team is notified:
+
+#### Email Notifications
+
+- **Recipients** — Email addresses to notify
+- **Include Transcript** — Attach conversation history
+- **Frequency** — Immediate or batched (hourly digest)
+
+#### Slack Notifications
+
+1. Connect your Slack workspace in **Integrations** → **Slack**
+2. Select the channel for escalation alerts
+3. Configure message format and mentions
+
+#### Webhook Notifications
+
+Send escalation data to your own systems:
+
+```json
+{
+  "type": "escalation.created",
+  "data": {
+    "escalationId": "esc_abc123",
+    "conversationId": "conv_xyz789",
+    "reason": "low_confidence",
+    "confidence": 35,
+    "priority": "medium",
+    "customerEmail": "jane@example.com",
+    "transcript": [
+      { "role": "user", "content": "..." },
+      { "role": "assistant", "content": "..." }
+    ]
+  }
+}
+```
+
+## Widget Settings
+
+### Escalation Button
+
+Control the "Talk to Human" button visibility:
+
+| Option | Description |
+|--------|-------------|
+| **Always Show** | Button visible on every message |
+| **After Threshold** | Show after N messages or low confidence |
+| **Never** | Hide button (escalation still possible via phrases) |
+
+### Escalation Button Label
+
+Customize the button text:
+
+- Default: "Talk to a human"
+- Examples: "Contact Support", "Get Help", "Speak to Agent"
+
+### Confirmation Message
+
+The message shown after escalation:
+
+```
+Your request has been escalated to our support team.
+We typically respond within 2 hours during business hours.
+```
+
+## Managing Escalations
+
+### Escalation Dashboard
+
+View all escalations at **Conversations** → **Escalations**:
+
+| Column | Description |
+|--------|-------------|
+| **Status** | Open, In Progress, Resolved |
+| **Priority** | Urgent, High, Medium, Low |
+| **Assigned To** | Team member handling the ticket |
+| **Created** | When the escalation was triggered |
+| **SLA Status** | On track, At risk, Breached |
+
+### Responding to Escalations
+
+1. Click an escalation to view the full conversation
+2. Review the AI's responses and confidence scores
+3. Type your response in the reply box
+4. Click **Send** — the customer receives your message in the widget
+
+### Resolving Escalations
+
+When the issue is resolved:
+
+1. Click **Resolve** on the escalation
+2. Optionally add a resolution note
+3. The AI resumes handling the conversation
+
+### Re-enabling AI
+
+After resolution, the AI automatically resumes. To keep AI paused:
+
+- Toggle **Keep AI Paused** before resolving
+- Manually re-enable via the conversation menu
+
+## Best Practices
+
+### Tune Confidence Thresholds
+
+1. Start with a 50% threshold
+2. Review escalated conversations weekly
+3. Adjust based on false positive rate
+
+### Set Realistic SLAs
+
+- Consider your team's capacity
+- Account for timezone coverage
+- Build in buffer for complex issues
+
+### Train Your AI
+
+Reduce escalations by:
+
+- Adding common questions to your knowledge base
+- Improving system prompt for edge cases
+- Creating tools for frequent actions
+
+### Monitor Escalation Metrics
+
+Track in **Analytics** → **Escalations**:
+
+- **Escalation Rate** — % of conversations escalated
+- **Resolution Time** — Average time to resolve
+- **SLA Compliance** — % meeting response targets
+- **Top Reasons** — Why escalations happen
+
+## API Reference
+
+### Create Escalation
+
+```bash
+POST /conversations/{conversationId}/escalate
+```
+
+**Request Body:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `reason` | string | Reason for escalation |
+| `priority` | string | `low`, `medium`, `high`, `urgent` |
+| `assignTo` | string | Team member email (optional) |
+
+### Update Escalation
+
+```bash
+PATCH /escalations/{escalationId}
+```
+
+**Request Body:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `status` | string | `open`, `in_progress`, `resolved` |
+| `priority` | string | Updated priority |
+| `assignTo` | string | Reassign to team member |
+| `note` | string | Internal note |
+
+### List Escalations
+
+```bash
+GET /escalations?agentId={agentId}&status=open
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Confidence Scores" icon="gauge" href="/user-guides/confidence-scores">
+    Understand how confidence affects escalations
+  </Card>
+  <Card title="Slack Integration" icon="slack" href="/integrations/slack">
+    Set up Slack notifications
+  </Card>
+</CardGroup>

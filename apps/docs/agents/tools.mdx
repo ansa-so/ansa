@@ -1,0 +1,144 @@
+---
+title: Custom Tools
+description: "Connect APIs to give your agent actions"
+---
+
+## Overview
+
+Tools allow your agent to take actions by calling external APIs. Examples:
+
+- Check order status from your e-commerce platform
+- Create support tickets in your helpdesk
+- Book appointments in your calendar
+- Look up customer information in your CRM
+
+## Creating a Tool
+
+<Steps>
+  <Step title="Navigate to Tools">
+    Go to your agent's **Tools** tab.
+  </Step>
+  <Step title="Add new tool">
+    Click **Add Tool** and provide:
+    - **Name**: How the AI refers to the tool
+    - **Description**: When to use the tool (important for AI decision-making)
+  </Step>
+  <Step title="Define parameters">
+    Specify what inputs the tool needs. For example, an order lookup tool might need an `orderId` parameter.
+  </Step>
+  <Step title="Configure execution">
+    Set up the HTTP endpoint:
+    - **URL**: The API endpoint to call
+    - **Method**: GET, POST, PUT, DELETE
+    - **Headers**: Authentication, content-type, etc.
+  </Step>
+</Steps>
+
+## Tool Schema
+
+Tools use JSON Schema to define their parameters:
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "orderId": {
+      "type": "string",
+      "description": "The order ID to look up"
+    }
+  },
+  "required": ["orderId"]
+}
+```
+
+<Tip>
+  Write clear descriptions for each parameter. The AI uses these to understand what values to pass.
+</Tip>
+
+## HTTP Configuration
+
+### URL Templates
+
+Use `{{paramName}}` syntax to inject parameters into URLs:
+
+```
+https://api.example.com/orders/{{orderId}}
+```
+
+### Request Body
+
+For POST/PUT requests, the body is automatically populated with the tool parameters as JSON.
+
+### Headers
+
+Common headers to configure:
+
+```json
+{
+  "Authorization": "Bearer your-api-key",
+  "Content-Type": "application/json"
+}
+```
+
+## Example: Order Lookup
+
+Here's a complete example for an order status tool:
+
+**Name:** `check_order_status`
+
+**Description:**
+```
+Use this tool when a customer asks about their order status, shipping, or delivery.
+Requires an order ID which usually starts with "ORD-".
+```
+
+**Parameters:**
+```json
+{
+  "type": "object",
+  "properties": {
+    "orderId": {
+      "type": "string",
+      "description": "The order ID (e.g., ORD-12345)"
+    }
+  },
+  "required": ["orderId"]
+}
+```
+
+**URL:** `https://api.yourstore.com/orders/{{orderId}}`
+
+**Method:** GET
+
+**Headers:**
+```json
+{
+  "Authorization": "Bearer sk-xxx"
+}
+```
+
+## Tool Limits
+
+| Plan | Tools per Agent |
+|------|-----------------|
+| Free | 3 |
+| Starter | 5 |
+| Growth | 10 |
+| Pro | Unlimited |
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Write clear descriptions">
+    The AI decides when to use tools based on descriptions. Be specific about when the tool should be used.
+  </Accordion>
+  <Accordion title="Handle errors gracefully">
+    Your API should return clear error messages that the AI can relay to users.
+  </Accordion>
+  <Accordion title="Keep responses concise">
+    Return only the data the AI needs. Large responses slow down processing.
+  </Accordion>
+  <Accordion title="Test thoroughly">
+    Test each tool with various inputs before deploying to production.
+  </Accordion>
+</AccordionGroup>

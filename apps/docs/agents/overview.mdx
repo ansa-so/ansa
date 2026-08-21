@@ -1,0 +1,77 @@
+---
+title: Agent Overview
+description: "Understanding how Ansa agents work"
+---
+
+## What is an Agent?
+
+An agent is an AI-powered chatbot that can:
+
+- Answer questions using context from your knowledge base
+- Execute actions through custom tools and APIs
+- Stream responses in real-time
+- Remember conversation history
+
+## Agent Settings
+
+### AI Quality
+
+Select the AI quality tier that balances response quality with speed:
+
+| Tier | Best For | Description |
+|------|----------|-------------|
+| **Fast** | High-volume, simple queries | Optimized for speed and cost. Best for straightforward Q&A, quick lookups, and high-traffic scenarios. |
+| **Balanced** | Most use cases | Good balance of quality and speed. Recommended for general customer support and knowledge base queries. |
+| **High Quality** | Complex reasoning | Maximum quality for nuanced responses. Best for technical support, detailed explanations, and complex problem-solving. |
+
+The system automatically selects the best available model for your chosen quality tier.
+
+<Tip>
+  Start with **Balanced** for most use cases. Switch to **Fast** if you need lower latency or have high message volumes, or **High Quality** for complex technical support.
+</Tip>
+
+### System Prompt
+
+The system prompt defines your agent's personality and behavior. Write clear instructions:
+
+```
+You are a customer support agent for TechCorp.
+
+Guidelines:
+- Be friendly and professional
+- Answer questions about our products
+- If you don't know something, say so
+- Never make up information
+- For billing issues, direct users to support@techcorp.com
+```
+
+### Temperature
+
+Controls response creativity:
+
+- **Low (0-30)**: More focused, deterministic responses
+- **Medium (40-60)**: Balanced creativity
+- **High (70-100)**: More varied, creative responses
+
+For support agents, use lower temperature. For creative applications, use higher.
+
+## Managing Agents
+
+### Creating an Agent
+
+1. Go to **Dashboard**
+2. Click **New Agent**
+3. Enter name and description
+4. Configure settings
+5. Add knowledge and tools
+
+### Agent Limits
+
+Limits depend on your plan:
+
+| Plan | Agents | Tools per Agent | Storage |
+|------|--------|-----------------|----------|
+| Free | 1 | 1 | 400 KB |
+| Starter | 1 | 3 | 5 MB |
+| Growth | 3 | 10 | 34 MB |
+| Pro | Unlimited | Unlimited | 100 MB |

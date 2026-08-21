@@ -1,0 +1,508 @@
+---
+title: JavaScript SDK
+description: "Server-side and client-side SDK for Node.js, browsers, and TypeScript"
+---
+
+The Ansa SDK provides a type-safe way to interact with the Ansa API from Node.js, browsers, or any JavaScript runtime. It includes both an API client for server-side integrations and helper functions for controlling the widget.
+
+## Installation
+
+<CodeGroup>
+```bash npm
+npm install @ansa-so/sdk
+```
+
+```bash pnpm
+pnpm add @ansa-so/sdk
+```
+
+```bash yarn
+yarn add @ansa-so/sdk
+```
+</CodeGroup>
+
+## Quick Start
+
+### API Client
+
+Use `AnsaClient` for server-side API access:
+
+```typescript
+import { AnsaClient } from "@ansa-so/sdk";
+
+const ansa = new AnsaClient({
+  apiKey: process.env.ANSA_API_KEY!,
+});
+
+// Send a message and get a response
+const response = await ansa.chat("agent_abc123", "What are your hours?");
+console.log(response.message);
+```
+
+### Widget Control
+
+Use the widget helpers for client-side control:
+
+```typescript
+import { embedWidget, openWidget, identify } from "@ansa-so/sdk";
+
+// Embed the widget (alternative to script tag)
+embedWidget({
+  agentId: "agent_abc123",
+});
+
+// Identify the logged-in user
+identify({
+  userId: "user_456",
+  userMetadata: {
+    name: "Jane Smith",
+    email: "jane@example.com",
+  },
+});
+
+// Open the chat when user clicks a button
+document.getElementById("help-btn")?.addEventListener("click", () => {
+  openWidget("I need help with my account");
+});
+```
+
+## API Client Reference
+
+### Configuration
+
+```typescript
+interface AnsaConfig {
+  /** Your Ansa API key (required) */
+  apiKey: string;
+  /** API base URL (default: https://api.ansa.so) */
+  baseUrl?: string;
+  /** Request timeout in milliseconds (default: 30000) */
+  timeout?: number;
+}
+```
+
+Create a client:
+
+```typescript
+import { AnsaClient, createClient } from "@ansa-so/sdk";
+
+// Using constructor
+const ansa = new AnsaClient({
+  apiKey: "ansa_sk_...",
+  timeout: 60000, // 60 second timeout
+});
+
+// Using factory function
+const ansa = createClient({
+  apiKey: "ansa_sk_...",
+});
+```
+
+### Chat Methods
+
+#### `chat(agentId, message, options?)`
+
+Send a message and receive a complete response.
+
+```typescript
+const response = await ansa.chat("agent_id", "Hello!", {
+  conversationId: "conv_123", // Continue existing conversation
+  metadata: {
+    source: "mobile-app",
+    userId: "user_456",
+  },
+});
+
+console.log(response.message);        // "Hi! How can I help?"
+console.log(response.conversationId); // "conv_789"
+console.log(response.messageId);      // "msg_abc"
+console.log(response.toolCalls);      // [{ id, name, args, result }]
+```
+
+**Options:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `conversationId` | `string` | Continue an existing conversation |
+| `metadata` | `Record<string, unknown>` | Visitor metadata passed to the agent |
+
+**Response:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `message` | `string` | The agent's response text |
+| `conversationId` | `string` | Conversation ID for follow-ups |
+| `messageId` | `string` | Unique message identifier |
+| `toolCalls` | `ToolCall[]` | Tools executed during response |
+
+#### `chatStream(agentId, message, callbacks, options?)`
+
+Stream responses token-by-token for real-time display.
+
+```typescript
+await ansa.chatStream(
+  "agent_id",
+  "Explain quantum computing",
+  {
+    onToken: (token) => {
+      // Append each token as it arrives
+      process.stdout.write(token);
+    },
+    onToolCall: (toolCall) => {
+      console.log(`Tool called: ${toolCall.name}`);
+    },
+    onMessage: (response) => {
+      // Full response when complete
+      console.log("\n\nFull message:", response.message);
+    },
+    onError: (error) => {
+      console.error("Stream error:", error);
+    },
+    onComplete: () => {
+      console.log("Stream finished");
+    },
+  },
+  { conversationId: "conv_123" }
+);
+```
+
+**Callbacks:**
+
+| Callback | Parameters | Description |
+|----------|------------|-------------|
+| `onToken` | `(token: string)` | Called for each streamed token |
+| `onToolCall` | `(toolCall: ToolCall)` | Called when a tool is executed |
+| `onMessage` | `(response: ChatResponse)` | Called with complete response |
+| `onError` | `(error: Error)` | Called on stream error |
+| `onComplete` | `()` | Called when stream ends |
+
+### Agent Methods
+
+#### `getAgents()`
+
+List all agents in your organization.
+
+```typescript
+const agents = await ansa.getAgents();
+
+for (const agent of agents) {
+  console.log(`${agent.name} (${agent.id})`);
+  console.log(`  Model: ${agent.model}`);
+  console.log(`  Temperature: ${agent.temperature}`);
+}
+```
+
+#### `getAgent(agentId)`
+
+Get details for a specific agent.
+
+```typescript
+const agent = await ansa.getAgent("agent_abc123");
+
+console.log(agent.name);         // "Sales Assistant"
+console.log(agent.systemPrompt); // "You are a helpful..."
+console.log(agent.model);        // "gpt-4o"
+```
+
+**Agent Object:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | `string` | Unique agent identifier |
+| `name` | `string` | Agent display name |
+| `systemPrompt` | `string` | System prompt/instructions |
+| `model` | `string` | AI model (e.g., "gpt-4o") |
+| `temperature` | `number` | Response randomness (0-1) |
+| `createdAt` | `string` | ISO timestamp |
+| `updatedAt` | `string` | ISO timestamp |
+
+### Conversation Methods
+
+#### `getConversations(agentId)`
+
+List all conversations for an agent.
+
+```typescript
+const conversations = await ansa.getConversations("agent_abc123");
+
+for (const conv of conversations) {
+  console.log(`${conv.id}: ${conv.messages.length} messages`);
+}
+```
+
+#### `getConversation(conversationId)`
+
+Get a conversation with its full message history.
+
+```typescript
+const conversation = await ansa.getConversation("conv_xyz789");
+
+for (const message of conversation.messages) {
+  console.log(`${message.role}: ${message.content}`);
+}
+```
+
+**Conversation Object:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | `string` | Conversation identifier |
+| `agentId` | `string` | Associated agent ID |
+| `messages` | `Message[]` | Array of messages |
+| `createdAt` | `string` | ISO timestamp |
+| `updatedAt` | `string` | ISO timestamp |
+
+## Widget Functions
+
+These functions control the embedded widget from your application code. They automatically queue commands if the widget isn't ready yet, using an internal command queue that processes once the widget is initialized.
+
+### Command Queue Pattern
+
+The SDK uses a command queue to handle cases where you call widget functions before the widget is fully loaded:
+
+```typescript
+import { openWidget, identify } from "@ansa-so/sdk";
+
+// These calls are safe even before the widget loads
+// They're queued and executed once the widget is ready
+identify({
+  userId: "user_123",
+  userMetadata: { name: "Jane" }
+});
+
+openWidget("How can I help?");
+```
+
+Under the hood, the SDK checks `window.ansa?.isReady()` and either executes immediately or queues the command:
+
+```typescript
+// Internal SDK pattern (for reference)
+function enqueueOrExecute(command: () => void) {
+  const api = window.ansa;
+  if (api?.isReady?.()) {
+    command();
+  } else {
+    commandQueue.push(command);
+    startQueueProcessor(); // Polls every 100ms until ready
+  }
+}
+```
+
+<Tip>
+  You don't need to manually wait for the widget—the SDK handles this automatically. But if you need to know when the widget is ready, use `window.ansa.onReady()` or listen for the `ansa:ready` event.
+</Tip>
+
+### `embedWidget(config)`
+
+Programmatically embed the widget (alternative to the script tag).
+
+```typescript
+import { embedWidget } from "@ansa-so/sdk";
+
+embedWidget({
+  agentId: "agent_abc123",
+  apiUrl: "https://api.ansa.so",      // optional
+  widgetUrl: "https://widget.ansa.so", // optional
+});
+```
+
+### `openWidget(message?)`
+
+Open the chat widget, optionally with a pre-filled message.
+
+```typescript
+import { openWidget } from "@ansa-so/sdk";
+
+// Just open
+openWidget();
+
+// Open with message
+openWidget("I'd like to schedule a demo");
+```
+
+### `closeWidget()`
+
+Close the chat widget.
+
+```typescript
+import { closeWidget } from "@ansa-so/sdk";
+
+closeWidget();
+```
+
+### `toggleWidget()`
+
+Toggle the widget open/closed.
+
+```typescript
+import { toggleWidget } from "@ansa-so/sdk";
+
+toggleWidget();
+```
+
+### `isWidgetOpen()` / `isWidgetReady()`
+
+Check widget state.
+
+```typescript
+import { isWidgetOpen, isWidgetReady } from "@ansa-so/sdk";
+
+if (isWidgetReady() && !isWidgetOpen()) {
+  openWidget();
+}
+```
+
+### `showBubbles(messages, duration?)`
+
+Show notification bubbles near the widget button.
+
+```typescript
+import { showBubbles, hideBubbles } from "@ansa-so/sdk";
+
+// Single message
+showBubbles("Need help?");
+
+// Multiple messages (appear sequentially)
+showBubbles(["👋 Welcome!", "Ask me anything"], 10);
+
+// Hide bubbles
+hideBubbles();
+```
+
+### `showForm(form, options?)`
+
+Display a form in the widget. See [Triggering Forms](/developer-guides/triggering-forms) for details.
+
+```typescript
+import { showForm } from "@ansa-so/sdk";
+
+// Server-side form by name
+showForm("contact_form");
+
+// Client-side form with schema
+showForm(
+  {
+    fields: [
+      { name: "email", label: "Email", type: "email" },
+      { name: "message", label: "Message", type: "textarea" },
+    ],
+    submitButtonText: "Send",
+  },
+  {
+    onSubmit: (data) => console.log("Form submitted:", data),
+    onCancel: () => console.log("Form cancelled"),
+    sendToAgent: true, // Also send as chat message
+  }
+);
+```
+
+### `identify(identity)` / `clearIdentity()`
+
+Set or clear user identity. Identity is used for:
+- **Form pre-filling** — Fields automatically populate from `userMetadata`
+- **HTTP tool authentication** — Pass tokens to your APIs via `{{userMetadata.token}}` syntax
+- **Personalization** — Agent receives user context for personalized responses
+
+See [Identity](/developer-guides/identity) for details.
+
+```typescript
+import { identify, clearIdentity } from "@ansa-so/sdk";
+
+// On login - include auth token for API calls
+identify({
+  userId: "user_123",
+  userMetadata: {
+    name: "Jane Smith",
+    email: "jane@example.com",
+    plan: "pro",
+    authToken: "eyJhbG...",  // Passed to HTTP tools via {{userMetadata.authToken}}
+  },
+});
+
+// On logout
+clearIdentity();
+```
+
+### `getVisitorId()`
+
+Get the anonymous visitor ID.
+
+```typescript
+import { getVisitorId } from "@ansa-so/sdk";
+
+const visitorId = getVisitorId();
+// "v_1703347200000_abc123def"
+```
+
+### `triggerEvent(eventName, data?)`
+
+Fire a custom event for trigger automation.
+
+```typescript
+import { triggerEvent } from "@ansa-so/sdk";
+
+// Trigger when user views pricing
+triggerEvent("viewed_pricing", {
+  plan: "enterprise",
+  source: "navbar",
+});
+```
+
+## Error Handling
+
+The SDK throws `AnsaError` for API errors:
+
+```typescript
+import { AnsaClient, AnsaError } from "@ansa-so/sdk";
+
+const ansa = new AnsaClient({ apiKey: "..." });
+
+try {
+  await ansa.chat("invalid_agent", "Hello");
+} catch (error) {
+  if (error instanceof AnsaError) {
+    console.error(`API Error: ${error.message}`);
+    console.error(`Status: ${error.statusCode}`);
+    console.error(`Code: ${error.code}`);
+  }
+}
+```
+
+**AnsaError Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `message` | `string` | Human-readable error message |
+| `statusCode` | `number` | HTTP status code |
+| `code` | `string?` | Machine-readable error code |
+
+## TypeScript
+
+The SDK is written in TypeScript and exports all types:
+
+```typescript
+import type {
+  AnsaConfig,
+  Agent,
+  Message,
+  ChatOptions,
+  ChatResponse,
+  ToolCall,
+  Conversation,
+  StreamCallbacks,
+  FormSchema,
+  FormField,
+  ShowFormOptions,
+} from "@ansa-so/sdk";
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Widget API" icon="comment" href="/developer-guides/widget-api">
+    Full widget API reference
+  </Card>
+  <Card title="Triggering Forms" icon="file-lines" href="/developer-guides/triggering-forms">
+    Display forms programmatically
+  </Card>
+</CardGroup>

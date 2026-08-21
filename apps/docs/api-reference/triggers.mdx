@@ -1,0 +1,455 @@
+---
+title: Triggers API
+description: "Create automated actions based on user behavior"
+---
+
+Triggers let you automate actions based on user behavior — like opening the chat when someone scrolls down, showing a form after time on page, or displaying a message on exit intent.
+
+## Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/triggers` | List triggers for an agent |
+| `GET` | `/triggers/:id` | Get a specific trigger |
+| `GET` | `/triggers/stats` | Get trigger statistics |
+| `GET` | `/triggers/templates` | List trigger templates |
+| `POST` | `/triggers` | Create a new trigger |
+| `PUT` | `/triggers/:id` | Update a trigger |
+| `DELETE` | `/triggers/:id` | Delete a trigger |
+| `POST` | `/triggers/:id/toggle` | Toggle enabled state |
+
+### Widget Endpoints (Public)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/triggers/widget/:agentId` | Get active triggers for widget |
+| `POST` | `/triggers/event` | Record a trigger event |
+| `GET` | `/triggers/form/:toolIdOrName` | Get form schema for trigger |
+
+## List Triggers
+
+```bash
+GET /triggers?agentId={agentId}
+```
+
+### Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `agentId` | `string` | Yes | The agent ID |
+
+### Response
+
+```json
+[
+  {
+    "id": "trig_abc123",
+    "agentId": "agent_xyz789",
+    "name": "Welcome Message",
+    "description": "Show welcome after 10 seconds",
+    "triggerType": "time_on_page",
+    "conditions": {
+      "timeOnPage": 10
+    },
+    "actionType": "show_bubble",
+    "actionConfig": {
+      "message": "👋 Need help finding something?"
+    },
+    "triggerOnce": true,
+    "isEnabled": true,
+    "priority": 0,
+    "createdAt": "2024-12-20T10:00:00.000Z",
+    "updatedAt": "2024-12-20T10:00:00.000Z"
+  }
+]
+```
+
+## Get Trigger
+
+```bash
+GET /triggers/{id}
+```
+
+Returns a single trigger object.
+
+## Get Trigger Stats
+
+```bash
+GET /triggers/stats?agentId={agentId}
+```
+
+Get performance statistics for all triggers.
+
+### Response
+
+```json
+{
+  "trig_abc123": {
+    "firedCount": 1250,
+    "convertedCount": 87
+  },
+  "trig_def456": {
+    "firedCount": 430,
+    "convertedCount": 23
+  }
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `firedCount` | Number of times trigger was activated |
+| `convertedCount` | Number of times user engaged after trigger |
+
+## List Templates
+
+```bash
+GET /triggers/templates
+```
+
+Get pre-built trigger templates from the marketplace.
+
+### Response
+
+```json
+[
+  {
+    "id": "template_welcome",
+    "name": "Welcome Message",
+    "description": "Greet visitors after 10 seconds",
+    "triggerType": "time_on_page",
+    "conditions": { "timeOnPage": 10 },
+    "actionType": "show_bubble",
+    "actionConfig": { "message": "👋 Hi! How can I help?" }
+  }
+]
+```
+
+## Create Trigger
+
+```bash
+POST /triggers?agentId={agentId}
+```
+
+### Request Body
+
+```json
+{
+  "name": "Exit Intent Popup",
+  "description": "Show offer when user tries to leave",
+  "triggerType": "exit_intent",
+  "conditions": {},
+  "actionType": "show_form",
+  "actionConfig": {
+    "toolId": "tool_abc123"
+  },
+  "triggerOnce": true,
+  "isEnabled": true,
+  "priority": 10
+}
+```
+
+### Parameters
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | `string` | Yes | Display name for the trigger |
+| `description` | `string` | No | Description of what the trigger does |
+| `triggerType` | `string` | Yes | Type of trigger (see below) |
+| `conditions` | `object` | Yes | Conditions for activation |
+| `actionType` | `string` | Yes | Action to perform |
+| `actionConfig` | `object` | Yes | Action configuration |
+| `triggerOnce` | `boolean` | No | Only fire once per session (default: true) |
+| `isEnabled` | `boolean` | No | Whether trigger is active (default: true) |
+| `priority` | `number` | No | Execution order (lower = first) |
+
+### Trigger Types
+
+| Type | Description | Conditions |
+|------|-------------|------------|
+| `time_on_page` | After user spends X seconds | `timeOnPage: number` |
+| `scroll_depth` | After scrolling X% of page | `scrollDepth: number (0-100)` |
+| `exit_intent` | When mouse leaves viewport | None |
+| `page_view` | When visiting specific page | `page: string` (glob pattern) |
+| `custom_event` | When custom event fires | `event: string`, `eventData?: object` |
+
+### Action Types
+
+| Type | Description | Config |
+|------|-------------|--------|
+| `open_chat` | Opens the chat widget | `message?: string` (pre-filled) |
+| `show_form` | Displays a form | `toolId: string` |
+| `show_bubble` | Shows notification bubble | `message: string`, `duration?: number` |
+
+### Response
+
+```json
+{
+  "id": "trig_abc123",
+  "agentId": "agent_xyz789",
+  "name": "Exit Intent Popup",
+  "triggerType": "exit_intent",
+  "conditions": {},
+  "actionType": "show_form",
+  "actionConfig": { "toolId": "tool_abc123" },
+  "triggerOnce": true,
+  "isEnabled": true,
+  "priority": 10,
+  "createdAt": "2024-12-20T10:00:00.000Z",
+  "updatedAt": "2024-12-20T10:00:00.000Z"
+}
+```
+
+## Update Trigger
+
+```bash
+PUT /triggers/{id}
+```
+
+### Request Body
+
+Only include fields you want to update:
+
+```json
+{
+  "conditions": {
+    "timeOnPage": 15
+  },
+  "isEnabled": false
+}
+```
+
+### Response
+
+Returns the updated trigger object.
+
+## Delete Trigger
+
+```bash
+DELETE /triggers/{id}
+```
+
+### Response
+
+```json
+{
+  "success": true
+}
+```
+
+## Toggle Trigger
+
+```bash
+POST /triggers/{id}/toggle
+```
+
+Quickly enable or disable a trigger.
+
+### Response
+
+Returns the updated trigger with `isEnabled` toggled.
+
+## Widget Endpoints
+
+These public endpoints are used by the widget to fetch and record triggers.
+
+### Get Widget Triggers
+
+```bash
+GET /triggers/widget/{agentId}
+```
+
+Returns only enabled triggers with minimal fields for the widget:
+
+```json
+[
+  {
+    "id": "trig_abc123",
+    "name": "Welcome Message",
+    "triggerType": "time_on_page",
+    "conditions": { "timeOnPage": 10 },
+    "actionType": "show_bubble",
+    "actionConfig": { "message": "👋 Need help?" },
+    "triggerOnce": true,
+    "priority": 0
+  }
+]
+```
+
+### Record Trigger Event
+
+```bash
+POST /triggers/event
+```
+
+Record when a trigger fires or converts.
+
+#### Request Body
+
+```json
+{
+  "agentId": "agent_xyz789",
+  "triggerId": "trig_abc123",
+  "triggerName": "Welcome Message",
+  "triggerType": "time_on_page",
+  "actionType": "show_bubble",
+  "eventType": "fired",
+  "sessionId": "sess_123",
+  "pagePath": "/pricing"
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `agentId` | `string` | Yes | Agent ID |
+| `triggerId` | `string` | No | Trigger ID (if known) |
+| `triggerName` | `string` | Yes | Trigger name |
+| `triggerType` | `string` | Yes | Trigger type |
+| `actionType` | `string` | Yes | Action type |
+| `eventType` | `string` | Yes | `fired` or `converted` |
+| `sessionId` | `string` | No | Session identifier |
+| `pagePath` | `string` | No | Current page path |
+
+#### Rate Limits
+
+- 100 events per minute per session/IP
+- Returns `429` when exceeded
+
+### Get Form for Trigger
+
+```bash
+GET /triggers/form/{toolIdOrName}
+```
+
+Fetch form schema when a `show_form` trigger fires.
+
+```json
+{
+  "toolId": "tool_abc123",
+  "toolName": "contact_form",
+  "formSchema": {
+    "fields": [
+      { "name": "email", "label": "Email", "type": "email" }
+    ]
+  },
+  "executionMode": "webhook",
+  "clientHandler": null
+}
+```
+
+## Examples
+
+### Time-Based Welcome
+
+Show a message after 10 seconds:
+
+```bash
+curl -X POST "https://api.ansa.so/triggers?agentId=agent_xyz789" \
+  -H "Authorization: Bearer $ANSA_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Welcome Message",
+    "triggerType": "time_on_page",
+    "conditions": { "timeOnPage": 10 },
+    "actionType": "show_bubble",
+    "actionConfig": {
+      "message": "👋 Hi! Looking for something specific?",
+      "duration": 10
+    }
+  }'
+```
+
+### Scroll-Triggered Form
+
+Show lead form after 50% scroll:
+
+```bash
+curl -X POST "https://api.ansa.so/triggers?agentId=agent_xyz789" \
+  -H "Authorization: Bearer $ANSA_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Scroll Lead Capture",
+    "triggerType": "scroll_depth",
+    "conditions": { "scrollDepth": 50 },
+    "actionType": "show_form",
+    "actionConfig": { "toolId": "tool_lead_form" }
+  }'
+```
+
+### Exit Intent Offer
+
+Open chat when user tries to leave:
+
+```bash
+curl -X POST "https://api.ansa.so/triggers?agentId=agent_xyz789" \
+  -H "Authorization: Bearer $ANSA_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Exit Intent",
+    "triggerType": "exit_intent",
+    "conditions": {},
+    "actionType": "open_chat",
+    "actionConfig": {
+      "message": "Wait! Can I help you find what you are looking for?"
+    }
+  }'
+```
+
+### Page-Specific Trigger
+
+Show help on pricing page:
+
+```bash
+curl -X POST "https://api.ansa.so/triggers?agentId=agent_xyz789" \
+  -H "Authorization: Bearer $ANSA_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Pricing Help",
+    "triggerType": "page_view",
+    "conditions": { "page": "/pricing/*" },
+    "actionType": "show_bubble",
+    "actionConfig": {
+      "message": "Questions about pricing? I can help!"
+    }
+  }'
+```
+
+### Custom Event Trigger
+
+React to custom events from your code:
+
+```bash
+curl -X POST "https://api.ansa.so/triggers?agentId=agent_xyz789" \
+  -H "Authorization: Bearer $ANSA_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Cart Abandonment",
+    "triggerType": "custom_event",
+    "conditions": {
+      "event": "cart_abandoned",
+      "eventData": { "cartValue": { "$gt": 100 } }
+    },
+    "actionType": "open_chat",
+    "actionConfig": {
+      "message": "Noticed you have items in your cart. Any questions?"
+    }
+  }'
+```
+
+Then fire from your code:
+
+```javascript
+ansa.trigger("cart_abandoned", { cartValue: 150 });
+```
+
+## Condition Patterns
+
+### Page Matching
+
+The `page` condition supports glob patterns:
+
+| Pattern | Matches |
+|---------|---------|
+| `/pricing` | Exact match |
+| `/pricing/*` | `/pricing/starter`, `/pricing/pro` |
+| `/blog/**` | Any path under `/blog/` |
+| `/docs/**/api` | `/docs/v1/api`, `/docs/v2/guides/api` |

@@ -1,0 +1,97 @@
+---
+title: Authentication
+description: "Authenticate with the Ansa API"
+---
+
+## API Keys
+
+API keys provide programmatic access to the Ansa API.
+
+### Generating a Key
+
+1. Go to **Settings > API** in your dashboard
+2. Click **Generate API Key**
+3. Copy the key immediately - it won't be shown again
+
+### Using API Keys
+
+Include the key in the `Authorization` header:
+
+```bash
+curl -X GET https://api.ansa.so/agents \
+  -H "Authorization: Bearer ansa_sk_xxxxxxxxxxxxxxxx"
+```
+
+### Key Permissions
+
+API keys have the same permissions as your account:
+- Access to all your agents
+- Ability to create/update/delete resources
+- Usage counts against your plan limits
+
+<Warning>
+  Keep your API keys secure. Never expose them in client-side code or public repositories.
+</Warning>
+
+## Session Authentication
+
+For dashboard and widget authentication, Ansa uses cookie-based sessions:
+
+### Sign In
+
+```bash
+POST /auth/sign-in/email
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "your-password"
+}
+```
+
+### Magic Link
+
+```bash
+POST /auth/magic-link
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "callbackUrl": "https://app.example.com/auth/callback"
+}
+```
+
+### OAuth
+
+Redirect users to:
+
+```
+GET /auth/sign-in/google
+GET /auth/sign-in/github
+```
+
+## Widget Authentication
+
+The chat widget uses a separate authentication flow for end-users:
+
+### Anonymous Sessions
+
+By default, widget users are anonymous. A session ID is stored in localStorage.
+
+### Identified Users
+
+Pass user information to track conversations:
+
+```javascript
+window.__ansa_config = {
+  agentId: "xxx",
+  userId: "user_123",
+  userEmail: "customer@example.com",
+  userName: "John Doe"
+};
+```
+
+This allows you to:
+- Track conversations by user
+- See user information in the dashboard
+- Build user-aware responses

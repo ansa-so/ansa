@@ -1,0 +1,48 @@
+{
+	"name": "ansa",
+	"private": true,
+	"scripts": {
+		"build": "turbo build --filter=@ansa/api --filter=@ansa/dashboard",
+		"build:all": "turbo build",
+		"dev": "turbo dev --filter=@ansa/api --filter=@ansa/dashboard",
+		"dev:all": "turbo dev",
+		"lint": "biome check .",
+		"lint:fix": "biome check --write .",
+		"format": "biome format --write .",
+		"type-check": "turbo type-check",
+		"clean": "turbo clean && rm -rf node_modules",
+		"db:migrate": "dotenv -- pnpm --filter @ansa/db db:migrate",
+		"db:generate": "dotenv -- pnpm --filter @ansa/db db:generate",
+		"db:push": "dotenv -- pnpm --filter @ansa/db db:push",
+		"db:studio": "dotenv -- pnpm --filter @ansa/db db:studio",
+		"db:sql": "dotenv -- pnpm --filter @ansa/db db:sql",
+		"docs:screenshots": "tsx scripts/screenshot-crawler.ts",
+		"test:marketing-widget": "tsx scripts/check-marketing-widget.ts",
+		"test:shopify-image": "tsx scripts/check-shopify-image.ts",
+		"test:widget-styles": "tsx scripts/check-widget-inline-styles.ts",
+		"generate:email-icons": "tsx scripts/generate-email-icons.ts",
+		"widget:release": "pnpm --filter @ansa/widget release",
+		"shopify:deploy": "shopify app deploy"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.5.9",
+		"dotenv-cli": "^8.0.0",
+		"playwright": "^1.62.1",
+		"tsx": "^4.23.12",
+		"turbo": "^2.10.10",
+		"typescript": "^5.7.2"
+	},
+	"packageManager": "pnpm@9.14.4",
+	"engines": {
+		"node": ">=20"
+	},
+	"workspaces": [
+		"apps/*",
+		"packages/*"
+	],
+	"pnpm": {
+		"overrides": {
+			"protobufjs": ">=7.5.5"
+		}
+	}
+}

@@ -1,0 +1,15 @@
+{
+	"extends": "../../tsconfig.json",
+	"compilerOptions": {
+		"outDir": "./dist",
+		"rootDir": ".",
+		"noEmit": false,
+		// This is an application, not a published library. Emitting declarations
+		// forces tsc to name types across pnpm's symlinked tree, which fails on
+		// socket.io's internal typed-events module (TS2742).
+		"declaration": false,
+		"jsx": "react-jsx"
+	},
+	"include": ["src/**/*", "emails/**/*"],
+	"exclude": ["node_modules", "dist"]
+}

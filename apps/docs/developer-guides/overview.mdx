@@ -1,0 +1,220 @@
+---
+title: Developer Guides
+description: "Integrate Ansa into your applications with our SDK, Widget API, and webhooks"
+---
+
+This section covers everything you need to programmatically integrate Ansa into your applications. Whether you're building a custom chat experience, syncing data with external systems, or personalizing conversations based on user identity.
+
+## Choose Your Integration
+
+<CardGroup cols={2}>
+  <Card
+    title="JavaScript SDK"
+    icon="npm"
+    href="/developer-guides/sdk"
+  >
+    Server-side and client-side SDK for Node.js, browsers, and TypeScript. Full API access with streaming support.
+  </Card>
+  <Card
+    title="Widget API"
+    icon="comment"
+    href="/developer-guides/widget-api"
+  >
+    Control the chat widget programmatically — open, close, send messages, and listen to events.
+  </Card>
+  <Card
+    title="Forms & Triggers"
+    icon="file-lines"
+    href="/developer-guides/triggering-forms"
+  >
+    Trigger forms programmatically and handle submissions with custom callbacks.
+  </Card>
+  <Card
+    title="User Identity"
+    icon="user"
+    href="/developer-guides/identity"
+  >
+    Pass user context to personalize conversations and pre-fill forms with known data.
+  </Card>
+  <Card
+    title="Custom Events"
+    icon="bolt"
+    href="/developer-guides/custom-events"
+  >
+    Track user actions and trigger automations based on custom events.
+  </Card>
+  <Card
+    title="Webhooks"
+    icon="webhook"
+    href="/developer-guides/webhooks"
+  >
+    Receive real-time notifications when conversations happen or forms are submitted.
+  </Card>
+</CardGroup>
+
+## Quick Start
+
+### Option 1: Embed Script (Recommended)
+
+The simplest way to add Ansa to your site. Add this script before the closing `</body>` tag:
+
+```html
+<script src="https://cdn.ansa.so/embed.js?agentId=YOUR_AGENT_ID"></script>
+```
+
+The `ansa` object is automatically available on `window` for programmatic control:
+
+```javascript
+// Open the chat widget
+ansa.open();
+
+// Open with a pre-filled message
+ansa.open("I need help with my order");
+
+// Close the widget
+ansa.close();
+
+// Identify the current user
+ansa.identify({
+  userId: "user_123",
+  userMetadata: {
+    name: "Jane Smith",
+    email: "jane@example.com",
+    plan: "pro"
+  }
+});
+```
+
+#### Waiting for Widget Ready
+
+The widget loads asynchronously. To ensure the widget is ready before calling methods:
+
+```javascript
+// Option 1: onReady callback (recommended)
+window.ansa?.onReady(() => {
+  ansa.identify({ userId: "user_123" });
+  ansa.open("Welcome back!");
+});
+
+// Option 2: Event listener
+window.addEventListener('ansa:ready', () => {
+  ansa.identify({ userId: "user_123" });
+});
+
+// Option 3: Polling helper
+function waitForAnsa(callback) {
+  if (window.ansa?.isReady?.()) {
+    callback();
+  } else {
+    setTimeout(() => waitForAnsa(callback), 100);
+  }
+}
+
+waitForAnsa(() => {
+  ansa.open();
+});
+```
+
+<Tip>
+  Use `onReady` when you need to run code immediately after the widget initializes. The callback fires immediately if the widget is already ready.
+</Tip>
+
+### Option 2: JavaScript SDK
+
+For server-side integrations or custom chat interfaces, install the SDK:
+
+```bash
+npm install @ansa-so/sdk
+```
+
+```typescript
+import { AnsaClient } from "@ansa-so/sdk";
+
+const ansa = new AnsaClient({
+  apiKey: "ansa_sk_...",
+});
+
+// Send a message and get a response
+const response = await ansa.chat("agent_id", {
+  message: "What are your business hours?",
+  conversationId: "conv_123", // optional, for multi-turn
+});
+
+console.log(response.message);
+```
+
+## API Overview
+
+### Widget API Methods
+
+The `ansa` object exposes these methods when using the embed script:
+
+| Method | Description |
+|--------|-------------|
+| `ansa.open(message?)` | Open the chat widget, optionally with a pre-filled message |
+| `ansa.close()` | Close the chat widget |
+| `ansa.toggle()` | Toggle the widget open/closed state |
+| `ansa.isOpen()` | Returns `true` if the widget is currently open |
+| `ansa.isReady()` | Returns `true` if the widget has finished initializing |
+| `ansa.onReady(callback)` | Execute callback when widget is ready (fires immediately if already ready) |
+| `ansa.identify(identity)` | Set user identity and metadata |
+| `ansa.resetUser()` | Clear user identity |
+| `ansa.showForm(form, options)` | Display a form in the widget |
+| `ansa.showBubbles(messages, duration?)` | Show notification bubbles |
+| `ansa.hideBubbles()` | Hide notification bubbles |
+| `ansa.trigger(eventName, data?)` | Fire a custom event for triggers |
+| `ansa.getVisitorId()` | Get the anonymous visitor ID |
+
+### SDK Methods
+
+The `AnsaClient` provides full API access:
+
+| Method | Description |
+|--------|-------------|
+| `chat(agentId, options)` | Send a message and receive a response |
+| `streamChat(agentId, options, callbacks)` | Stream responses token-by-token |
+| `getAgent(agentId)` | Retrieve agent configuration |
+| `listAgents()` | List all agents in your organization |
+| `getConversation(id)` | Get conversation history |
+| `listConversations(agentId)` | List conversations for an agent |
+
+## Architecture
+
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│   Your Site     │     │   Ansa Widget   │     │   Ansa API      │
+│                 │     │   (iframe)      │     │                 │
+│  ┌───────────┐  │     │                 │     │  ┌───────────┐  │
+│  │ ansa.open │──┼────▶│   Chat UI       │────▶│  │  /chat    │  │
+│  │ ansa.id.. │  │     │                 │     │  │  /agents  │  │
+│  └───────────┘  │     │                 │◀────│  │  /tools   │  │
+│                 │     │                 │     │  └───────────┘  │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+                                                        │
+                                                        ▼
+                                                ┌─────────────────┐
+                                                │   Your Server   │
+                                                │   (webhooks)    │
+                                                └─────────────────┘
+```
+
+The widget runs in an iframe for security isolation. Your page communicates with the widget via `postMessage`, and the widget communicates with the Ansa API. Webhooks notify your server of events in real-time.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="SDK Reference"
+    icon="book"
+    href="/developer-guides/sdk"
+  >
+    Complete SDK documentation with TypeScript types
+  </Card>
+  <Card
+    title="Widget Customization"
+    icon="palette"
+    href="/widget/customization"
+  >
+    Customize the widget appearance and behavior
+  </Card>
+</CardGroup>

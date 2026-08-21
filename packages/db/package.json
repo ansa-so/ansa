@@ -1,0 +1,39 @@
+{
+	"name": "@ansa/db",
+	"version": "0.0.1",
+	"private": true,
+	"type": "module",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"types": "./dist/index.d.ts"
+		}
+	},
+	"scripts": {
+		"build": "tsup src/index.ts --format esm --dts --external @ansa/types",
+		"dev": "tsup src/index.ts --format esm --dts --watch --external @ansa/types",
+		"type-check": "tsc --noEmit",
+		"lint": "biome check src",
+		"lint:fix": "biome check --write src",
+		"db:generate": "npx tsx node_modules/drizzle-kit/bin.cjs generate",
+		"db:migrate": "tsx src/migrate.ts",
+		"db:push": "npx tsx node_modules/drizzle-kit/bin.cjs push",
+		"db:studio": "npx tsx node_modules/drizzle-kit/bin.cjs studio",
+		"db:sql": "tsx scripts/run-sql.ts"
+	},
+	"dependencies": {
+		"@ansa/types": "workspace:*",
+		"dotenv": "^17.4.2",
+		"drizzle-orm": "^0.45.2",
+		"postgres": "^3.4.9"
+	},
+	"devDependencies": {
+		"@types/node": "^26.2.0",
+		"drizzle-kit": "^0.31.10",
+		"tsup": "^8.5.1",
+		"tsx": "^4.23.12",
+		"typescript": "^5.7.2"
+	}
+}

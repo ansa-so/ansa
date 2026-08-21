@@ -1,0 +1,239 @@
+---
+title: Widget Customization
+description: "Match the chat widget to your brand"
+---
+
+## Configuration Options
+
+Customize the widget appearance using `window.__ansa_config`:
+
+```html
+<script>
+  window.__ansa_config = {
+    agentId: "your-agent-id",
+    apiUrl: "https://api.ansa.so",
+    url: "https://widget.ansa.so",
+
+    // Appearance
+    theme: "light",
+    primaryColor: "#6366f1",
+    chatBubbleColor: "#6366f1",
+
+    // Branding
+    displayName: "Acme Support",
+    profilePicture: "https://example.com/avatar.png",
+
+    // Messages
+    initialMessage: "Hi! How can I help you today?",
+    messagePlaceholder: "Type your question...",
+    footerMessage: "Powered by Acme Corp"
+  };
+</script>
+<script src="https://cdn.ansa.so/embed.js"></script>
+```
+
+## All Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `agentId` | string | Required | Your agent identifier |
+| `apiUrl` | string | Required | Ansa API URL |
+| `url` | string | Required | Widget URL |
+| `theme` | string | `"light"` | `"light"` or `"dark"` |
+| `primaryColor` | string | `"#3b82f6"` | Header and button color |
+| `chatBubbleColor` | string | `"#3b82f6"` | User message bubble color |
+| `widgetButtonColor` | string | `"#3b82f6"` | Floating button background color |
+| `buttonIcon` | string | `null` | Custom button icon (emoji, URL, or uploaded image) |
+| `buttonIconType` | string | `null` | Icon type: `"emoji"`, `"url"`, or `"upload"` |
+| `displayName` | string | `"AI Assistant"` | Bot name in header |
+| `profilePicture` | string | `null` | Bot avatar URL |
+| `initialMessage` | string | `"Hello! How can I help you today?"` | Welcome message |
+| `suggestedMessages` | array | `[]` | Quick reply buttons |
+| `messagePlaceholder` | string | `"Type a message..."` | Input placeholder text |
+| `footerMessage` | string | `null` | Footer text |
+| `showPoweredBy` | boolean | `true` | Show "Powered by Ansa" branding |
+| `dismissibleMessage` | string | `null` | Dismissible banner |
+| `welcomeBubbles` | array | `[]` | Floating welcome bubbles |
+| `disableAi` | boolean | `false` | Disable AI responses, route all to human inbox |
+| `escalationButtonLabel` | string | `"Talk to a human"` | Text for escalation button |
+| `language` | string | `"en"` | Widget language code |
+
+<Tip>
+  Most of these settings can be configured in the dashboard under **Settings > Widget**. The embed code will automatically use your saved settings.
+</Tip>
+
+## Theme Options
+
+### Light Theme
+
+```javascript
+{
+  theme: "light",
+  primaryColor: "#3b82f6"
+}
+```
+
+### Dark Theme
+
+```javascript
+{
+  theme: "dark",
+  primaryColor: "#6366f1"
+}
+```
+
+## Suggested Messages
+
+Add quick-reply buttons that appear at the start of a conversation:
+
+```javascript
+{
+  suggestedMessages: [
+    "What are your business hours?",
+    "I need help with my order",
+    "Pricing information"
+  ]
+}
+```
+
+## Welcome Bubbles
+
+Show floating message bubbles that animate in when the widget loads:
+
+```javascript
+{
+  welcomeBubbles: [
+    "👋 Hi there!",
+    "Have a question? I'm here to help."
+  ]
+}
+```
+
+## Remove Branding
+
+On **Growth** and **Pro** plans, you can customize or remove the footer:
+
+```javascript
+{
+  footerMessage: "Support by YourCompany"
+  // or
+  footerMessage: "" // Empty to hide
+}
+```
+
+<Note>
+  Removing branding is available on Growth and Pro plans only.
+</Note>
+
+## User Feedback
+
+By default, thumbs up/down buttons appear on assistant messages to collect user feedback. You can toggle this in the dashboard under **Settings > Widget > Collect User Feedback**.
+
+Feedback is tracked in your analytics and helps you identify areas for improvement.
+
+## Button Customization
+
+Customize the floating chat button appearance:
+
+### Custom Icon
+
+Use an emoji, URL, or uploaded image as the button icon:
+
+```javascript
+{
+  // Emoji icon
+  buttonIcon: "💬",
+  buttonIconType: "emoji",
+
+  // Or URL icon
+  buttonIcon: "https://example.com/chat-icon.png",
+  buttonIconType: "url",
+
+  // Or uploaded image (from dashboard)
+  buttonIcon: "https://cdn.ansa.so/uploads/xxx.png",
+  buttonIconType: "upload"
+}
+```
+
+### Button Color
+
+```javascript
+{
+  widgetButtonColor: "#6366f1"  // Indigo button
+}
+```
+
+## Escalation Settings
+
+Configure how users can request human support:
+
+```javascript
+{
+  // Custom button label
+  escalationButtonLabel: "Contact Support",
+
+  // Or disable AI entirely (all messages go to human inbox)
+  disableAi: true
+}
+```
+
+See [Escalations & Human Handoff](/user-guides/escalations) for full escalation configuration.
+
+## Multi-language Support
+
+Override widget text for different languages:
+
+```javascript
+{
+  // Set the language
+  language: "es",
+
+  // Override specific strings via dashboard or API
+}
+```
+
+You can also change the language dynamically:
+
+```javascript
+ansa.setLanguage("fr");
+```
+
+See [Multi-language](/widget/multi-language) for the full list of supported languages.
+
+## Full Example
+
+```html
+<script>
+  window.__ansa_config = {
+    agentId: "agent_xxx",
+    apiUrl: "https://api.ansa.so",
+    url: "https://widget.ansa.so",
+
+    // Theme
+    theme: "light",
+    primaryColor: "#6366f1",
+    chatBubbleColor: "#6366f1",
+
+    // Branding
+    displayName: "Acme Support",
+    profilePicture: "https://acme.com/support-avatar.png",
+
+    // Messages
+    initialMessage: "Hi! I'm Acme's AI assistant. How can I help you today?",
+    suggestedMessages: [
+      "Track my order",
+      "Return policy",
+      "Contact human support"
+    ],
+    messagePlaceholder: "Ask me anything...",
+    footerMessage: "Powered by Acme AI",
+
+    // Welcome
+    welcomeBubbles: [
+      "👋 Need help?",
+      "Ask me anything about Acme!"
+    ]
+  };
+</script>
+<script src="https://cdn.ansa.so/embed.js"></script>
+```

@@ -1,0 +1,551 @@
+---
+title: Shopify Integration
+description: "Connect your Shopify store to power AI customer support"
+---
+
+The Shopify integration connects your store to Ansa, enabling AI-powered customer support that understands your products, orders, and policies. Answer customer questions, handle refund requests, and display products directly in chat.
+
+## Features
+
+<CardGroup cols={2}>
+  <Card title="Knowledge Sync" icon="database">
+    Auto-import products, orders, and customers. Your agent learns your entire catalog.
+  </Card>
+  <Card title="One-Click Widget" icon="code">
+    Install the chat widget on your storefront instantly. No code required.
+  </Card>
+  <Card title="Smart Q&A" icon="message-square">
+    AI answers questions using your store data—order status, products, shipping.
+  </Card>
+  <Card title="Refund Handling" icon="wallet">
+    Customers request refunds via chat. Review and approve from your dashboard.
+  </Card>
+  <Card title="Page-Aware Context" icon="map-pin">
+    Agent knows what page customers are viewing. Ask "what colors?" and it knows which product.
+  </Card>
+  <Card title="Rich Components" icon="layout">
+    Display slideshows, forms, product carousels, and more directly in chat.
+  </Card>
+</CardGroup>
+
+## Getting Started
+
+### Prerequisites
+
+- A Shopify store (any plan)
+- A Ansa account (Starter plan or higher)
+- Admin access to your Shopify store
+
+### Step 1: Connect Your Store
+
+1. Visit the [Shopify App Store](https://apps.shopify.com/ansa) and click **Install**
+2. Authorize Ansa in your Shopify admin
+3. You'll be redirected to the Ansa dashboard automatically
+
+### Step 2: Link an Agent
+
+1. After connecting, click **Link Agent**
+2. Select an existing agent or create new
+3. Configure sync settings
+4. Click **Save**
+
+### Step 3: Install Widget
+
+1. Click **Install Widget**
+2. Ansa adds the chat widget to your storefront
+3. Widget appears on all pages automatically
+
+No theme editing required—it's automatic!
+
+## Knowledge Sync
+
+Ansa syncs your store data to power intelligent responses.
+
+### What Gets Synced
+
+| Data | Used For |
+|------|----------|
+| **Products** | Answer product questions, show recommendations |
+| **Collections** | Category-based queries |
+| **Policies** | Returns, shipping, privacy questions |
+| **Store info** | Contact, hours, about us |
+
+### Manual Sync
+
+Trigger a sync anytime:
+
+1. Go to **Integrations** → **Shopify**
+2. Find your store
+3. Click **Sync Now**
+
+### Automatic Sync
+
+Data syncs automatically:
+- When you first connect
+- When products are updated in Shopify (via webhooks)
+- Daily refresh to catch any changes
+
+## Product Display
+
+Show products beautifully in chat conversations.
+
+### How It Works
+
+When your agent mentions products, they can display:
+- Product image
+- Title and description
+- Price (with sale price if applicable)
+- Variants (size, color, etc.)
+- Add to cart button
+
+### Example Conversation
+
+> **Customer:** Do you have running shoes?
+>
+> **Agent:** Yes! Here are our most popular running shoes:
+>
+> [Product Card: Nike Air Zoom - $129.99]
+> [Product Card: Adidas Ultraboost - $189.99]
+>
+> Would you like details on any of these?
+
+### Configuring Products
+
+Products are automatically available through the synced knowledge base. Train your agent to recommend products:
+
+```
+When a customer asks about products, search the product catalog
+and display up to 3 relevant products with the product_display tool.
+```
+
+## Page-Aware Context
+
+Your agent automatically knows what page customers are viewing, enabling natural conversations without repetitive questions.
+
+### How It Works
+
+When a customer opens the chat widget, Ansa captures:
+- **Current page URL** — Product page, collection, cart, etc.
+- **Product details** — If on a product page, the full product info
+- **Collection context** — What category they're browsing
+- **Cart contents** — What's in their cart
+
+This context is automatically passed to your agent, enabling intelligent responses.
+
+### Example Conversations
+
+**On a product page:**
+> **Customer:** What colors does this come in?
+>
+> **Agent:** The Classic Oxford Shirt comes in Navy, White, and Light Blue. All colors are currently in stock!
+
+No need to ask "which product?" — the agent already knows.
+
+**Browsing a collection:**
+> **Customer:** Which of these is best for running?
+>
+> **Agent:** From our Athletic Footwear collection, I'd recommend the Nike Air Zoom for daily training or the Adidas Ultraboost for long-distance comfort.
+
+**With items in cart:**
+> **Customer:** Will these fit together?
+>
+> **Agent:** Great choices! The Medium shirt and 32" jeans you've selected are a classic combination. Want me to check size availability?
+
+### Benefits
+
+- **Faster resolutions** — Skip "which product?" back-and-forth
+- **Natural conversations** — Customers ask questions like they would in a store
+- **Smarter recommendations** — Suggest complementary items based on what they're viewing
+- **Reduced friction** — Context-aware support feels effortless
+
+<Info>
+Page context is captured automatically. No configuration required—just connect your store.
+</Info>
+
+## Rich Chat Components
+
+Go beyond plain text with interactive components that showcase your products and collect information beautifully.
+
+### Available Components
+
+<CardGroup cols={2}>
+  <Card title="Product Cards" icon="square">
+    Display products with images, prices, variants, and add-to-cart buttons.
+  </Card>
+  <Card title="Product Slideshows" icon="images">
+    Carousel of multiple products customers can swipe through.
+  </Card>
+  <Card title="Interactive Forms" icon="rectangle-list">
+    Collect information with styled inputs, dropdowns, and validation.
+  </Card>
+  <Card title="Quick Replies" icon="message-circle">
+    Clickable suggestion buttons for common responses.
+  </Card>
+</CardGroup>
+
+### Product Slideshow
+
+Show multiple products in a swipeable carousel:
+
+> **Customer:** Show me your best sellers
+>
+> **Agent:** Here are our top 5 best sellers this month:
+>
+> [← Product Slideshow: 5 products →]
+>
+> Swipe to browse, or tap any product for details!
+
+Perfect for:
+- Product recommendations
+- Collection highlights
+- Cross-sells and upsells
+- New arrivals
+
+### Interactive Forms
+
+Collect structured information with beautiful forms:
+
+- **Return requests** — Order number, reason, item selection
+- **Contact forms** — Pre-filled with customer data when logged in
+- **Size finder** — Height, weight, fit preference
+- **Custom orders** — Specifications, quantities, preferences
+
+Forms support:
+- Text inputs and text areas
+- Dropdown selects
+- Radio buttons and checkboxes
+- Date pickers
+- File uploads
+- Field validation
+
+### Quick Reply Buttons
+
+Guide conversations with clickable options:
+
+> **Agent:** How can I help you today?
+>
+> [Track Order] [Return Item] [Product Question] [Talk to Human]
+
+Reduces typing and speeds up resolution.
+
+### Configuring Components
+
+Components are controlled through your agent's tools:
+
+1. Go to **Agents** → Select agent → **Tools**
+2. Enable desired component tools
+3. Train your agent when to use each
+
+Example instruction:
+```
+When showing 3+ products, use the slideshow component.
+For single products, use a product card.
+Always offer quick replies for common next steps.
+```
+
+## Refund Handling
+
+Let customers request refunds through chat, then manage them in your dashboard.
+
+### Customer Experience
+
+1. Customer asks about refund
+2. Agent collects order number and reason
+3. Agent submits refund request
+4. Customer receives confirmation
+
+### Managing Refunds
+
+1. Go to **Integrations** → **Shopify** → **Refunds**
+2. View pending refund requests
+3. For each request, see:
+   - Order details
+   - Items to refund
+   - Customer reason
+   - Conversation link
+4. Click **Approve** or **Reject**
+
+### Auto-Approve
+
+Save time on small refunds:
+
+1. Go to store settings in Shopify integration
+2. Enable **Auto-Approve Refunds**
+3. Set maximum amount (e.g., $25)
+4. Refunds under threshold are approved automatically
+
+<Warning>
+Auto-approved refunds are processed immediately and cannot be undone. Start with a low threshold.
+</Warning>
+
+## Widget Installation
+
+### Automatic Installation
+
+Ansa installs the widget via Shopify's Script Tag API:
+
+1. Click **Install Widget** in the integration
+2. Widget is added to your store's `<head>`
+3. Appears on all storefront pages
+
+### Customization
+
+Widget appearance syncs with your Ansa settings:
+
+1. Go to **Settings** → **Widget**
+2. Customize colors, position, launcher
+3. Changes apply to Shopify automatically
+
+### Removal
+
+To remove the widget:
+
+1. Go to **Integrations** → **Shopify**
+2. Click store menu (⋯)
+3. Select **Uninstall Widget**
+
+Or disconnect the store entirely.
+
+## Customer Identification
+
+Ansa automatically identifies logged-in Shopify customers to personalize conversations and pre-fill forms.
+
+### How It Works
+
+When a customer is logged into your Shopify store, Ansa automatically:
+- Identifies them by their Shopify customer ID
+- Loads their profile information
+- Pre-fills forms with their details
+- Enriches agent context with order history
+
+This happens transparently on every page load—no action required from customers.
+
+### What Data Is Captured
+
+| Field | Used For | Example |
+|-------|----------|---------|
+| **Email** | Identity, form pre-fill | jane@example.com |
+| **Name** | Personalization, greetings | Jane Smith |
+| **Order Count** | Conversation context | 5 orders |
+| **Total Spent** | VIP treatment, tiering | $499.50 |
+| **Customer Tags** | Segmentation, routing | `vip`, `wholesale` |
+| **Customer Since** | Relationship context | 2023-01-15 |
+| **Marketing Status** | Compliance | Opted in |
+
+### Benefits
+
+**Personalized Greetings**
+```
+Agent: "Hi Jane! Welcome back. I see you've ordered from us 5 times!"
+```
+
+**Automatic Form Pre-fill**
+
+When customers submit forms (contact, returns, etc.), their email and name are automatically filled in—no typing required.
+
+**Contextual Support**
+
+Your agent can see:
+- Past order history
+- Total customer value
+- Customer tags (VIP, wholesale, etc.)
+- Whether they've had issues before
+
+This enables agents to provide more personalized, informed responses.
+
+### Privacy & Data Handling
+
+<Info>
+All customer data is handled in accordance with Shopify's customer privacy policies and your store's privacy policy. Data is only used to enhance the support experience.
+</Info>
+
+**What's Stored:**
+- Customer information is encrypted in transit and at rest
+- Data is only accessible to your agents during conversations
+- No sensitive payment or password information is ever captured
+
+**Customer Control:**
+- Identification only works when customers are logged in
+- Logging out clears all identification data
+- Customers can request data deletion per your store's privacy policy
+
+### Guest Customers
+
+For customers who aren't logged in (guests):
+- No identification occurs
+- Forms are shown blank for manual entry
+- Agent provides standard (non-personalized) support
+
+Guest customers can still receive excellent support—they just won't have the convenience of automatic identification.
+
+### Technical Details
+
+The identification system uses:
+- Shopify Liquid templates to access customer data
+- The widget's `.identify()` method to pass data
+- Automatic cleanup on logout via `.resetUser()`
+
+This all happens client-side in the browser, keeping the implementation simple and fast.
+
+## Order Lookups
+
+Your agent can look up order information for customers.
+
+### What Customers Can Ask
+
+- "Where is my order?"
+- "What's the status of order #1234?"
+- "When will my package arrive?"
+- "What did I order last month?"
+
+### Required Information
+
+For order lookups, agents ask for:
+- Order number, OR
+- Email address used for order
+
+### Response Example
+
+> **Customer:** Where is my order #1234?
+>
+> **Agent:** I found your order! Here's the status:
+>
+> **Order #1234**
+> - Status: Shipped
+> - Carrier: UPS
+> - Tracking: 1Z999AA10123456784
+> - Estimated delivery: December 28
+>
+> [Track Package →]
+
+## Store Settings
+
+Configure per-store settings in the integration.
+
+### Agent Settings
+
+| Setting | Description |
+|---------|-------------|
+| Linked Agent | Which agent handles this store |
+| Knowledge Sync | What data to sync |
+| Widget Enabled | Show widget on storefront |
+
+### Refund Settings
+
+| Setting | Description |
+|---------|-------------|
+| Allow Refunds | Enable refund requests via chat |
+| Auto-Approve | Automatically approve small refunds |
+| Max Auto Amount | Maximum amount for auto-approval |
+
+## Multi-Store Support
+
+Connect multiple Shopify stores to one Ansa account.
+
+### Setup
+
+1. Connect first store normally
+2. Return to **Integrations** → **Shopify**
+3. Click **Connect Another Store**
+4. Repeat setup process
+
+### Agent Assignment
+
+Each store can have:
+- **Same agent** — Unified support experience
+- **Different agents** — Customized per brand
+
+### Considerations
+
+- Each store counts toward your agent limit
+- Knowledge bases are separate per store
+- Billing is per account, not per store
+
+## Troubleshooting
+
+### Widget Not Appearing
+
+**Check:**
+- Widget is installed (green indicator)
+- No JavaScript errors on page
+- Theme isn't blocking third-party scripts
+
+**Solution:**
+1. Click **Reinstall Widget**
+2. Clear Shopify cache
+3. Check browser console for errors
+
+### Products Not Syncing
+
+**Check:**
+- Products are published
+- App has required permissions
+- Last sync wasn't too long ago
+
+**Solution:**
+1. Click **Sync Now**
+2. Check sync status
+3. Verify permissions in Shopify admin
+
+### Refund Requests Missing
+
+**Check:**
+- Refund tool is enabled
+- Agent is trained to use refund flow
+- Customer provided order details
+
+**Solution:** Review conversation to see where flow stopped.
+
+### Disconnected Store
+
+If store shows as disconnected:
+1. Click **Reconnect**
+2. Re-authorize in Shopify
+3. Widget and settings are preserved
+
+## API Access
+
+Access Shopify integration via API for custom workflows.
+
+### Get Connected Stores
+
+```bash
+curl "https://api.ansa.so/shopify/shops" \
+  -H "Authorization: Bearer $ANSA_API_KEY"
+```
+
+### Sync Store
+
+```bash
+curl -X POST "https://api.ansa.so/shopify/shops/{shopId}/sync" \
+  -H "Authorization: Bearer $ANSA_API_KEY"
+```
+
+### List Refund Requests
+
+```bash
+curl "https://api.ansa.so/shopify/refunds?shopId=xxx" \
+  -H "Authorization: Bearer $ANSA_API_KEY"
+```
+
+## Best Practices
+
+<Tip>
+Start with common questions. Sync your store, then review what customers actually ask before building complex flows.
+</Tip>
+
+1. **Keep policies updated** — Sync after changing return/shipping policies
+2. **Test the widget** — Place test orders and try the customer experience
+3. **Monitor refunds** — Review auto-approved refunds weekly
+4. **Train specifically** — Add Shopify-specific instructions to your agent
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Widget Customization" icon="palette" href="/widget/customization">
+    Match the widget to your brand
+  </Card>
+  <Card title="Form Tools" icon="rectangle-list" href="/tools/form-tools">
+    Collect customer information
+  </Card>
+</CardGroup>

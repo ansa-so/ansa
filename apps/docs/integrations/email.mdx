@@ -1,0 +1,330 @@
+---
+title: Email Channel
+description: "Let your AI agent respond to emails automatically"
+---
+
+The email channel allows your AI agent to receive and respond to emails. Customers can email your support address, and your agent responds using your knowledge base—just like the chat widget but over email.
+
+## How It Works
+
+1. **Email arrives** at your agent's inbound address
+2. **Agent processes** the email using your knowledge base
+3. **Response sent** back to the customer
+4. **Conversation tracked** in your dashboard
+
+All email conversations appear alongside widget chats, so you have a unified view of all customer interactions.
+
+## Getting Started
+
+### Prerequisites
+
+- A Ansa account (Starter plan or higher)
+- An agent with knowledge base content
+- Access to configure email forwarding (for custom domains)
+
+### Step 1: Enable Email Channel
+
+1. Go to **Channels** → **Email**
+2. Select an agent
+3. Toggle **Enabled** on
+4. Note your inbound address (e.g., `agent-abc123@mail.ansa.so`)
+
+### Step 2: Forward Emails
+
+Set up email forwarding from your support address to your agent's inbound address.
+
+**Common providers:**
+
+<CardGroup cols={2}>
+  <Card title="Gmail" icon="google">
+    Settings → Forwarding → Add address
+  </Card>
+  <Card title="Outlook" icon="microsoft">
+    Settings → Mail → Forwarding
+  </Card>
+  <Card title="Zendesk" icon="headset">
+    Admin → Channels → Email → Forwarding
+  </Card>
+  <Card title="Other" icon="envelope">
+    Check your email provider's forwarding docs
+  </Card>
+</CardGroup>
+
+### Step 3: Configure Settings
+
+Customize how your agent handles emails:
+
+1. Go to **Channels** → **Email**
+2. Configure display name, signature, etc.
+3. Save settings
+
+## Configuration Options
+
+### Basic Settings
+
+| Setting | Description |
+|---------|-------------|
+| **Display Name** | Name shown in "From" field (e.g., "Acme Support") |
+| **Reply Address** | Where replies go (optional, defaults to inbound) |
+| **Signature** | Text appended to every email |
+| **Subject Prefix** | Text prepended to subject lines |
+
+### Email Content
+
+| Setting | Description |
+|---------|-------------|
+| **Disclaimer Enabled** | Add a disclaimer to emails |
+| **Disclaimer Text** | The disclaimer content |
+| **Include Original** | Quote the original message in replies |
+
+### Security & Filtering
+
+| Setting | Description |
+|---------|-------------|
+| **Allowed Domains** | Only accept emails from these domains |
+| **Blocked Senders** | Reject emails from these addresses |
+| **CC Address** | Copy all responses to this address |
+| **Alert Contact** | Email for system alerts |
+
+## Confidence-Based Routing
+
+Route emails based on how confident your agent is in its response.
+
+### How It Works
+
+1. Agent receives email
+2. Searches knowledge base for relevant content
+3. Calculates confidence score
+4. Takes action based on threshold
+
+### Configuration
+
+1. Go to **Channels** → **Email**
+2. Set **Confidence Threshold** (e.g., 70%)
+3. Choose **Low Confidence Action**:
+   - **Forward** — Send to a human for review
+   - **Draft** — Save response but don't send
+   - **Send Anyway** — Send with disclaimer
+
+### Forward to Human
+
+For low-confidence responses:
+
+1. Set **Forward To Email** (your support team)
+2. The agent forwards:
+   - Original customer email
+   - Drafted response
+   - Confidence score
+   - Conversation link
+
+Your team reviews and sends manually if appropriate.
+
+## Custom Domain
+
+Use your own domain instead of `mail.ansa.so`.
+
+### Setup
+
+1. Go to **Channels** → **Email** → **Domain**
+2. Click **Add Domain**
+3. Enter your domain (e.g., `support.yourcompany.com`)
+4. Add the DNS records shown:
+   - SPF record
+   - DKIM record
+   - MX record (optional)
+5. Click **Verify**
+
+### DNS Records Example
+
+```
+Type: TXT
+Name: @
+Value: v=spf1 include:amazonses.com ~all
+
+Type: CNAME
+Name: ansa._domainkey
+Value: dkim.resend.com
+
+Type: MX (optional)
+Name: support
+Value: mail.ansa.so
+Priority: 10
+```
+
+<Tip>
+DNS changes can take up to 48 hours to propagate. You can still use the default inbound address while waiting.
+</Tip>
+
+## Threading & Conversations
+
+Emails are automatically threaded into conversations.
+
+### How Threading Works
+
+- Replies to existing threads continue the conversation
+- New subjects start new conversations
+- Thread ID tracked via email headers
+
+### Viewing Conversations
+
+1. Go to **Conversations**
+2. Filter by **Email** channel
+3. Click to view full thread
+
+Each message shows:
+- Sender
+- Timestamp
+- Confidence score
+- Original email content
+
+## Auto-Learn
+
+Improve your agent automatically from email interactions.
+
+### How It Works
+
+When enabled:
+1. Agent analyzes incoming questions
+2. Identifies knowledge gaps
+3. Suggests additions to knowledge base
+4. You approve or reject suggestions
+
+### Configuration
+
+1. Go to **Channels** → **Email**
+2. Toggle **Auto-Learn Enabled**
+3. Review suggestions in **Knowledge Base**
+
+## Email Formatting
+
+### Outgoing Emails
+
+Agent responses are formatted as clean HTML emails:
+- Markdown converted to HTML
+- Mobile-friendly styling
+- Plain text fallback included
+
+### Incoming Emails
+
+The agent processes:
+- Plain text emails
+- HTML emails (converted to text)
+- Email threads (extracts latest message)
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Start Conservative" icon="shield">
+    Set high confidence threshold initially
+  </Card>
+  <Card title="Monitor Closely" icon="eye">
+    Review email conversations daily at first
+  </Card>
+  <Card title="Build Knowledge" icon="book">
+    Add content based on common questions
+  </Card>
+  <Card title="Human Backup" icon="user">
+    Always have a forward address for edge cases
+  </Card>
+</CardGroup>
+
+### Gradual Rollout
+
+1. **Week 1:** Forward only, review all drafts
+2. **Week 2:** Auto-send high confidence (90%+)
+3. **Week 3:** Lower threshold to 80%
+4. **Ongoing:** Adjust based on feedback
+
+### Quality Checks
+
+- Review low-confidence forwards weekly
+- Check for patterns in forwarded emails
+- Update knowledge base with missing info
+- Monitor customer satisfaction
+
+## Troubleshooting
+
+### Emails Not Arriving
+
+**Check:**
+- Forwarding is configured correctly
+- Inbound address is correct
+- Email isn't in spam/junk
+- Sender isn't in blocked list
+
+**Test:** Send a test email to your inbound address.
+
+### Responses Not Sending
+
+**Check:**
+- Email channel is enabled
+- Agent has content in knowledge base
+- Confidence threshold isn't too high
+- Low confidence action is set correctly
+
+### Wrong Response Format
+
+**Check:**
+- Signature is configured
+- Display name is set
+- Subject prefix is correct
+
+### Threading Issues
+
+**Check:**
+- Email client preserves thread headers
+- Subject line isn't modified
+- Reply is to the same thread
+
+## API Access
+
+### Get Email Settings
+
+```bash
+curl "https://api.ansa.so/email/settings/{agentId}" \
+  -H "Authorization: Bearer $ANSA_API_KEY"
+```
+
+### Update Email Settings
+
+```bash
+curl -X POST "https://api.ansa.so/email/settings/{agentId}" \
+  -H "Authorization: Bearer $ANSA_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "displayName": "Acme Support",
+    "enabled": true,
+    "confidenceThreshold": 70,
+    "lowConfidenceAction": "forward",
+    "forwardToEmail": "support@example.com"
+  }'
+```
+
+### Verify Domain
+
+```bash
+curl -X POST "https://api.ansa.so/email/verify-domain" \
+  -H "Authorization: Bearer $ANSA_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"domain": "support.example.com"}'
+```
+
+## Limits & Quotas
+
+| Limit | Value |
+|-------|-------|
+| Email size | 25 MB max |
+| Attachments | Not processed (text extracted) |
+| Rate limit | 100 emails/minute |
+| Thread depth | 50 messages max |
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Confidence Scores" icon="gauge" href="/user-guides/confidence-scores">
+    Understand response confidence
+  </Card>
+  <Card title="Knowledge Base" icon="book" href="/agents/knowledge-base">
+    Improve agent responses
+  </Card>
+</CardGroup>

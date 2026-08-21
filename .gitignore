@@ -1,0 +1,52 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Build outputs
+dist
+.next
+.turbo
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Testing
+coverage
+
+# Misc
+*.tsbuildinfo
+.claude
+
+# Docs build output
+apps/docs/out/*
+apps/docs/.wrangler/
+.wrangler
+
+# widget build artifact (produced by `pnpm --filter @ansa/widget release`)
+apps/widget/embed.js
+
+# Internal agent scratch space and editor config
+agents/
+.claude-code.json
+SECURITY_HARDENING.md
+SETTINGS_MIGRATION_STATUS.md
+
+# Written at container start from the environment
+apps/dashboard/public/runtime-config.js

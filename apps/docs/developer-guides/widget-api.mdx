@@ -1,0 +1,479 @@
+---
+title: Widget API
+description: "Control the chat widget programmatically with the window.ansa API"
+---
+
+When you embed the Ansa widget using the script tag, a `ansa` object is automatically exposed on the `window` object. This API lets you programmatically control the widget — open/close the chat, show forms, identify users, and trigger automations.
+
+## Basic Setup
+
+Add the embed script to your page:
+
+```html
+<script src="https://cdn.ansa.so/embed.js?agentId=YOUR_AGENT_ID"></script>
+```
+
+The `ansa` object is available immediately after the script loads:
+
+```javascript
+// Check if widget is ready
+if (ansa.isReady()) {
+  ansa.open();
+}
+```
+
+## API Reference
+
+### `ansa.open(message?)`
+
+Opens the chat widget. Optionally pre-fill the input with a message.
+
+```javascript
+// Just open the chat
+ansa.open();
+
+// Open with a pre-filled message
+ansa.open("I need help with my order #12345");
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `message` | `string?` | Optional message to pre-fill in the input |
+
+### `ansa.close()`
+
+Closes the chat widget.
+
+```javascript
+ansa.close();
+```
+
+### `ansa.toggle()`
+
+Toggles the widget between open and closed states.
+
+```javascript
+// Toggle on button click
+document.getElementById("chat-btn").addEventListener("click", () => {
+  ansa.toggle();
+});
+```
+
+### `ansa.isOpen()`
+
+Returns whether the widget is currently open.
+
+```javascript
+if (ansa.isOpen()) {
+  console.log("Chat is visible");
+} else {
+  console.log("Chat is hidden");
+}
+```
+
+**Returns:** `boolean`
+
+### `ansa.isReady()`
+
+Returns whether the widget has finished initializing.
+
+```javascript
+// Wait for widget to be ready
+function waitForAnsa(callback) {
+  if (window.ansa?.isReady()) {
+    callback();
+  } else {
+    setTimeout(() => waitForAnsa(callback), 100);
+  }
+}
+
+waitForAnsa(() => {
+  ansa.identify({ userId: "user_123" });
+});
+```
+
+**Returns:** `boolean`
+
+### `ansa.showBubbles(messages, duration?)`
+
+Shows notification bubble(s) near the widget button. Great for proactive engagement.
+
+```javascript
+// Single message
+ansa.showBubbles("👋 Need help?");
+
+// Multiple messages (appear with staggered timing)
+ansa.showBubbles(["Welcome!", "Ask me anything about our products"]);
+
+// Auto-hide after 10 seconds
+ansa.showBubbles("Limited time offer!", 10);
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `messages` | `string \| string[]` | Message(s) to display |
+| `duration` | `number?` | Seconds before auto-hide (optional) |
+
+### `ansa.hideBubbles()`
+
+Hides any visible notification bubbles.
+
+```javascript
+ansa.hideBubbles();
+```
+
+### `ansa.showForm(form, options?)`
+
+Displays a form in the widget. Can reference a server-side form by name or provide a client-side schema.
+
+```javascript
+// Server-side form (defined in dashboard)
+ansa.showForm("contact_form");
+
+// Client-side form with custom schema
+ansa.showForm({
+  fields: [
+    { name: "name", label: "Your Name", type: "text" },
+    { name: "email", label: "Email", type: "email" },
+    {
+      name: "interest",
+      label: "Interest",
+      type: "select",
+      options: [
+        { label: "Sales", value: "sales" },
+        { label: "Support", value: "support" }
+      ]
+    }
+  ],
+  submitButtonText: "Get Started"
+}, {
+  onSubmit: (data) => {
+    console.log("Form data:", data);
+    // { name: "Jane", email: "jane@example.com", interest: "sales" }
+  },
+  onCancel: () => {
+    console.log("User cancelled");
+  },
+  sendToAgent: true // Send form data as chat message
+});
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `form` | `string \| FormSchema` | Tool name (server) or form schema (client) |
+| `options.onSubmit` | `function?` | Called with form data on submit |
+| `options.onCancel` | `function?` | Called when form is cancelled |
+| `options.sendToAgent` | `boolean?` | Also send data to agent as message |
+
+See [Triggering Forms](/developer-guides/triggering-forms) for complete form schema reference.
+
+### `ansa.trigger(eventName, data?)`
+
+Fires a custom event that can trigger automations.
+
+```javascript
+// Simple event
+ansa.trigger("pricing_viewed");
+
+// Event with data
+ansa.trigger("product_viewed", {
+  productId: "prod_123",
+  category: "electronics",
+  price: 299.99
+});
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `eventName` | `string` | Name of the custom event |
+| `data` | `object?` | Optional event payload |
+
+See [Custom Events](/developer-guides/custom-events) for setting up event-based triggers.
+
+### `ansa.identify(identity)`
+
+Sets the current user's identity. This personalizes the chat experience and pre-fills forms.
+
+```javascript
+ansa.identify({
+  userId: "user_abc123",
+  userMetadata: {
+    name: "Jane Smith",
+    email: "jane@example.com",
+    plan: "enterprise",
+    company: "Acme Inc",
+    signupDate: "2024-01-15"
+  }
+});
+```
+
+**Parameters:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `userId` | `string?` | Your internal user ID |
+| `userMetadata` | `object?` | Additional user properties |
+
+See [Identity](/developer-guides/identity) for personalization use cases.
+
+### `ansa.resetUser()`
+
+Clears the current user identity (e.g., on logout).
+
+```javascript
+// When user logs out
+function logout() {
+  ansa.resetUser();
+  // ... rest of logout logic
+}
+```
+
+### `ansa.getVisitorId()`
+
+Returns the anonymous visitor ID (persisted in localStorage).
+
+```javascript
+const visitorId = ansa.getVisitorId();
+console.log(visitorId); // "v_1703347200000_abc123def"
+```
+
+**Returns:** `string` — Unique visitor identifier
+
+### `ansa.registerFormSchema(schemas)`
+
+Registers client-side form schema providers. Forms are generated dynamically based on context.
+
+```javascript
+ansa.registerFormSchema({
+  "quote_form": async (args, user) => {
+    // Fetch options from your API
+    const products = await fetch("/api/products").then(r => r.json());
+
+    return {
+      fields: [
+        { name: "email", label: "Email", type: "email", defaultValue: user.userMetadata?.email },
+        {
+          name: "product",
+          label: "Product",
+          type: "select",
+          options: products.map(p => ({ label: p.name, value: p.id }))
+        },
+        { name: "quantity", label: "Quantity", type: "number" }
+      ],
+      submitButtonText: "Get Quote"
+    };
+  }
+});
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `schemas` | `object` | Map of form name → schema provider function |
+
+The schema provider receives:
+- `args`: Arguments passed from the agent tool call
+- `user`: User context (`{ visitorId, userId?, userMetadata?, conversationId? }`)
+
+### `ansa.hasFormSchema(name)`
+
+Checks if a form schema provider is registered.
+
+```javascript
+if (ansa.hasFormSchema("quote_form")) {
+  console.log("Quote form is available");
+}
+```
+
+**Returns:** `boolean`
+
+### `ansa.registerFormHandler(name, handler)` <Badge>Legacy</Badge>
+
+Registers a form submission handler for server-side forms.
+
+```javascript
+ansa.registerFormHandler("order_lookup", {
+  onInit: ({ agentId }) => {
+    console.log("Handler initialized for agent:", agentId);
+  },
+  onSubmit: async (context) => {
+    const { formData, conversationId } = context;
+
+    // Look up order in your system
+    const order = await fetch(`/api/orders/${formData.orderId}`).then(r => r.json());
+
+    return {
+      success: true,
+      message: `Order ${order.id} is ${order.status}`,
+      data: order
+    };
+  }
+});
+```
+
+### `ansa.unregisterFormHandler(name)` <Badge>Legacy</Badge>
+
+Removes a registered form handler.
+
+```javascript
+ansa.unregisterFormHandler("order_lookup");
+```
+
+### `ansa.hasFormHandler(name)` <Badge>Legacy</Badge>
+
+Checks if a form handler is registered.
+
+```javascript
+if (ansa.hasFormHandler("order_lookup")) {
+  console.log("Order lookup is available");
+}
+```
+
+## Configuration
+
+### Script Parameters
+
+Configure the widget via URL parameters:
+
+```html
+<script src="https://cdn.ansa.so/embed.js?agentId=xxx&theme=dark&primaryColor=%233b82f6"></script>
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `agentId` | `string` | Your agent ID (required) |
+| `theme` | `"light" \| "dark"` | Color theme |
+| `primaryColor` | `string` | Primary accent color (URL-encoded hex) |
+| `chatBubbleColor` | `string` | Chat bubble button color |
+| `displayName` | `string` | Agent display name |
+| `profilePicture` | `string` | Agent avatar URL |
+| `initialMessage` | `string` | First message from agent |
+| `messagePlaceholder` | `string` | Input placeholder text |
+| `suggestedMessages` | `string` | Comma-separated suggestions |
+| `welcomeBubbles` | `string` | Comma-separated bubble messages |
+
+### Window Config
+
+Alternatively, set config before loading the script:
+
+```html
+<script>
+  window.__ansa_config = {
+    agentId: "agent_abc123",
+    theme: "dark",
+    primaryColor: "#3b82f6",
+    displayName: "Sales Bot",
+    suggestedMessages: ["Pricing info", "Book a demo", "Talk to sales"],
+    welcomeBubbles: ["👋 Hi there!", "How can I help you today?"]
+  };
+</script>
+<script src="https://cdn.ansa.so/embed.js"></script>
+```
+
+## Common Patterns
+
+### Open Chat on Button Click
+
+```html
+<button onclick="ansa.open()">Chat with us</button>
+```
+
+### Open Chat with Context
+
+```javascript
+// On product page
+document.getElementById("product-help").addEventListener("click", () => {
+  const productName = document.querySelector("h1").textContent;
+  ansa.open(`I have a question about ${productName}`);
+});
+```
+
+### Identify User on Login
+
+```javascript
+async function onLoginSuccess(user) {
+  ansa.identify({
+    userId: user.id,
+    userMetadata: {
+      name: user.name,
+      email: user.email,
+      plan: user.subscription.plan
+    }
+  });
+}
+```
+
+### Proactive Engagement
+
+```javascript
+// Show help bubble after 30 seconds on pricing page
+if (window.location.pathname === "/pricing") {
+  setTimeout(() => {
+    ansa.showBubbles("Have questions about our plans? I can help!", 15);
+  }, 30000);
+}
+```
+
+### Custom Chat Trigger
+
+```javascript
+// Open chat when user shows exit intent
+document.addEventListener("mouseleave", (e) => {
+  if (e.clientY < 0 && !ansa.isOpen()) {
+    ansa.showBubbles("Wait! Can I help you find what you're looking for?");
+  }
+});
+```
+
+## React Integration
+
+```tsx
+import { useEffect } from "react";
+
+declare global {
+  interface Window {
+    ansa?: {
+      open: (message?: string) => void;
+      close: () => void;
+      identify: (identity: { userId?: string; userMetadata?: Record<string, unknown> }) => void;
+      isReady: () => boolean;
+    };
+  }
+}
+
+export function useAnsa() {
+  const open = (message?: string) => window.ansa?.open(message);
+  const close = () => window.ansa?.close();
+  const identify = (userId: string, metadata?: Record<string, unknown>) => {
+    window.ansa?.identify({ userId, userMetadata: metadata });
+  };
+
+  return { open, close, identify };
+}
+
+// Usage
+function ChatButton() {
+  const { open } = useAnsa();
+  return <button onClick={() => open()}>Chat</button>;
+}
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Triggering Forms" icon="file-lines" href="/developer-guides/triggering-forms">
+    Display and handle forms programmatically
+  </Card>
+  <Card title="Identity" icon="user" href="/developer-guides/identity">
+    Personalize conversations with user data
+  </Card>
+</CardGroup>

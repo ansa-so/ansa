@@ -1,0 +1,340 @@
+---
+title: "Internal Tools"
+description: "Build AI assistants for internal use with self-hosting, local LLMs, and secure API integrations."
+---
+
+import { Screenshot } from '/snippets/screenshot.mdx'
+
+## Overview
+
+Ansa is ideal for internal tools because:
+- **Self-hosting** — Keep all data on your infrastructure
+- **Local LLMs** — Use Ollama for complete privacy
+- **API integrations** — Connect to internal systems
+- **User identification** — Personalize based on employee data
+- **Access control** — Limit access to authorized users
+
+## Self-Hosting Setup
+
+For internal deployments, self-host Ansa on your infrastructure:
+
+### Docker Deployment
+
+```bash
+# Clone the repository
+git clone https://github.com/ansa/ansa.git
+cd ansa
+
+# Configure environment
+cp .env.example .env
+# Edit .env with your settings
+
+# Start with Docker Compose
+docker-compose up -d
+```
+
+### Environment Variables
+
+Key settings for internal use:
+
+```env
+# Database
+DATABASE_URL=postgresql://...
+
+# Set deployment mode
+ANSA_MODE=self-hosted
+
+# Disable external analytics
+DISABLE_TELEMETRY=true
+
+# Configure allowed domains
+ALLOWED_DOMAINS=internal.yourcompany.com
+
+# Local LLM (Ollama)
+OLLAMA_URL=http://localhost:11434
+```
+
+See [Self-Hosting](/self-hosting) for complete setup guide.
+
+## Local LLMs with Ollama
+
+For complete data privacy, use Ollama:
+
+### Setup Ollama
+
+```bash
+# Install Ollama
+curl https://ollama.ai/install.sh | sh
+
+# Pull a model
+ollama pull llama3.2
+ollama pull mistral
+```
+
+### Configure in Ansa
+
+1. Go to **Agent Settings → Model**
+2. Select **Ollama** as provider
+3. Choose your model (llama3.2, mistral, etc.)
+4. Set the Ollama URL (default: `http://localhost:11434`)
+
+<Screenshot src="/screenshots/agent-settings.png" alt="Agent settings with Ollama" />
+
+### Model Recommendations
+
+| Model | Use Case | Notes |
+|-------|----------|-------|
+| **Llama 3.2 8B** | General assistant | Good balance |
+| **Llama 3.2 70B** | Complex reasoning | Requires GPU |
+| **Mistral 7B** | Fast responses | Lower resource usage |
+| **CodeLlama** | Code-focused tasks | Best for dev tools |
+
+<Warning>
+Ollama models don't have native tool calling. Ansa uses a text-based JSON parsing fallback, which may be less reliable than Claude/GPT for complex tool use.
+</Warning>
+
+## Internal API Integrations
+
+Connect to your internal systems with HTTP tools:
+
+### HR System Integration
+
+```json
+{
+  "name": "lookup_employee",
+  "description": "Look up employee information by name or email.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "query": { "type": "string", "description": "Employee name or email" }
+    },
+    "required": ["query"]
+  },
+  "executionType": "http",
+  "httpUrl": "https://hr.internal.company.com/api/employees?q=${query}",
+  "httpMethod": "GET",
+  "httpHeaders": {
+    "Authorization": "Bearer ${hr_api_key}",
+    "X-Internal-Token": "${internal_token}"
+  },
+  "displayConfig": {
+    "type": "product_card",
+    "fieldMappings": {
+      "title": "$.name",
+      "subtitle": "$.department",
+      "image": "$.avatar_url"
+    }
+  }
+}
+```
+
+### IT Ticketing System
+
+```json
+{
+  "name": "create_ticket",
+  "description": "Create an IT support ticket for the user.",
+  "executionType": "form",
+  "formSchema": {
+    "fields": [
+      {
+        "name": "category",
+        "label": "Category",
+        "type": "select",
+        "options": [
+          { "label": "Hardware", "value": "hardware" },
+          { "label": "Software", "value": "software" },
+          { "label": "Access", "value": "access" },
+          { "label": "Network", "value": "network" }
+        ]
+      },
+      {
+        "name": "priority",
+        "label": "Priority",
+        "type": "select",
+        "options": [
+          { "label": "Low", "value": "low" },
+          { "label": "Medium", "value": "medium" },
+          { "label": "High", "value": "high" },
+          { "label": "Critical", "value": "critical" }
+        ]
+      },
+      {
+        "name": "description",
+        "label": "Describe the issue",
+        "type": "textarea"
+      }
+    ],
+    "submitLabel": "Create Ticket",
+    "successMessage": "Ticket created! You'll receive an email with the ticket number."
+  },
+  "formPostActions": [
+    {
+      "type": "webhook",
+      "url": "https://jira.internal.company.com/api/issues",
+      "headers": {
+        "Authorization": "Bearer ${jira_token}"
+      }
+    }
+  ]
+}
+```
+
+### Internal Database Query
+
+```json
+{
+  "name": "query_inventory",
+  "description": "Check inventory levels for a product or part.",
+  "executionType": "http",
+  "httpUrl": "https://inventory.internal.company.com/api/items?sku=${sku}",
+  "httpMethod": "GET",
+  "displayConfig": {
+    "type": "table",
+    "options": {
+      "columns": [
+        { "key": "sku", "label": "SKU" },
+        { "key": "name", "label": "Item Name" },
+        { "key": "quantity", "label": "In Stock" },
+        { "key": "location", "label": "Warehouse" }
+      ]
+    }
+  }
+}
+```
+
+## Employee Identification
+
+Identify employees for personalized assistance:
+
+<CodeGroup>
+```javascript Vanilla JS
+// After SSO/LDAP login
+window.ansa.identify({
+  userId: 'emp_12345',
+  userMetadata: {
+    name: 'Jane Smith',
+    email: 'jane.smith@company.com',
+    department: 'Engineering',
+    role: 'Senior Developer',
+    manager: 'John Doe',
+    location: 'NYC Office',
+    startDate: '2022-03-15'
+  }
+});
+```
+
+```javascript ES Module
+import { identifyUser } from '@ansa-so/sdk';
+
+identifyUser({
+  userId: 'emp_12345',
+  userMetadata: {
+    name: 'Jane Smith',
+    email: 'jane.smith@company.com',
+    department: 'Engineering',
+    role: 'Senior Developer'
+  }
+});
+```
+</CodeGroup>
+
+The agent can then:
+- Greet employees by name
+- Know their department and role
+- Pre-fill forms with employee info
+- Provide relevant information based on role
+
+### Pre-filling Forms
+
+Use employee data in form defaults:
+
+```json
+{
+  "name": "email",
+  "label": "Email",
+  "type": "email",
+  "defaultValue": "{{user.email}}",
+  "disabled": true
+}
+```
+
+## Access Control
+
+### Domain Restrictions
+
+Limit widget to internal domains:
+
+```env
+ALLOWED_DOMAINS=internal.company.com,intranet.company.com
+```
+
+### Security Settings
+
+Configure in **Settings → Security**:
+
+<Screenshot src="/screenshots/security.png" alt="Security settings" />
+
+- **Allowed Domains** — Only show widget on these domains
+- **Rate Limits** — Prevent abuse
+- **IP Whitelist** — Restrict to office/VPN IPs (if supported)
+
+## Use Cases for Internal Tools
+
+### IT Help Desk
+
+- Answer common IT questions from internal docs
+- Create tickets for issues that need human help
+- Look up asset information
+- Reset password requests (with proper auth)
+
+### HR Assistant
+
+- Answer policy questions
+- Look up employee directory
+- Submit time-off requests
+- Onboarding information for new hires
+
+### Sales Operations
+
+- Look up customer information from CRM
+- Check pricing and inventory
+- Generate quotes
+- Find case studies and collateral
+
+### Engineering Support
+
+- Search internal documentation
+- Look up service status
+- Create bug reports
+- Find code examples and patterns
+
+## Knowledge Base for Internal Docs
+
+### Indexing Internal Content
+
+| Source | How to Index |
+|--------|--------------|
+| **Confluence** | Export to PDF, upload as files |
+| **Notion** | Export workspace, upload markdown |
+| **SharePoint** | Export documents, upload as files |
+| **Internal Wiki** | Web crawl if accessible, or export |
+| **Google Docs** | Export as PDF, upload |
+
+### Sensitive Information
+
+<Warning>
+Be careful about what you index. The AI will use any indexed content to answer questions. Avoid indexing:
+- Salary/compensation data
+- Personal employee information
+- Security credentials
+- Confidential business strategy
+</Warning>
+
+## See Also
+
+- [Self-Hosting](/self-hosting) — Complete deployment guide
+- [HTTP Tools](/tools/http-tools) — Building API integrations
+- [Tools Overview](/tools/overview) — LLM provider differences (Ollama fallback)
+- [Identity & Personalization](/developer-guides/identity) — User identification
+- [Form Tools](/tools/form-tools) — Creating internal forms

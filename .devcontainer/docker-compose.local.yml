@@ -1,0 +1,39 @@
+# Local development compose file
+# Usage: docker compose -f docker-compose.yml -f docker-compose.local.yml up -d
+#
+# This adds Ollama (local LLM) and Widget services for local development
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    # Uncomment for GPU support (NVIDIA)
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+  api:
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ollama:
+        condition: service_started
+    environment:
+      - OLLAMA_API_BASE=http://ollama:11434/v1
+
+  docs:
+    build:
+      context: .
+      dockerfile: apps/docs/Dockerfile
+    ports:
+      - "3003:3003"
+
+volumes:
+  ollama_data:

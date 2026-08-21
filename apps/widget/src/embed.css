@@ -1,0 +1,104 @@
+@import "tailwindcss";
+@config "../tailwind.config.js";
+
+/* Widget-specific styles for Shadow DOM */
+:host {
+  display: block !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* Don't use 'all: initial' - it breaks form inputs */
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Fix for buttons - ensure inline styles take precedence */
+button {
+  background-color: inherit;
+}
+
+/* Ensure form inputs work properly in Shadow DOM */
+input,
+textarea,
+select {
+  -webkit-appearance: auto;
+  appearance: auto;
+  background-color: inherit;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+}
+
+/* Ensure scrollbars look good */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Animations */
+@keyframes ansa-ping {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes ansa-icon-rotate-in {
+  from {
+    transform: translate(-50%, -50%) rotate(-90deg);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes ansa-icon-rotate-out {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+    opacity: 1;
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(90deg);
+    opacity: 0;
+  }
+}
+
+@keyframes ansa-icon-scale-in {
+  from {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes ansa-icon-scale-out {
+  from {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+  }
+}

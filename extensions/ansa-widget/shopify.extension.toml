@@ -1,0 +1,11 @@
+api_version = "2026-01"
+
+[[extensions]]
+uid = "4c0e3f27-8580-7e2a-a936-70a5ff54e0c8c364d71a"
+type = "theme"
+name = "Ansa Chat Widget"
+handle = "ansa-widget"
+
+  [[extensions.targeting]]
+  module = "./blocks/embed.liquid"
+  target = "body"

@@ -1,0 +1,379 @@
+---
+title: Trigger Templates
+description: "Pre-built triggers to engage visitors and capture leads"
+---
+
+Trigger templates are ready-to-use automation recipes that help you engage visitors at the right moment. Browse templates by category, install with one click, and customize for your needs.
+
+## Template Categories
+
+<CardGroup cols={3}>
+  <Card title="Engagement" icon="hand">
+    Welcome visitors and start conversations
+  </Card>
+  <Card title="Conversion" icon="target">
+    Convert browsers into buyers
+  </Card>
+  <Card title="E-commerce" icon="shopping-cart">
+    Product pages, carts, and checkout
+  </Card>
+  <Card title="Lead Generation" icon="user-plus">
+    Capture emails and book demos
+  </Card>
+  <Card title="Support" icon="headset">
+    Help visitors find answers
+  </Card>
+  <Card title="Feedback" icon="star">
+    Collect reviews and NPS scores
+  </Card>
+</CardGroup>
+
+## Using Templates
+
+### Install a Template
+
+1. Go to **Triggers** → **Browse Templates**
+2. Find a template that fits your use case
+3. Click **Use Template**
+4. Customize settings if needed
+5. Click **Create Trigger**
+
+### Customize After Install
+
+Templates create regular triggers that you can fully edit:
+- Change timing and conditions
+- Modify messages
+- Connect different forms
+- Adjust page patterns
+
+## Engagement Templates
+
+### Welcome Message
+
+Greet visitors after they've been on your site for a few seconds.
+
+| Setting | Value |
+|---------|-------|
+| Trigger | Time on page: 5 seconds |
+| Action | Open chat |
+| Message | "👋 Hi there! Welcome to our site. Is there anything I can help you find today?" |
+
+**Best for:** Homepages, landing pages
+
+### Scroll Engagement
+
+Engage visitors who scroll through most of your page.
+
+| Setting | Value |
+|---------|-------|
+| Trigger | Scroll depth: 80% |
+| Action | Show bubble |
+| Message | "Enjoying the content? Let me know if you have any questions!" |
+
+**Best for:** Blog posts, long-form content
+
+## Conversion Templates
+
+### Exit Intent Offer
+
+Catch leaving visitors with a special offer or assistance.
+
+| Setting | Value |
+|---------|-------|
+| Trigger | Exit intent |
+| Action | Show bubble |
+| Message | "Wait! Before you go, can I help you find what you're looking for?" |
+
+**Best for:** Any page with high bounce rate
+
+### Pricing Page Assistance
+
+Offer help to visitors viewing your pricing page.
+
+| Setting | Value |
+|---------|-------|
+| Trigger | Time on page: 30 seconds |
+| Page | `/pricing*` |
+| Action | Open chat |
+| Message | "I see you're checking out our pricing. Do you have any questions about our plans?" |
+
+**Best for:** SaaS, subscription businesses
+
+## E-commerce Templates
+
+### Product Page Assistant
+
+Help visitors browsing product pages.
+
+| Setting | Value |
+|---------|-------|
+| Trigger | Time on page: 45 seconds |
+| Page | `/products/*` |
+| Action | Open chat |
+| Message | "Hi! I noticed you're looking at this product. Do you have any questions?" |
+
+**Best for:** Product detail pages
+
+### Back in Stock Notification
+
+Offer stock notifications for out-of-stock products.
+
+| Setting | Value |
+|---------|-------|
+| Trigger | Custom event: `product_view` |
+| Condition | `inStock: false` |
+| Action | Show form |
+| Form | Back in Stock Form |
+
+**Requires:** Custom event when viewing out-of-stock products
+
+```javascript
+// Fire when viewing out-of-stock product
+window.ansa.trigger("product_view", { inStock: false });
+```
+
+### Cart Abandonment Recovery
+
+Engage visitors about to leave with items in cart.
+
+| Setting | Value |
+|---------|-------|
+| Trigger | Exit intent |
+| Condition | Cart has items |
+| Action | Open chat |
+| Message | "I noticed you have items in your cart. Is there anything I can help with?" |
+
+**Requires:** Cart state event
+
+```javascript
+// Update cart state when items change
+window.ansa.trigger("cart_state", { hasItems: true, itemCount: 3 });
+```
+
+### Checkout Assistance
+
+Offer help during the checkout process.
+
+| Setting | Value |
+|---------|-------|
+| Trigger | Page view |
+| Page | `/checkout*` |
+| Action | Show bubble |
+| Message | "Need help checking out? I'm here if you have questions about shipping or payment." |
+
+**Best for:** Checkout pages
+
+## Lead Generation Templates
+
+### Blog Newsletter Signup
+
+Capture readers who engage with your blog content.
+
+| Setting | Value |
+|---------|-------|
+| Trigger | Time on page: 60 seconds |
+| Page | `/blog/*` |
+| Action | Show form |
+| Form | Newsletter Signup Form |
+| Message | "Enjoying this article? Subscribe to get more content like this!" |
+
+**Best for:** Blog posts, content marketing
+
+### Demo Request Prompt
+
+Encourage demo requests on key pages.
+
+| Setting | Value |
+|---------|-------|
+| Trigger | Time on page: 45 seconds |
+| Page | `/features*` |
+| Action | Show form |
+| Form | Book Demo Form |
+| Message | "Would you like to see our product in action? Book a free demo!" |
+
+**Best for:** Features pages, product tours
+
+### Contact Us Prompt
+
+Encourage visitors to reach out on the contact page.
+
+| Setting | Value |
+|---------|-------|
+| Trigger | Page view |
+| Page | `/contact*` |
+| Action | Show form |
+| Form | Contact Form |
+| Message | "Looking to get in touch? Fill out this quick form!" |
+
+**Best for:** Contact pages
+
+## Support Templates
+
+### FAQ Assistance
+
+Offer additional help on FAQ pages.
+
+| Setting | Value |
+|---------|-------|
+| Trigger | Time on page: 30 seconds |
+| Page | `/faq*` |
+| Action | Open chat |
+| Message | "Can't find what you're looking for? I'm here to help!" |
+
+**Best for:** FAQ pages, help centers
+
+### Documentation Helper
+
+Assist users browsing documentation.
+
+| Setting | Value |
+|---------|-------|
+| Trigger | Time on page: 60 seconds |
+| Page | `/docs/*` |
+| Action | Show bubble |
+| Message | "Need help understanding something? Ask me anything!" |
+
+**Best for:** Documentation sites, knowledge bases
+
+## Feedback Templates
+
+### Post-Purchase Feedback
+
+Collect feedback after a purchase.
+
+| Setting | Value |
+|---------|-------|
+| Trigger | Page view |
+| Page | `/order-confirmation*` |
+| Action | Show form |
+| Form | Feedback Form |
+| Message | "Thanks for your order! We'd love to hear about your experience." |
+
+**Best for:** Order confirmation pages
+
+### NPS Survey
+
+Measure customer loyalty with Net Promoter Score.
+
+| Setting | Value |
+|---------|-------|
+| Trigger | Custom event: `returning_visitor` |
+| Condition | `visitCount: 3` |
+| Action | Show form |
+| Form | NPS Survey Form |
+| Message | "How likely are you to recommend us to a friend?" |
+
+**Requires:** Returning visitor tracking
+
+```javascript
+// Fire for returning visitors
+const visitCount = parseInt(localStorage.getItem("visitCount") || "0") + 1;
+localStorage.setItem("visitCount", visitCount.toString());
+
+if (visitCount >= 3) {
+  window.ansa.trigger("returning_visitor", { visitCount });
+}
+```
+
+## Combining Templates
+
+Templates work best when combined strategically:
+
+### E-commerce Stack
+
+1. **Product Page Assistant** — Help during browsing
+2. **Cart Abandonment** — Recover leaving shoppers
+3. **Checkout Assistance** — Support during purchase
+4. **Post-Purchase Feedback** — Collect reviews
+
+### SaaS Stack
+
+1. **Welcome Message** — Greet new visitors
+2. **Pricing Page Assistance** — Convert on pricing
+3. **Demo Request** — Capture leads
+4. **Exit Intent** — Last-chance engagement
+
+### Content Stack
+
+1. **Scroll Engagement** — Engage readers
+2. **Blog Newsletter** — Capture emails
+3. **Documentation Helper** — Support users
+4. **NPS Survey** — Measure satisfaction
+
+## Customizing Templates
+
+### Adjust Timing
+
+Fine-tune when triggers fire:
+
+| Default | Adjustment | Why |
+|---------|------------|-----|
+| 5 seconds | 10 seconds | Let visitors orient first |
+| 30 seconds | 15 seconds | More aggressive conversion |
+| 60 seconds | 90 seconds | Less intrusive |
+
+### Modify Messages
+
+Make messages match your brand voice:
+
+**Default:** "Hi there! Welcome to our site."
+
+**Friendly:** "Hey! 👋 Great to see you here!"
+
+**Professional:** "Welcome. How may I assist you today?"
+
+**Direct:** "Looking for something specific? I can help."
+
+### Change Page Patterns
+
+Adjust URL patterns for your site structure:
+
+| Template | Default | Your Site |
+|----------|---------|-----------|
+| Products | `/products/*` | `/shop/*` |
+| Blog | `/blog/*` | `/articles/*` |
+| Pricing | `/pricing*` | `/plans*` |
+| Checkout | `/checkout*` | `/cart/checkout*` |
+
+## Best Practices
+
+<Tip>
+Start with 2-3 templates, measure results, then add more. Too many triggers can overwhelm visitors.
+</Tip>
+
+### Do's
+
+- **Test on yourself first** — Experience the visitor journey
+- **Use trigger-once** — Don't repeat same trigger
+- **Match the context** — Right message for right page
+- **Track conversions** — Measure what works
+
+### Don'ts
+
+- **Don't trigger immediately** — Give visitors time to orient
+- **Don't stack triggers** — Avoid multiple overlapping triggers
+- **Don't be pushy** — Respect visitor experience
+- **Don't ignore data** — Disable underperforming triggers
+
+## Creating Custom Templates
+
+If templates don't fit your needs, create custom triggers:
+
+1. Go to **Triggers** → **New Trigger**
+2. Choose trigger type
+3. Set conditions
+4. Configure action
+5. Test and enable
+
+Then save your custom configuration as a template for future use across agents.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Widget Triggers" icon="bolt" href="/widget/triggers">
+    Learn about trigger types
+  </Card>
+  <Card title="Form Tools" icon="rectangle-list" href="/tools/form-tools">
+    Create forms for triggers
+  </Card>
+</CardGroup>

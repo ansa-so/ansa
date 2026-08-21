@@ -1,0 +1,215 @@
+---
+title: Confidence Scores
+description: "Understand how confident your agent is in its responses"
+---
+
+Confidence scores indicate how certain your agent is about each response. They're calculated based on how well the user's question matches your knowledge base content, helping you identify where your agent might need more training data.
+
+## How Confidence Works
+
+When a user asks a question:
+
+1. **Vector search** — The question is compared against your knowledge base
+2. **Match scoring** — Each document gets a similarity score (0-100%)
+3. **Confidence calculation** — The highest match score becomes the confidence
+4. **Response generation** — The AI uses matched documents to answer
+
+### Score Ranges
+
+| Score | Level | Meaning |
+|-------|-------|---------|
+| 80-100% | High | Strong match to knowledge base |
+| 60-79% | Medium | Partial match, may need more context |
+| 40-59% | Low | Weak match, answer may be general |
+| 0-39% | Very Low | No good match, relying on general knowledge |
+| `null` | No Match | No knowledge base search performed |
+
+## Viewing Confidence Scores
+
+### In Conversations
+
+1. Go to **Conversations**
+2. Open a conversation
+3. Each assistant message shows its confidence score
+
+Messages with low confidence are highlighted so you can easily spot potential issues.
+
+### In Analytics
+
+1. Go to **Analytics**
+2. View the **Confidence** section:
+   - **Average confidence** over time
+   - **Distribution** (how many responses at each level)
+   - **Trend** (improving or declining)
+
+### On Agent Cards
+
+The main agents list shows average confidence for each agent, giving you a quick health check.
+
+## Interpreting Scores
+
+### High Confidence (80-100%)
+
+✅ **What it means:** Your knowledge base contains relevant information for this question.
+
+**Example:**
+> User: "What are your business hours?"
+> Agent: "We're open Monday to Friday, 9 AM to 6 PM." (95% confidence)
+
+The agent found a direct match in your documentation.
+
+### Medium Confidence (60-79%)
+
+⚠️ **What it means:** The agent found related content but may be extrapolating.
+
+**Example:**
+> User: "Can I return an item after 60 days?"
+> Agent: "Our return policy is 30 days from purchase." (68% confidence)
+
+The agent found return policy info but the specific 60-day scenario wasn't documented.
+
+### Low Confidence (40-59%)
+
+🟡 **What it means:** Limited relevant content found. The answer may be based on general knowledge.
+
+**Example:**
+> User: "Do you offer enterprise pricing?"
+> Agent: "Please contact our sales team for enterprise options." (45% confidence)
+
+Consider adding enterprise pricing documentation.
+
+### Very Low Confidence (0-39%)
+
+🔴 **What it means:** The agent is essentially guessing or using fallback responses.
+
+**Example:**
+> User: "What's your CEO's favorite color?"
+> Agent: "I don't have that information." (12% confidence)
+
+This is expected for off-topic questions.
+
+## Using Confidence for Automation
+
+### Email Channel
+
+For the email channel, confidence scores drive automation:
+
+| Confidence | Action |
+|------------|--------|
+| Above threshold | Auto-reply to customer |
+| Below threshold | Forward to human for review |
+
+Configure the threshold in **Channels** → **Email** → **Settings**.
+
+### Recommended Thresholds
+
+| Use Case | Threshold | Why |
+|----------|-----------|-----|
+| Customer support | 70% | Balance automation with accuracy |
+| Sales inquiries | 80% | Higher stakes, be more careful |
+| Internal tools | 60% | Lower risk, more automation |
+| Documentation | 65% | Users expect accuracy |
+
+## Improving Confidence
+
+### Add Missing Content
+
+1. Filter conversations by low confidence
+2. Identify common low-confidence questions
+3. Add relevant documentation to knowledge base
+
+### Review Low-Confidence Responses
+
+Weekly routine:
+1. Go to **Conversations**
+2. Sort by confidence (low to high)
+3. Review responses
+4. Add missing info to knowledge base
+
+### Track Trends
+
+In **Analytics**, monitor:
+- Is average confidence increasing over time?
+- Which topics have lowest confidence?
+- Are there sudden drops after knowledge base changes?
+
+## Confidence vs Accuracy
+
+<Warning>
+High confidence doesn't guarantee accuracy. It means the agent found relevant content, not that the response is correct.
+</Warning>
+
+### When Confidence Can Mislead
+
+1. **Outdated content** — High match to old, incorrect info
+2. **Similar but wrong** — Question matches related but different topic
+3. **Partial information** — Good match but incomplete answer
+
+### Best Practice
+
+Combine confidence monitoring with:
+- **User feedback** (thumbs up/down)
+- **Regular content audits**
+- **Human review of edge cases**
+
+## API Access
+
+Access confidence data programmatically:
+
+### Per-Message Confidence
+
+```bash
+curl "https://api.ansa.so/conversations/{id}" \
+  -H "Authorization: Bearer $ANSA_API_KEY"
+```
+
+Response includes `confidenceScore` for each assistant message.
+
+### Aggregate Analytics
+
+```bash
+# Get confidence summary
+curl "https://api.ansa.so/analytics/confidence/summary?agentId=xxx" \
+  -H "Authorization: Bearer $ANSA_API_KEY"
+
+# Get confidence distribution
+curl "https://api.ansa.so/analytics/confidence/distribution?agentId=xxx" \
+  -H "Authorization: Bearer $ANSA_API_KEY"
+
+# Get confidence over time
+curl "https://api.ansa.so/analytics/confidence/over-time?agentId=xxx" \
+  -H "Authorization: Bearer $ANSA_API_KEY"
+```
+
+## Filtering Conversations
+
+Find conversations that need attention:
+
+1. Go to **Conversations**
+2. Use filters:
+   - **Min Confidence** — Show only above threshold
+   - **Max Confidence** — Show only below threshold
+3. Review and improve knowledge base
+
+## Best Practices
+
+<Tip>
+Set a weekly calendar reminder to review low-confidence conversations. This is the fastest way to improve your agent.
+</Tip>
+
+1. **Start with 70% threshold** — Adjust based on your needs
+2. **Review weekly** — Check low-confidence conversations
+3. **Track trends** — Monitor average confidence over time
+4. **Combine with feedback** — Use both metrics together
+5. **Update regularly** — Keep knowledge base current
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Knowledge Base" icon="book" href="/agents/knowledge-base">
+    Add content to improve confidence
+  </Card>
+  <Card title="Conversation History" icon="clock-rotate-left" href="/user-guides/history">
+    Review past conversations
+  </Card>
+</CardGroup>

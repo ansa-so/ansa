@@ -1,0 +1,445 @@
+---
+title: Analytics
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</CardGroup>  </Card>    Fill knowledge gaps  <Card title="Knowledge Base" icon="book" href="/agents/knowledge-base">  </Card>    Deep dive into your metrics  <Card title="Analytics" icon="chart-line" href="/user-guides/analytics"><CardGroup cols={2}>## Next Steps2. Go to **Account** → **Preferences** → Set frequency to **None**1. Click **Unsubscribe** in any recap email, orTo stop receiving recap emails:## Unsubscribing```  }'    "recapCombineAgents": true    "recapHour": 9,    "recapFrequency": "weekly",  -d '{  -H "Content-Type: application/json" \  -H "Authorization: Bearer $ANSA_API_KEY" \curl -X PATCH "https://api.ansa.so/user/preferences" \```bashConfigure preferences via API:## API Configuration| Scroll - 50% | 203 | 28 | 13.8% || Time on Page - 30s | 156 | 31 | 19.9% || Exit Intent - Pricing | 89 | 23 | 25.8% ||---------|-------|-----------|------|| Trigger | Fired | Converted | Rate |Shows which triggers are driving engagement:### Trigger Efficacy| create_ticket | 45 | 45 | 0 || check_order_status | 156 | 150 | 6 || search_products | 234 | 228 | 6 ||------|------------|---------|----------|| Tool | Executions | Success | Failures |Shows tool performance:### Tool Execution LogClick "Teach AI" to add the answer to your knowledge base.> [Teach AI →]> > This question was asked 47 times with low confidence.> > "How do I cancel my subscription?"> > **Knowledge Gap Detected**Highlights the top unanswered question:### Knowledge Gap Alert- Response times- Escalation rates- Tool success rates- Confidence scoresHealth is calculated from:| **Critical** | Red | Significant issues detected || **Needs Attention** | Yellow | Some metrics below threshold || **Improving** | Blue | Metrics trending up || **Healthy** | Green | All metrics normal ||--------|-------|---------|| Status | Color | Meaning |A color-coded indicator showing overall agent health:### Health Status## Email Sections| **Separate** | One email per agent || **Combined** | One email with all agents summarized ||--------|-------------|| Option | Description |### Agent GroupingChoose the hour (in your timezone) when you'd like to receive emails. Default is 9:00 AM.### Delivery Time| **Weekly** | Receive every Monday at your preferred time || **Daily** | Receive every day at your preferred time || **None** | Disable recap emails ||--------|-------------|| Option | Description |### FrequencyNavigate to **Account** → **Preferences** to configure:## Configuring Recap Emails- **High Traffic Pages** — Most visited pages- **Geographic Distribution** — Where your users are located- **Trigger Efficacy** — Which triggers are converting- **Tool Performance** — Success/failure counts per tool- **Knowledge Gaps** — Top unanswered questions with "Teach AI" links- **Health Status** — System health indicator (healthy, improving, needs attention, critical)- **Executive Summary** — Conversations, submissions, escalationsRecap emails include:## OverviewRecap emails deliver regular performance summaries for your AI agents, helping you stay informed without constantly checking the dashboard.---description: "Automated performance summaries delivered to your inbox"description: "Track and measure your agent's performance"
+---
+
+The Analytics dashboard gives you insights into how users interact with your agent, helping you identify opportunities to improve responses and increase engagement.
+
+## Accessing Analytics
+
+1. Go to **Agents** in the sidebar
+2. Select your agent
+3. Click **Analytics** in the agent menu
+
+## Overview Metrics
+
+The summary section shows key performance indicators:
+
+| Metric | Description |
+|--------|-------------|
+| **Total Conversations** | Number of chat sessions |
+| **Total Messages** | All messages exchanged |
+| **Avg Messages/Conversation** | Engagement depth |
+| **Thumbs Up** | Positive feedback count |
+| **Thumbs Down** | Negative feedback count |
+| **Feedback Ratio** | Positive / total feedback % |
+
+## Date Range
+
+Filter analytics by time period:
+
+- **Last 7 days** — Recent performance
+- **Last 30 days** — Monthly trends
+- **Last 90 days** — Quarterly view
+- **Custom range** — Select specific dates
+
+## Daily Trends
+
+The daily chart shows:
+
+- **Conversations** — Chat sessions per day
+- **Messages** — Total messages per day
+- **Feedback** — Thumbs up/down per day
+
+Use this to identify:
+- Peak usage times
+- Trends over time
+- Impact of changes you make
+
+## Channel Breakdown
+
+See where conversations originate:
+
+| Channel | Description |
+|---------|-------------|
+| **Widget** | Embedded chat on your website |
+| **API** | Programmatic API calls |
+| **Test** | Dashboard test conversations |
+
+## Geographic Distribution
+
+View conversations by country to understand your audience:
+
+- See which regions use your agent most
+- Identify localization opportunities
+- Understand timezone patterns
+
+## Tool Performance
+
+Track how your tools are performing:
+
+| Metric | Description |
+|--------|-------------|
+| **Execution Count** | Times the tool was called |
+| **Success Count** | Successful executions |
+| **Failure Count** | Failed executions |
+| **Success Rate** | Success percentage |
+| **Avg Execution Time** | Average response time (ms) |
+
+### Identifying Issues
+
+- **Low success rate** — Check API credentials, endpoint availability
+- **High execution time** — Optimize external API or add caching
+- **Low usage** — Improve tool description or agent prompts
+
+## Form Analytics
+
+For form tools, track the conversion funnel:
+
+| Metric | Description |
+|--------|-------------|
+| **Impressions** | Times form was shown |
+| **Started** | Users who began filling |
+| **Submitted** | Completed submissions |
+| **Conversion Rate** | Submitted / Impressions |
+| **Completion Rate** | Submitted / Started |
+
+### Field-Level Analysis
+
+See which fields have the highest drop-off:
+
+| Field | Completion Rate |
+|-------|-----------------|
+| Email | 98% |
+| Name | 95% |
+| Phone | 45% |
+| Message | 85% |
+
+<Tip>
+High drop-off on a field? Consider making it optional or moving it later in the form.
+</Tip>
+
+## Trigger Analytics
+
+Measure automation effectiveness:
+
+| Metric | Description |
+|--------|-------------|
+| **Fired** | Times trigger activated |
+| **Converted** | User engaged after trigger |
+| **Conversion Rate** | Engaged / Fired |
+
+Access via **Agents** → **Triggers** tab.
+
+## LLM Cost Tracking
+
+Monitor AI usage costs across your agents:
+
+### Viewing Costs
+
+Navigate to **Analytics** → **Costs** to see:
+
+| Metric | Description |
+|--------|-------------|
+| **Total Cost** | Cumulative spending in selected period |
+| **Cost per Conversation** | Average cost per chat session |
+| **Cost by Model** | Breakdown by AI model used |
+| **Cost by Channel** | Widget vs API vs Email costs |
+| **Token Usage** | Input and output tokens consumed |
+
+### Cost Breakdown
+
+Each message tracks:
+
+- **Model** — The specific AI model used (e.g., gpt-4o, claude-sonnet-4)
+- **Quality Tier** — fast, balanced, or high_quality
+- **Input Tokens** — Tokens in the prompt
+- **Output Tokens** — Tokens in the response
+- **Cost** — Calculated cost in cents
+
+### Cost Optimization Tips
+
+1. **Use appropriate quality tiers** — Fast tier for simple queries
+2. **Optimize system prompts** — Shorter prompts = fewer input tokens
+3. **Review high-cost conversations** — Identify inefficient patterns
+4. **Set up alerts** — Get notified when costs exceed thresholds
+
+## Retrieval Traces
+
+Debug knowledge base performance with retrieval traces:
+
+### Understanding Traces
+
+Every AI response that uses your knowledge base generates a trace:
+
+| Field | Description |
+|-------|-------------|
+| **Confidence** | Overall response confidence (0-100) |
+| **Strategy** | `kb` (knowledge base), `hybrid`, or `none` |
+| **Chunks Retrieved** | Number of text chunks found |
+| **Unique Sources** | Documents that contributed |
+| **No Context Reason** | Why context wasn't found (if applicable) |
+
+### Viewing Traces
+
+1. Go to **Conversations**
+2. Click a conversation
+3. Click the **Trace** icon on any assistant message
+4. Review retrieved chunks and similarity scores
+
+### Diagnosing Issues
+
+| Issue | What to Check |
+|-------|---------------|
+| **Low confidence** | Are relevant docs in knowledge base? |
+| **Wrong sources** | Check chunk similarity scores |
+| **No context found** | Verify knowledge base isn't empty |
+| **Timeout** | Large knowledge bases may need optimization |
+
+## Question Clustering
+
+Identify common user intents and knowledge gaps:
+
+### How Clustering Works
+
+The system automatically groups similar questions:
+
+1. Questions are embedded into vectors
+2. Similar questions are clustered (cosine similarity > 0.85)
+3. Clusters are analyzed for patterns
+4. Runs daily on a 90-day rolling window
+
+### Viewing Clusters
+
+Navigate to **Analytics** → **Questions** to see:
+
+| Column | Description |
+|--------|-------------|
+| **Representative Question** | Most central question in cluster |
+| **Count** | Number of similar questions |
+| **Avg Confidence** | Average response confidence |
+| **Conversion Rate** | % that led to form submissions |
+| **Trend** | Increasing or decreasing volume |
+
+### Using Clusters
+
+1. **Find knowledge gaps** — Low-confidence clusters need better docs
+2. **Identify popular topics** — High-count clusters show common needs
+3. **Optimize for conversions** — Improve responses for high-conversion questions
+4. **Track trends** — New clusters may indicate emerging needs
+
+## Feedback Analysis
+
+User feedback helps identify areas for improvement:
+
+### Viewing Feedback
+
+1. Go to **Conversations**
+2. Filter by **Has Feedback**
+3. Review conversations with thumbs down
+
+### Common Issues
+
+- **Wrong answers** — Update knowledge base
+- **Missing information** — Add relevant documents
+- **Tool failures** — Check tool configuration
+- **Tone issues** — Adjust system prompt
+
+## Exporting Data
+
+Export analytics data for external analysis:
+
+1. Select date range
+2. Click **Export** button
+3. Choose format (CSV or JSON)
+
+## Best Practices
+
+### Weekly Review
+
+1. Check feedback ratio trend
+2. Review negative feedback conversations
+3. Identify top-performing tools
+4. Monitor form conversion rates
+
+### Monthly Analysis
+
+1. Compare month-over-month trends
+2. Analyze geographic patterns
+3. Review tool success rates
+4. Assess trigger effectiveness
+
+### Continuous Improvement
+
+1. **Low feedback ratio?**
+   - Review negative feedback conversations
+   - Update knowledge base with missing info
+   - Improve system prompt clarity
+
+2. **Declining conversations?**
+   - Check widget installation
+   - Review trigger configurations
+   - Assess content freshness
+
+3. **Poor form conversion?**
+   - Simplify form fields
+   - Improve form timing (triggers)
+   - Add better context/descriptions
+
+4. **Tool failures increasing?**
+   - Check external API status
+   - Verify credentials
+   - Review error logs
+
+## API Access
+
+Access analytics programmatically:
+
+```bash
+# Get summary metrics
+curl "https://api.ansa.so/analytics/summary?agentId=xxx&startDate=2024-12-01" \
+  -H "Authorization: Bearer $ANSA_API_KEY"
+
+# Get daily data
+curl "https://api.ansa.so/analytics/daily?agentId=xxx" \
+  -H "Authorization: Bearer $ANSA_API_KEY"
+
+# Get channel breakdown
+curl "https://api.ansa.so/analytics/channels?agentId=xxx" \
+  -H "Authorization: Bearer $ANSA_API_KEY"
+
+# Get country data
+curl "https://api.ansa.so/analytics/countries?agentId=xxx" \
+  -H "Authorization: Bearer $ANSA_API_KEY"
+
+# Get tool performance
+curl "https://api.ansa.so/analytics/tools?agentId=xxx" \
+  -H "Authorization: Bearer $ANSA_API_KEY"
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Confidence Scores" icon="gauge" href="/user-guides/confidence-scores">
+    Understand response confidence
+  </Card>
+  <Card title="Conversation History" icon="clock-rotate-left" href="/user-guides/history">
+    Review past conversations
+  </Card>
+</CardGroup>

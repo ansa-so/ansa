@@ -1,0 +1,78 @@
+---
+title: Quickstart
+description: "Create your first AI agent in 5 minutes"
+---
+
+## Create an Account
+
+<Steps>
+  <Step title="Sign up">
+    Go to [ansa.so](https://ansa.so) and create an account with email or Google.
+  </Step>
+  <Step title="Create your first agent">
+    After signing up, you'll be guided through creating your first agent. Give it a name and description.
+  </Step>
+  <Step title="Customize the system prompt">
+    Tell your agent how to behave. For example:
+
+    ```
+    You are a helpful customer support agent for Acme Corp.
+    Be friendly, concise, and always try to help resolve issues.
+    If you don't know something, say so honestly.
+    ```
+  </Step>
+</Steps>
+
+## Add Knowledge
+
+Your agent can answer questions using documents you upload.
+
+<Steps>
+  <Step title="Go to Knowledge Base">
+    Navigate to the **Knowledge** tab in your agent settings.
+  </Step>
+  <Step title="Upload documents">
+    Drag and drop PDFs, text files, or Word documents. Ansa will automatically chunk and index them.
+  </Step>
+  <Step title="Add web sources">
+    Enter URLs to sync content from websites. Ansa can crawl and index entire sites.
+  </Step>
+</Steps>
+
+## Install the Widget
+
+Add the chat widget to your website:
+
+```html
+<script src="https://cdn.ansa.so/embed.js?agentId=XXX"></script>
+```
+
+<Tip>
+  Find your agent ID in **Settings > Widget** in the dashboard.
+</Tip>
+
+## Test Your Agent
+
+1. Visit your website
+2. Click the chat bubble in the bottom-right corner
+3. Ask a question about your uploaded documents
+4. Watch your agent respond with accurate, context-aware answers!
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Add Custom Tools"
+    icon="wrench"
+    href="/agents/tools"
+  >
+    Connect APIs to let your agent take actions
+  </Card>
+  <Card
+    title="Customize Widget"
+    icon="palette"
+    href="/widget/customization"
+  >
+    Match the widget to your brand
+  </Card>
+</CardGroup>

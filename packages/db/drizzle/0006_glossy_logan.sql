@@ -1,0 +1,2 @@
+ALTER TABLE "interface_settings" ADD COLUMN "rate_limit_notice_message" text DEFAULT 'This conversation has reached its message limit. Please start a new conversation for further assistance.';--> statement-breakpoint
+ALTER TABLE "interface_settings_translations" ADD COLUMN "rate_limit_notice_message" text;

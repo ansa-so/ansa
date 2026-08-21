@@ -1,0 +1,123 @@
+{
+	"name": "Ansa",
+	"theme": "mint",
+	"logo": {
+		"dark": "/logo/dark.svg",
+		"light": "/logo/light.svg"
+	},
+	"favicon": "/favicon.svg",
+	"colors": {
+		"primary": "#18181B",
+		"light": "#3B82F6",
+		"dark": "#18181B"
+	},
+	"topbarLinks": [
+		{
+			"name": "Dashboard",
+			"url": "https://ansa.so"
+		}
+	],
+	"topbarCtaButton": {
+		"name": "Get Started",
+		"url": "https://ansa.so/signup"
+	},
+	"anchors": [
+		{
+			"name": "GitHub",
+			"icon": "github",
+			"url": "https://github.com/ansa/ansa"
+		}
+	],
+	"navigation": {
+		"groups": [
+			{
+				"group": "Getting Started",
+				"pages": ["introduction", "quickstart", "tips-strategies", "self-hosting"]
+			},
+			{
+				"group": "User Guides",
+				"pages": [
+					"agents/overview",
+					"agents/knowledge-base",
+					"widget/installation",
+					"widget/customization",
+					"widget/theming",
+					"widget/multi-language",
+					"widget/triggers",
+					"user-guides/analytics",
+					"user-guides/confidence-scores",
+					"user-guides/escalations",
+					"user-guides/history",
+					"user-guides/leads",
+					"user-guides/team",
+					"user-guides/personality",
+					"user-guides/billing"
+				]
+			},
+			{
+				"group": "Use Cases",
+				"pages": [
+					"use-cases/customer-support",
+					"use-cases/sales",
+					"use-cases/ecommerce",
+					"use-cases/lead-generation",
+					"use-cases/documentation",
+					"use-cases/internal-tools"
+				]
+			},
+			{
+				"group": "Developer Guides",
+				"pages": [
+					"developer-guides/overview",
+					"developer-guides/sdk",
+					"developer-guides/widget-api",
+					"developer-guides/triggering-forms",
+					"developer-guides/custom-events",
+					"developer-guides/identity",
+					"developer-guides/webhooks",
+					"developer-guides/realtime"
+				]
+			},
+			{
+				"group": "Tools & Forms",
+				"pages": [
+					"tools/overview",
+					"tools/http-tools",
+					"tools/form-tools",
+					"tools/display-config",
+					"tools/post-actions",
+					"tools/marketplace"
+				]
+			},
+			{
+				"group": "Integrations",
+				"pages": [
+					"integrations/shopify",
+					"integrations/email",
+					"integrations/messenger",
+					"integrations/trigger-templates"
+				]
+			},
+			{
+				"group": "API Reference",
+				"pages": [
+					"api-reference/overview",
+					"api-reference/authentication",
+					"api-reference/chat",
+					"api-reference/agents",
+					"api-reference/conversations",
+					"api-reference/tools",
+					"api-reference/triggers",
+					"api-reference/forms"
+				]
+			},
+			{
+				"group": "Support",
+				"pages": ["faq"]
+			}
+		]
+	},
+	"footerSocials": {
+		"github": "https://github.com/ansa-so"
+	}
+}

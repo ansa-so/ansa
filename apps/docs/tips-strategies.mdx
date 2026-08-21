@@ -1,0 +1,399 @@
+---
+title: Tips & Strategies
+description: "Best practices for getting the most out of your AI agent"
+---
+
+Get better results from your Ansa agent with these proven strategies. From knowledge base optimization to conversation design, these tips will help you create an exceptional customer experience.
+
+## Agent Setup
+
+### Start with Clear Goals
+
+Before configuring your agent, define what success looks like:
+
+| Goal | Metrics to Track |
+|------|------------------|
+| Reduce support tickets | Conversations resolved without escalation |
+| Capture leads | Form submissions, conversion rate |
+| Improve satisfaction | Thumbs up ratio, NPS scores |
+| Deflect common questions | Messages per conversation |
+
+### Write a Great System Prompt
+
+Your system prompt shapes every response. Include:
+
+```
+You are [name], a [role] for [company]. Your goal is to [primary purpose].
+
+PERSONALITY:
+- [Tone descriptors: friendly, professional, casual, etc.]
+- [Communication style: concise, detailed, conversational]
+
+CAPABILITIES:
+- Answer questions about [topics]
+- Help users [actions]
+- Collect information via [forms]
+
+LIMITATIONS:
+- Don't discuss [off-topic areas]
+- Always [safety guidelines]
+- When unsure, [escalation behavior]
+
+FORMATTING:
+- Use [markdown, bullets, emojis, etc.]
+- Keep responses [length guideline]
+```
+
+### Choose the Right Model
+
+| Model | Best For | Trade-off |
+|-------|----------|-----------|
+| GPT-4o | Complex reasoning, nuance | Higher cost |
+| GPT-4o-mini | General support, speed | Less nuanced |
+| Claude 3.5 | Long context, safety | Different style |
+
+<Tip>
+Start with GPT-4o-mini for most use cases. Upgrade to GPT-4o if you need better reasoning or notice quality issues.
+</Tip>
+
+## Knowledge Base Optimization
+
+### Structure Content Well
+
+Organize your knowledge base for best results:
+
+**Do:**
+- One topic per document
+- Clear headings and sections
+- Specific, factual content
+- Include common question variations
+
+**Don't:**
+- Dump entire websites
+- Mix unrelated topics
+- Use vague language
+- Include outdated information
+
+### Write for AI Understanding
+
+Format content so the AI can use it effectively:
+
+```markdown
+# Product Returns
+
+## Return Policy
+We accept returns within 30 days of purchase for a full refund.
+
+## Conditions
+- Item must be unused
+- Original packaging required
+- Receipt or order number needed
+
+## Process
+1. Start a return at [URL]
+2. Print shipping label
+3. Drop off at any carrier location
+4. Refund processed in 5-7 days
+
+## Exceptions
+- Final sale items cannot be returned
+- Personalized items are non-refundable
+```
+
+### Cover Common Questions
+
+Anticipate what users will ask:
+
+1. **Audit existing support tickets** — What do people actually ask?
+2. **Check search logs** — What terms do visitors search for?
+3. **Review competitors** — What do they answer?
+4. **Talk to support team** — What questions repeat?
+
+### Keep Content Fresh
+
+| Cadence | Action |
+|---------|--------|
+| Weekly | Review low-confidence conversations |
+| Monthly | Update seasonal/promotional content |
+| Quarterly | Full knowledge base audit |
+| As needed | Policy/product changes |
+
+## Conversation Quality
+
+### Reduce Response Length
+
+Long responses hurt engagement. Optimize for scanability:
+
+**Before:**
+> Thank you so much for reaching out to us today! I'd be more than happy to help you with your question about our return policy. Our standard return policy allows you to return any item within 30 days of your original purchase date for a full refund to your original payment method. The item must be in its original condition with all tags attached and in the original packaging...
+
+**After:**
+> Returns are accepted within 30 days for a full refund.
+>
+> Requirements:
+> - Unused condition
+> - Original packaging
+> - Receipt or order number
+>
+> Start your return at [link].
+
+### Handle Edge Cases
+
+Train your agent for situations where it doesn't have an answer:
+
+```
+When you cannot answer a question:
+1. Acknowledge what the user is asking
+2. Explain why you can't help with that specific request
+3. Offer an alternative (contact support, FAQ link, etc.)
+
+Never make up information. It's okay to say "I don't have that information."
+```
+
+### Use Conversational Tone
+
+Match your brand voice throughout:
+
+| Brand Style | Example Response |
+|-------------|------------------|
+| Professional | "I'd be happy to assist with that inquiry." |
+| Friendly | "Sure thing! Let me help you out." |
+| Casual | "Got it! Here's what you need..." |
+| Technical | "The correct approach is..." |
+
+## Form Design
+
+### Keep Forms Short
+
+Every field reduces completion rate:
+
+| Fields | Completion Rate |
+|--------|-----------------|
+| 1-2 | 80%+ |
+| 3-4 | 60-70% |
+| 5-6 | 40-50% |
+| 7+ | Below 30% |
+
+### Ask in Context
+
+Don't show forms immediately. Build context first:
+
+**Bad:**
+> Agent: "Hi! Please fill out this form."
+> [Shows 5-field contact form]
+
+**Good:**
+> User: "I'm interested in your enterprise plan"
+> Agent: "Great! Our enterprise plan includes unlimited users and dedicated support. What's your company size?"
+> User: "About 200 employees"
+> Agent: "Perfect for enterprise! To connect you with the right person, I just need a few details."
+> [Shows 3-field form: name, email, company]
+
+### Use Progressive Disclosure
+
+Collect information gradually:
+
+1. **Initial:** Name, email (required)
+2. **Follow-up:** Company, role (if relevant)
+3. **Later:** Detailed requirements (if needed)
+
+### Make Fields Smart
+
+| Instead of | Use |
+|------------|-----|
+| Free text for everything | Dropdowns for known options |
+| Required fields | Optional with smart defaults |
+| Separate first/last name | Single "Full Name" field |
+| Manual entry | Auto-detect when possible |
+
+## Trigger Strategy
+
+### Don't Overwhelm Visitors
+
+| Practice | Guideline |
+|----------|-----------|
+| Max triggers per session | 2-3 |
+| Time between triggers | 30+ seconds |
+| Same page triggers | 1 |
+| Exit intent | Once per session |
+
+### Match Intent to Action
+
+| Trigger | Action | Why |
+|---------|--------|-----|
+| New visitor (5s) | Soft bubble | Welcome without interrupting |
+| Pricing page (30s) | Open chat | They're evaluating |
+| Exit intent | Form | Last chance to capture |
+| Deep scroll | Bubble | Engaged but not interrupting |
+
+### Test and Iterate
+
+Run experiments:
+
+1. **A/B test timing** — Does 5s or 10s convert better?
+2. **Compare messages** — Which welcome message gets engagement?
+3. **Try different actions** — Bubble vs. chat vs. form
+4. **Measure conversions** — Track what leads to form submissions
+
+## Monitoring & Improvement
+
+### Daily Habits
+
+- [ ] Check for failed form submissions
+- [ ] Review any escalated conversations
+- [ ] Glance at confidence trends
+
+### Weekly Review
+
+- [ ] Read 10 random conversations
+- [ ] Analyze thumbs-down feedback
+- [ ] Update knowledge base with gaps
+- [ ] Review trigger performance
+
+### Monthly Optimization
+
+- [ ] Full analytics review
+- [ ] Compare to previous month
+- [ ] Update system prompt if needed
+- [ ] Test as a new visitor
+
+## Common Mistakes
+
+### ❌ Mistake: Too Much Content
+
+**Problem:** Dumping your entire website creates noise.
+
+**Solution:** Curate the most important, question-answering content. Less is more.
+
+### ❌ Mistake: Generic Responses
+
+**Problem:** Agent gives vague, unhelpful answers.
+
+**Solution:** Add specific, factual content. Include exact numbers, dates, and processes.
+
+### ❌ Mistake: No Escalation Path
+
+**Problem:** Users get stuck with no way to reach a human.
+
+**Solution:** Always provide a fallback: email, phone, or contact form.
+
+### ❌ Mistake: Ignoring Low Confidence
+
+**Problem:** Agent answers with low confidence, users get wrong info.
+
+**Solution:** Set confidence thresholds and forward uncertain responses for review.
+
+### ❌ Mistake: Set and Forget
+
+**Problem:** Agent performance degrades over time.
+
+**Solution:** Schedule regular reviews. Products change, questions evolve.
+
+## Advanced Techniques
+
+### Personalization
+
+Use visitor identity for better responses:
+
+```javascript
+window.ansa.identify({
+  userId: "user_123",
+  email: "jane@example.com",
+  name: "Jane",
+  plan: "pro",
+  company: "Acme Corp"
+});
+```
+
+Now the agent can:
+- Greet by name
+- Reference their plan
+- Provide account-specific help
+
+### Segmented Experiences
+
+Different triggers for different audiences:
+
+```javascript
+// VIP customers get proactive help
+if (customer.plan === "enterprise") {
+  window.ansa.trigger("vip_welcome");
+}
+
+// New users see onboarding
+if (customer.signupDate > sevenDaysAgo) {
+  window.ansa.trigger("onboarding_help");
+}
+```
+
+### Contextual Knowledge
+
+Pass page context to your agent:
+
+```javascript
+// On product pages
+window.ansa.setContext({
+  currentProduct: "Widget Pro",
+  productPrice: 99.99,
+  inStock: true
+});
+```
+
+Agent can now answer "Is this in stock?" accurately.
+
+## Measuring Success
+
+### Key Metrics
+
+| Metric | Good | Excellent |
+|--------|------|-----------|
+| Resolution rate | 60%+ | 80%+ |
+| Avg confidence | 70%+ | 85%+ |
+| Thumbs up ratio | 80%+ | 90%+ |
+| Form conversion | 20%+ | 40%+ |
+| Avg messages/convo | 3-5 | 2-4 |
+
+### ROI Calculation
+
+Track the value your agent creates:
+
+```
+Monthly savings = (Support tickets deflected) × (Cost per ticket)
+Lead value = (Form submissions) × (Lead-to-customer rate) × (Customer value)
+```
+
+### Continuous Improvement Loop
+
+1. **Measure** — Track metrics weekly
+2. **Identify** — Find underperforming areas
+3. **Hypothesize** — What might improve it?
+4. **Test** — Make a change
+5. **Validate** — Did metrics improve?
+6. **Repeat**
+
+## Quick Wins
+
+### This Week
+
+- [ ] Review 5 low-confidence conversations
+- [ ] Add answers for top 3 unanswered questions
+- [ ] Shorten your longest knowledge base doc
+- [ ] Test your agent as a new visitor
+
+### This Month
+
+- [ ] Set up a weekly review calendar reminder
+- [ ] Create 2-3 trigger automations
+- [ ] Build a lead capture form
+- [ ] Review and update system prompt
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="FAQ" icon="circle-question" href="/faq">
+    Common questions answered
+  </Card>
+  <Card title="Analytics" icon="chart-bar" href="/user-guides/analytics">
+    Measure your performance
+  </Card>
+</CardGroup>

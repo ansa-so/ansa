@@ -1,0 +1,260 @@
+---
+title: "Marketplace"
+description: "Install pre-built tool templates to quickly add functionality to your agents."
+---
+
+import { Screenshot } from '/snippets/screenshot.mdx'
+
+## Overview
+
+The Marketplace provides ready-to-use tool templates that you can install in seconds:
+
+- **Pre-configured** — Tools are set up with best practices
+- **One-click install** — Just add your API keys
+- **Categorized** — Find tools by use case
+- **Free and premium** — Many templates are free
+
+## Browsing the Marketplace
+
+Navigate to **Agent → Tools → Marketplace** to browse available templates.
+
+### Categories
+
+| Category | Examples |
+|----------|----------|
+| **Search** | Google Search, Bing, DuckDuckGo |
+| **Productivity** | Calendar, Task management |
+| **Communication** | Email, SMS, Slack |
+| **Data** | Weather, Stock prices, Currency |
+| **E-commerce** | Shopify, WooCommerce, Stripe |
+
+### Template Information
+
+Each template shows:
+- **Name and description** — What the tool does
+- **Category and icon** — Visual identification
+- **Install count** — Popularity indicator
+- **Required configuration** — API keys or settings needed
+- **Free/Premium** — Pricing status
+
+## Installing a Template
+
+### 1. Select Template
+
+Click on a template to view details:
+
+- Full description
+- Input parameters
+- Example usage
+- Required configuration
+
+### 2. Provide Configuration
+
+Most templates require some configuration:
+
+```json
+{
+  "requiredConfig": [
+    {
+      "key": "api_key",
+      "label": "API Key",
+      "type": "password",
+      "placeholder": "sk-...",
+      "helpText": "Get your API key from the dashboard",
+      "helpUrl": "https://example.com/api-keys"
+    }
+  ]
+}
+```
+
+| Config Type | Description |
+|-------------|-------------|
+| `text` | Plain text input |
+| `password` | Hidden/masked input (for API keys) |
+| `url` | URL input |
+
+### 3. Install
+
+Click **Install** to add the tool to your agent. The template's placeholders are replaced with your configuration:
+
+```
+Before: https://api.example.com?key=${api_key}
+After:  https://api.example.com?key=sk-your-actual-key
+```
+
+## Configuration Substitution
+
+Templates use `${config_key}` placeholders that are replaced during installation:
+
+### In URLs
+
+```json
+{
+  "httpUrl": "https://api.weatherapi.com/v1/current.json?key=${weather_api_key}&q=${city}"
+}
+```
+
+### In Headers
+
+```json
+{
+  "httpHeaders": {
+    "Authorization": "Bearer ${api_token}",
+    "X-Api-Key": "${secondary_key}"
+  }
+}
+```
+
+### In Mock Responses
+
+```json
+{
+  "mockResponse": "Welcome to ${company_name}! How can I help?"
+}
+```
+
+## Managing Installed Tools
+
+After installation, tools appear in your agent's Tools list:
+
+- **Edit** — Modify configuration or behavior
+- **Enable/Disable** — Toggle without deleting
+- **Delete** — Remove from agent
+
+Installed tools reference the original template via `templateId`, allowing you to see template updates.
+
+## Trigger Templates
+
+The Marketplace also includes trigger templates for common engagement patterns:
+
+| Category | Examples |
+|----------|----------|
+| **Engagement** | Welcome message, time on page |
+| **Conversion** | Exit intent, pricing page |
+| **E-commerce** | Cart abandonment, product view |
+| **Lead Generation** | Scroll depth, content engagement |
+| **Support** | Help page assistance |
+| **Feedback** | Survey prompts |
+
+### Installing Trigger Templates
+
+1. Go to **Agent → Triggers → Browse Templates**
+2. Select a template
+3. Customize conditions if needed
+4. Install
+
+Some trigger templates include associated form templates that are installed together.
+
+## Popular Templates
+
+### Weather API
+
+Get current weather conditions:
+
+```json
+{
+  "name": "get_weather",
+  "description": "Get weather when user asks about weather conditions.",
+  "httpUrl": "https://api.weatherapi.com/v1/current.json?key=${api_key}&q=${location}",
+  "requiredConfig": [
+    { "key": "api_key", "label": "WeatherAPI Key", "type": "password" }
+  ]
+}
+```
+
+### Google Search
+
+Search the web:
+
+```json
+{
+  "name": "web_search",
+  "description": "Search the web for current information.",
+  "httpUrl": "https://www.googleapis.com/customsearch/v1?key=${google_key}&cx=${search_engine_id}&q=${query}",
+  "requiredConfig": [
+    { "key": "google_key", "label": "Google API Key", "type": "password" },
+    { "key": "search_engine_id", "label": "Search Engine ID", "type": "text" }
+  ]
+}
+```
+
+### Contact Form
+
+Basic contact form with Slack notification:
+
+```json
+{
+  "name": "contact_support",
+  "description": "Show contact form when user needs human help.",
+  "executionType": "form",
+  "formSchema": {
+    "fields": [
+      { "name": "email", "label": "Email", "type": "email" },
+      { "name": "message", "label": "Message", "type": "textarea" }
+    ]
+  },
+  "formPostActions": [
+    { "type": "slack", "webhookUrl": "${slack_webhook}", "messageTemplate": "New contact: {{email}}\n{{message}}" }
+  ],
+  "requiredConfig": [
+    { "key": "slack_webhook", "label": "Slack Webhook URL", "type": "url" }
+  ]
+}
+```
+
+### Shopify Product Search
+
+Search Shopify products:
+
+```json
+{
+  "name": "search_products",
+  "description": "Search products when user asks about items.",
+  "httpUrl": "${shopify_store}/admin/api/2024-01/products.json?title=${query}",
+  "httpHeaders": {
+    "X-Shopify-Access-Token": "${shopify_token}"
+  },
+  "displayConfig": {
+    "type": "product_carousel"
+  },
+  "requiredConfig": [
+    { "key": "shopify_store", "label": "Store URL", "type": "url", "placeholder": "https://your-store.myshopify.com" },
+    { "key": "shopify_token", "label": "Access Token", "type": "password" }
+  ]
+}
+```
+
+## Creating Custom Templates
+
+Currently, templates are managed by the Ansa team. To suggest a template:
+
+1. Build and test the tool in your agent
+2. Contact us with the tool configuration
+3. We'll review and potentially add it to the Marketplace
+
+## Best Practices
+
+### Security
+
+- **Protect API keys** — Use password-type config fields
+- **Review permissions** — Understand what access tools need
+- **Rotate keys** — Update API keys periodically
+
+### Testing
+
+- **Test before deploying** — Use the chat playground
+- **Check error handling** — Try edge cases
+- **Monitor usage** — Watch for API quota issues
+
+### Maintenance
+
+- **Check for updates** — Templates may be improved
+- **Review periodically** — Remove unused tools
+- **Keep configs current** — Update expired keys
+
+## See Also
+
+- [Tools Overview](/tools/overview) — Tool types and configuration
+- [HTTP Tools](/tools/http-tools) — Building custom API tools
+- [Form Tools](/tools/form-tools) — Creating custom forms
+- [Triggers](/widget/triggers) — Engagement automation

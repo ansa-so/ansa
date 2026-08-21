@@ -1,0 +1,475 @@
+---
+title: "Form Tools"
+description: "Collect user information with interactive forms that support validation, multiple field types, and post-submission actions."
+---
+
+import { Screenshot } from '/snippets/screenshot.mdx'
+
+## Overview
+
+Form tools display interactive forms within the chat widget to collect structured data from users. Use them for:
+
+- Lead capture
+- Contact forms
+- Support ticket creation
+- Surveys and feedback
+- User onboarding
+
+<Screenshot src="/screenshots/widget.png" alt="Form in widget" />
+
+## Creating a Form Tool
+
+```json
+{
+  "name": "contact_form",
+  "description": "Show this form when user wants to contact support, has an issue you cannot resolve, or requests human assistance.",
+  "executionType": "form",
+  "formSchema": {
+    "fields": [
+      {
+        "name": "email",
+        "label": "Email",
+        "type": "email",
+        "placeholder": "you@example.com",
+        "validation": {
+          "required": { "value": true, "message": "Email is required" }
+        }
+      },
+      {
+        "name": "message",
+        "label": "Message",
+        "type": "textarea",
+        "placeholder": "How can we help?"
+      }
+    ],
+    "submitLabel": "Send Message",
+    "successMessage": "Thanks! We'll get back to you soon.",
+    "errorMessage": "Something went wrong. Please try again."
+  }
+}
+```
+
+## Field Types
+
+Ansa supports 11 field types:
+
+### Text Input
+
+Single-line text entry.
+
+```json
+{
+  "name": "name",
+  "label": "Full Name",
+  "type": "text",
+  "placeholder": "John Smith"
+}
+```
+
+### Email
+
+Email input with format validation.
+
+```json
+{
+  "name": "email",
+  "label": "Email Address",
+  "type": "email",
+  "placeholder": "you@company.com"
+}
+```
+
+### Phone (Tel)
+
+Phone number input.
+
+```json
+{
+  "name": "phone",
+  "label": "Phone Number",
+  "type": "tel",
+  "placeholder": "+1 (555) 123-4567"
+}
+```
+
+### Number
+
+Numeric input with optional min/max.
+
+```json
+{
+  "name": "quantity",
+  "label": "Quantity",
+  "type": "number",
+  "validation": {
+    "min": { "value": 1, "message": "Minimum is 1" },
+    "max": { "value": 100, "message": "Maximum is 100" }
+  }
+}
+```
+
+### Textarea
+
+Multi-line text input.
+
+```json
+{
+  "name": "description",
+  "label": "Description",
+  "type": "textarea",
+  "placeholder": "Tell us more..."
+}
+```
+
+### Select (Dropdown)
+
+Single selection from options.
+
+```json
+{
+  "name": "department",
+  "label": "Department",
+  "type": "select",
+  "options": [
+    { "label": "Sales", "value": "sales" },
+    { "label": "Support", "value": "support" },
+    { "label": "Billing", "value": "billing" }
+  ]
+}
+```
+
+### Multi-Select
+
+Multiple selections from options.
+
+```json
+{
+  "name": "interests",
+  "label": "Interests",
+  "type": "multiselect",
+  "options": [
+    { "label": "Product Updates", "value": "updates" },
+    { "label": "Tips & Tutorials", "value": "tips" },
+    { "label": "Case Studies", "value": "cases" }
+  ]
+}
+```
+
+### Date
+
+Date picker.
+
+```json
+{
+  "name": "preferred_date",
+  "label": "Preferred Date",
+  "type": "date",
+  "validation": {
+    "min": { "value": "2024-01-01", "message": "Date must be in 2024 or later" }
+  }
+}
+```
+
+### DateTime
+
+Date and time picker.
+
+```json
+{
+  "name": "appointment",
+  "label": "Appointment Time",
+  "type": "datetime"
+}
+```
+
+### File Upload
+
+File upload (max 5MB, base64 encoded).
+
+```json
+{
+  "name": "attachment",
+  "label": "Attachment",
+  "type": "file"
+}
+```
+
+### Image Upload
+
+Image upload (max 5MB, base64 encoded).
+
+```json
+{
+  "name": "screenshot",
+  "label": "Screenshot",
+  "type": "image"
+}
+```
+
+## Field Properties
+
+Every field supports these properties:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `name` | string | Field identifier (required) |
+| `label` | string | Display label (required) |
+| `type` | string | Field type (required) |
+| `placeholder` | string | Placeholder text |
+| `defaultValue` | string | Pre-filled value |
+| `disabled` | boolean | Make field read-only |
+| `validation` | object | Validation rules |
+| `options` | array | For select/multiselect only |
+
+## Validation
+
+Add validation rules with custom error messages:
+
+### Required
+
+```json
+{
+  "validation": {
+    "required": {
+      "value": true,
+      "message": "This field is required"
+    }
+  }
+}
+```
+
+### Min/Max Length (Text)
+
+```json
+{
+  "validation": {
+    "minLength": {
+      "value": 10,
+      "message": "Please enter at least 10 characters"
+    },
+    "maxLength": {
+      "value": 500,
+      "message": "Maximum 500 characters"
+    }
+  }
+}
+```
+
+### Min/Max Value (Numbers/Dates)
+
+```json
+{
+  "validation": {
+    "min": {
+      "value": 1,
+      "message": "Must be at least 1"
+    },
+    "max": {
+      "value": 100,
+      "message": "Cannot exceed 100"
+    }
+  }
+}
+```
+
+### Pattern (Regex)
+
+```json
+{
+  "validation": {
+    "pattern": {
+      "value": "^[A-Z]{2}[0-9]{6}$",
+      "message": "Please enter a valid order number (e.g., AB123456)"
+    }
+  }
+}
+```
+
+### Combined Validation
+
+```json
+{
+  "name": "email",
+  "type": "email",
+  "validation": {
+    "required": { "value": true, "message": "Email is required" },
+    "pattern": {
+      "value": "^[^@]+@[^@]+\\.[^@]+$",
+      "message": "Please enter a valid email"
+    }
+  }
+}
+```
+
+## Default Values
+
+### Static Defaults
+
+```json
+{
+  "name": "country",
+  "type": "select",
+  "defaultValue": "us"
+}
+```
+
+### Template Defaults
+
+Use user data to pre-fill fields:
+
+```json
+{
+  "name": "email",
+  "type": "email",
+  "defaultValue": "{{user.email}}"
+}
+```
+
+Available template variables:
+- `{{user.email}}` — Identified user's email
+- `{{user.name}}` — Identified user's name
+- `{{user.userId}}` — User ID
+- `{{user.metadata.field}}` — Any custom metadata field
+- `{{context.previousResult.field}}` — Data from previous tool result
+
+## Form Schema
+
+The complete form structure:
+
+```json
+{
+  "formSchema": {
+    "fields": [...],
+    "submitLabel": "Submit",
+    "successMessage": "Form submitted successfully!",
+    "errorMessage": "Something went wrong. Please try again."
+  }
+}
+```
+
+| Property | Default | Description |
+|----------|---------|-------------|
+| `fields` | required | Array of field definitions |
+| `submitLabel` | "Submit" | Button text |
+| `successMessage` | "Submitted" | Shown after success |
+| `errorMessage` | "Error" | Shown on failure |
+
+## Execution Modes
+
+Control how form submissions are handled:
+
+| Mode | Description |
+|------|-------------|
+| `webhook` | Data sent to server/webhook only |
+| `client` | Handled by client-side JavaScript only |
+| `both` | Sent to webhook AND processed by client |
+
+```json
+{
+  "formExecutionMode": "webhook"
+}
+```
+
+See [Triggering Forms in Code](/developer-guides/triggering-forms) for client-side handling.
+
+## Complete Example
+
+A comprehensive lead capture form:
+
+```json
+{
+  "name": "lead_capture",
+  "description": "Capture lead information when visitor expresses interest in a demo, pricing, or wants to be contacted.",
+  "executionType": "form",
+  "formSchema": {
+    "fields": [
+      {
+        "name": "firstName",
+        "label": "First Name",
+        "type": "text",
+        "placeholder": "Jane",
+        "validation": {
+          "required": { "value": true, "message": "First name is required" }
+        }
+      },
+      {
+        "name": "lastName",
+        "label": "Last Name",
+        "type": "text",
+        "placeholder": "Smith"
+      },
+      {
+        "name": "email",
+        "label": "Work Email",
+        "type": "email",
+        "placeholder": "jane@company.com",
+        "defaultValue": "{{user.email}}",
+        "validation": {
+          "required": { "value": true, "message": "Email is required" }
+        }
+      },
+      {
+        "name": "phone",
+        "label": "Phone",
+        "type": "tel",
+        "placeholder": "+1 (555) 123-4567"
+      },
+      {
+        "name": "company",
+        "label": "Company",
+        "type": "text",
+        "placeholder": "Acme Inc"
+      },
+      {
+        "name": "companySize",
+        "label": "Company Size",
+        "type": "select",
+        "options": [
+          { "label": "1-10 employees", "value": "1-10" },
+          { "label": "11-50 employees", "value": "11-50" },
+          { "label": "51-200 employees", "value": "51-200" },
+          { "label": "201-500 employees", "value": "201-500" },
+          { "label": "500+ employees", "value": "500+" }
+        ]
+      },
+      {
+        "name": "interest",
+        "label": "What are you interested in?",
+        "type": "multiselect",
+        "options": [
+          { "label": "Product Demo", "value": "demo" },
+          { "label": "Pricing", "value": "pricing" },
+          { "label": "Technical Questions", "value": "technical" },
+          { "label": "Integration Help", "value": "integration" }
+        ]
+      },
+      {
+        "name": "message",
+        "label": "Anything else?",
+        "type": "textarea",
+        "placeholder": "Tell us about your use case..."
+      }
+    ],
+    "submitLabel": "Request Demo",
+    "successMessage": "Thanks! Our team will reach out within 24 hours."
+  },
+  "formPostActions": [
+    {
+      "type": "webhook",
+      "url": "https://hooks.zapier.com/hooks/catch/123/abc"
+    },
+    {
+      "type": "slack",
+      "webhookUrl": "https://hooks.slack.com/services/...",
+      "messageTemplate": "🎯 *New Lead*\n\n*Name:* {{firstName}} {{lastName}}\n*Email:* {{email}}\n*Company:* {{company}} ({{companySize}})\n*Interest:* {{interest}}"
+    }
+  ]
+}
+```
+
+## See Also
+
+- [Submission Actions](/tools/post-actions) — Webhooks, Slack, email notifications
+- [Triggering Forms in Code](/developer-guides/triggering-forms) — Client-side form control
+- [Display Configuration](/tools/display-config) — Rich response formatting
+- [Leads & Forms](/user-guides/leads) — Managing form submissions

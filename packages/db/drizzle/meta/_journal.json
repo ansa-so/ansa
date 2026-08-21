@@ -1,0 +1,76 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1768917100191,
+      "tag": "0000_petite_zemo",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1737676800000,
+      "tag": "0001_add_refund_contact_fields",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1769253382664,
+      "tag": "0002_add-email-mismatch-to-refund-requests",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1769766975014,
+      "tag": "0003_perpetual_ender_wiggin",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1769864542638,
+      "tag": "0004_certain_skrulls",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1771113600000,
+      "tag": "0005_normalize_tool_schema_defaults",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1771186592373,
+      "tag": "0006_glossy_logan",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1772873656203,
+      "tag": "0008_yielding_tyger_tiger",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1776024233242,
+      "tag": "0008_illegal_madripoor",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1787325151908,
+      "tag": "0009_better_auth_account_issuer",
+      "breakpoints": true
+    }
+  ]
+}

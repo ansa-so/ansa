@@ -1,0 +1,439 @@
+---
+title: "Display Configuration"
+description: "Show rich, interactive content like product cards, carousels, tables, and buttons in your agent's responses."
+---
+
+import { Screenshot } from '/snippets/screenshot.mdx'
+
+## Overview
+
+Display configuration transforms raw API data into rich, visual responses:
+
+| Display Type | Best For |
+|--------------|----------|
+| `product_card` | Single item with image, price, details |
+| `product_carousel` | Multiple products, recommendations |
+| `product_grid` | Grid layout for multiple products |
+| `table` | Structured data, comparisons |
+| `buttons` | Quick actions, choices |
+| `image` | Single image display |
+| `form` | Interactive form input |
+| `text` | Plain text (default) |
+| `custom` | Custom HTML/template |
+
+## Configuration Structure
+
+```json
+{
+  "displayConfig": {
+    "type": "product_carousel",
+    "fieldMappings": {
+      "title": "$.products[*].name",
+      "price": "$.products[*].price",
+      "image": "$.products[*].image_url",
+      "url": "$.products[*].product_url"
+    },
+    "options": {
+      "showPrice": true,
+      "showImage": true,
+      "showAddToCart": true
+    },
+    "textFallback": "Found {{count}} products for you."
+  }
+}
+```
+
+## Field Mappings
+
+Field mappings use JSONPath to extract data from API responses:
+
+### JSONPath Basics
+
+| Pattern | Meaning |
+|---------|---------|
+| `$.field` | Root level field |
+| `$.nested.field` | Nested field |
+| `$.array[0]` | First array item |
+| `$.array[*].field` | Field from all array items |
+
+### Example API Response
+
+```json
+{
+  "products": [
+    {
+      "name": "Blue Widget",
+      "price": 29.99,
+      "image_url": "https://...",
+      "sku": "BW-001"
+    },
+    {
+      "name": "Red Widget",
+      "price": 34.99,
+      "image_url": "https://...",
+      "sku": "RW-002"
+    }
+  ]
+}
+```
+
+### Mapping Configuration
+
+```json
+{
+  "fieldMappings": {
+    "title": "$.products[*].name",
+    "price": "$.products[*].price",
+    "image": "$.products[*].image_url",
+    "id": "$.products[*].sku"
+  }
+}
+```
+
+## Display Types
+
+### Product Card
+
+Single product display with image, title, price, and action button.
+
+```json
+{
+  "displayConfig": {
+    "type": "product_card",
+    "fieldMappings": {
+      "title": "$.product.name",
+      "price": "$.product.price",
+      "image": "$.product.image",
+      "description": "$.product.description",
+      "url": "$.product.url"
+    },
+    "options": {
+      "showPrice": true,
+      "showImage": true,
+      "showAddToCart": true
+    }
+  }
+}
+```
+
+**Options:**
+| Option | Type | Description |
+|--------|------|-------------|
+| `showPrice` | boolean | Display price |
+| `showImage` | boolean | Display product image |
+| `showAddToCart` | boolean | Show add to cart button |
+
+### Product Carousel
+
+Multiple products in a scrollable carousel.
+
+```json
+{
+  "displayConfig": {
+    "type": "product_carousel",
+    "fieldMappings": {
+      "title": "$.items[*].name",
+      "price": "$.items[*].price",
+      "image": "$.items[*].thumbnail",
+      "url": "$.items[*].link"
+    },
+    "options": {
+      "showPrice": true,
+      "showImage": true,
+      "showAddToCart": false
+    }
+  }
+}
+```
+
+### Table
+
+Structured data in rows and columns.
+
+```json
+{
+  "displayConfig": {
+    "type": "table",
+    "fieldMappings": {
+      "data": "$.orders"
+    },
+    "options": {
+      "columns": [
+        { "key": "order_id", "label": "Order #", "width": "20%" },
+        { "key": "date", "label": "Date", "width": "25%" },
+        { "key": "status", "label": "Status", "width": "25%" },
+        { "key": "total", "label": "Total", "width": "30%" }
+      ]
+    }
+  }
+}
+```
+
+**Column Properties:**
+| Property | Type | Description |
+|----------|------|-------------|
+| `key` | string | Field name in data |
+| `label` | string | Column header |
+| `width` | string | Column width (%, px) |
+
+### Buttons
+
+Quick action buttons.
+
+```json
+{
+  "displayConfig": {
+    "type": "buttons",
+    "fieldMappings": {
+      "buttons": "$.actions"
+    },
+    "options": {
+      "buttonStyle": "primary"
+    }
+  }
+}
+```
+
+**Button Styles:**
+- `primary` — Filled, prominent
+- `secondary` — Subtle background
+- `outline` — Border only
+
+### Product Grid
+
+Display products in a responsive grid layout (2-4 columns):
+
+```json
+{
+  "displayConfig": {
+    "type": "product_grid",
+    "fieldMappings": {
+      "title": "$.products[*].name",
+      "price": "$.products[*].price",
+      "image": "$.products[*].thumbnail",
+      "url": "$.products[*].link"
+    },
+    "options": {
+      "columns": 3,
+      "showPrice": true,
+      "showImage": true,
+      "showAddToCart": true
+    }
+  }
+}
+```
+
+**Options:**
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `columns` | number | `2` | Number of columns (2-4) |
+| `showPrice` | boolean | `true` | Display price |
+| `showImage` | boolean | `true` | Display product image |
+| `showAddToCart` | boolean | `false` | Show add to cart button |
+
+### Form
+
+Display an interactive form within the chat:
+
+```json
+{
+  "displayConfig": {
+    "type": "form",
+    "options": {
+      "formId": "contact_form",
+      "prefill": {
+        "email": "$.user.email",
+        "name": "$.user.name"
+      }
+    }
+  }
+}
+```
+
+**Options:**
+| Option | Type | Description |
+|--------|------|-------------|
+| `formId` | string | ID or name of the form tool to display |
+| `prefill` | object | JSONPath mappings for pre-filling fields |
+
+### Image
+
+Single image display.
+
+```json
+{
+  "displayConfig": {
+    "type": "image",
+    "fieldMappings": {
+      "src": "$.image_url",
+      "alt": "$.image_description"
+    }
+  }
+}
+```
+
+### Custom Template
+
+Fully custom rendering with templates.
+
+```json
+{
+  "displayConfig": {
+    "type": "custom",
+    "options": {
+      "template": "<div class='custom-card'><h3>{{title}}</h3><p>{{description}}</p><a href='{{url}}'>Learn more</a></div>"
+    },
+    "fieldMappings": {
+      "title": "$.name",
+      "description": "$.summary",
+      "url": "$.link"
+    }
+  }
+}
+```
+
+## Text Fallback
+
+Always provide a text fallback for:
+- Email channel responses
+- Accessibility
+- Failed display rendering
+
+```json
+{
+  "textFallback": "Here are {{count}} products matching your search: {{products}}"
+}
+```
+
+Fallback templates can use:
+- `{{count}}` — Number of items
+- `{{fieldName}}` — Any mapped field
+- `{{products}}` — Formatted list of items
+
+## Complete Examples
+
+### E-commerce Product Search
+
+```json
+{
+  "name": "search_products",
+  "description": "Search products when user asks about items or inventory.",
+  "executionType": "http",
+  "httpUrl": "https://api.store.com/products?q=${query}",
+  "httpMethod": "GET",
+  "displayConfig": {
+    "type": "product_carousel",
+    "fieldMappings": {
+      "title": "$.results[*].title",
+      "price": "$.results[*].price",
+      "image": "$.results[*].image",
+      "url": "$.results[*].url"
+    },
+    "options": {
+      "showPrice": true,
+      "showImage": true,
+      "showAddToCart": true
+    },
+    "textFallback": "Found {{count}} products: {{title}} - ${{price}}"
+  }
+}
+```
+
+### Order Status Table
+
+```json
+{
+  "name": "order_history",
+  "description": "Show order history when user asks about past orders.",
+  "executionType": "http",
+  "httpUrl": "https://api.store.com/orders?email=${email}",
+  "httpMethod": "GET",
+  "displayConfig": {
+    "type": "table",
+    "fieldMappings": {
+      "data": "$.orders"
+    },
+    "options": {
+      "columns": [
+        { "key": "id", "label": "Order #" },
+        { "key": "date", "label": "Date" },
+        { "key": "items", "label": "Items" },
+        { "key": "status", "label": "Status" },
+        { "key": "total", "label": "Total" }
+      ]
+    },
+    "textFallback": "You have {{count}} orders: {{data}}"
+  }
+}
+```
+
+### Feature Comparison
+
+```json
+{
+  "name": "compare_plans",
+  "description": "Show plan comparison when user asks about pricing or features.",
+  "executionType": "mock",
+  "mockResponse": "{\"plans\": [{\"name\": \"Starter\", \"price\": \"$29\", \"agents\": \"1\", \"messages\": \"1,000\"}, {\"name\": \"Pro\", \"price\": \"$99\", \"agents\": \"5\", \"messages\": \"10,000\"}]}",
+  "displayConfig": {
+    "type": "table",
+    "fieldMappings": {
+      "data": "$.plans"
+    },
+    "options": {
+      "columns": [
+        { "key": "name", "label": "Plan" },
+        { "key": "price", "label": "Price/mo" },
+        { "key": "agents", "label": "Agents" },
+        { "key": "messages", "label": "Messages" }
+      ]
+    }
+  }
+}
+```
+
+### Quick Actions
+
+```json
+{
+  "name": "quick_help",
+  "description": "Show help options when user needs assistance.",
+  "executionType": "mock",
+  "mockResponse": "{\"actions\": [{\"label\": \"Contact Support\", \"action\": \"contact\"}, {\"label\": \"View FAQs\", \"action\": \"faq\"}, {\"label\": \"Schedule Call\", \"action\": \"schedule\"}]}",
+  "displayConfig": {
+    "type": "buttons",
+    "fieldMappings": {
+      "buttons": "$.actions"
+    },
+    "options": {
+      "buttonStyle": "primary"
+    }
+  }
+}
+```
+
+## Best Practices
+
+### Image Handling
+
+- Use HTTPS URLs for images
+- Provide fallback for broken images
+- Optimize image sizes for fast loading
+
+### Responsive Design
+
+- Display types are mobile-responsive by default
+- Carousels scroll horizontally on mobile
+- Tables may scroll on narrow screens
+
+### Accessibility
+
+- Always include `textFallback`
+- Use descriptive button labels
+- Ensure sufficient color contrast
+
+## See Also
+
+- [HTTP Tools](/tools/http-tools) — API integration
+- [Tools Overview](/tools/overview) — Tool types and AI usage
+- [E-commerce Use Case](/use-cases/ecommerce) — Product display examples

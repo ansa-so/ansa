@@ -1,0 +1,275 @@
+---
+title: "Documentation"
+description: "Create an AI assistant that helps users find answers in your documentation quickly and accurately."
+---
+
+import { Screenshot } from '/snippets/screenshot.mdx'
+
+## Overview
+
+Ansa helps documentation teams:
+- Provide instant answers from your docs
+- Reduce support tickets for documented topics
+- Surface relevant articles naturally
+- Identify documentation gaps from user questions
+- Handle questions your docs don't cover gracefully
+
+<Screenshot src="/screenshots/chat.png" alt="Documentation assistant" />
+
+## Knowledge Base Setup
+
+### Indexing Your Documentation
+
+Ansa supports multiple ways to index docs:
+
+| Source Type | Best For |
+|-------------|----------|
+| **Web Crawl** | Public documentation sites |
+| **File Upload** | PDFs, markdown files, internal docs |
+| **Text Sources** | Custom content, snippets |
+| **Q&A Pairs** | Common questions with vetted answers |
+
+<Screenshot src="/screenshots/web-sources.png" alt="Web sources" />
+
+### Web Crawling Tips
+
+When crawling documentation sites:
+
+1. **Start from the docs root** (e.g., `docs.yoursite.com`)
+2. **Set appropriate depth** — Most docs need 3-5 levels
+3. **Exclude irrelevant paths** — Changelog, release notes (unless needed)
+4. **Re-sync regularly** — Set up scheduled syncs for updated content
+
+<Tip>
+Use the **auto-detect feature** during onboarding. Ansa automatically discovers docs pages at `/docs`, `/documentation`, `/help`, `/guides`, and `/api`.
+</Tip>
+
+### Structuring Content for Best Results
+
+Good documentation indexing:
+
+✅ Clear headings and subheadings
+✅ Concise paragraphs
+✅ Code examples with context
+✅ Descriptive link text
+
+Avoid:
+❌ Single-page docs with everything
+❌ Heavily nested accordions (may not crawl)
+❌ Content loaded via JavaScript (use static/SSR)
+
+## Agent Configuration
+
+### System Prompt for Documentation
+
+```
+You are a helpful documentation assistant for [Product Name].
+
+Your role:
+- Answer questions accurately based on the documentation
+- Provide code examples when relevant
+- Link to relevant documentation pages for further reading
+- Be concise but thorough
+
+When you don't know the answer:
+- Acknowledge honestly that you couldn't find this in the docs
+- Suggest related topics that might help
+- Offer to connect them with support if needed
+
+Format responses for readability:
+- Use markdown formatting
+- Include code blocks with proper syntax highlighting
+- Use bullet points for lists
+```
+
+### Temperature Settings
+
+| Use Case | Temperature | Why |
+|----------|-------------|-----|
+| **API Reference** | 0.1 - 0.3 | Accuracy is critical |
+| **Tutorials/Guides** | 0.3 - 0.5 | Balance of accuracy and explanation |
+| **Conceptual Docs** | 0.5 - 0.7 | More natural explanations |
+
+### Model Selection
+
+For documentation assistants:
+
+| Model | Best For |
+|-------|----------|
+| **Claude 3.5 Sonnet** | Excellent at explaining code and concepts |
+| **GPT-4o** | Great for technical documentation |
+| **GPT-4o-mini** | Cost-effective for high-volume sites |
+
+## Widget Configuration
+
+### Suggested Messages
+
+Guide users to common topics:
+
+<Screenshot src="/screenshots/widget.png" alt="Widget customization" />
+
+Configure suggested messages for quick access:
+
+```json
+{
+  "suggestedMessages": [
+    "How do I get started?",
+    "Show me authentication examples",
+    "What are the API rate limits?",
+    "How do I handle errors?"
+  ]
+}
+```
+
+### Placement
+
+For documentation sites:
+
+| Placement | Position | When |
+|-----------|----------|------|
+| **Bottom Right** | Default | General docs sites |
+| **Bottom Left** | Alternative | If conflicts with ToC |
+| **Inline** | Embedded | Specific help sections |
+
+## Triggers for Documentation
+
+### Engagement on Complex Pages
+
+Help users on lengthy or complex docs:
+
+```json
+{
+  "name": "Long Page Help",
+  "triggerType": "time_on_page",
+  "conditions": {
+    "timeOnPage": 60,
+    "page": "/docs/advanced/*"
+  },
+  "actionType": "show_bubble",
+  "actionConfig": {
+    "message": "Need help understanding this? I can explain any part.",
+    "duration": 8
+  }
+}
+```
+
+### Search Page Fallback
+
+Engage users who might not find what they need:
+
+```json
+{
+  "name": "Search Assistance",
+  "triggerType": "time_on_page",
+  "conditions": {
+    "timeOnPage": 30,
+    "page": "/docs/search*"
+  },
+  "actionType": "open_chat",
+  "actionConfig": {
+    "message": "Can't find what you're looking for? Tell me what you need and I'll help you find it."
+  }
+}
+```
+
+## Handling Unknown Questions
+
+When the agent can't find an answer in the docs:
+
+### 1. Honest Acknowledgment
+
+System prompt should include:
+```
+When information isn't in the documentation:
+- Say "I couldn't find this in our documentation"
+- Suggest similar topics that might help
+- Offer to connect them with support
+```
+
+### 2. Fallback Form
+
+Create a form for questions that need human help:
+
+```json
+{
+  "name": "docs_feedback",
+  "description": "Use when you cannot answer the user's question from the documentation.",
+  "executionType": "form",
+  "formSchema": {
+    "fields": [
+      {
+        "name": "question",
+        "label": "Your Question",
+        "type": "textarea",
+        "defaultValue": "{{context.lastMessage}}"
+      },
+      {
+        "name": "email",
+        "label": "Email (for follow-up)",
+        "type": "email"
+      }
+    ],
+    "submitLabel": "Submit Question",
+    "successMessage": "We'll add this to our docs or get back to you!"
+  },
+  "formPostActions": [
+    {
+      "type": "slack",
+      "webhookUrl": "https://hooks.slack.com/...",
+      "messageTemplate": "📝 *Docs Gap Identified*\n\n{{question}}\n\nFrom: {{email}}"
+    }
+  ]
+}
+```
+
+## Identifying Documentation Gaps
+
+### Review Low-Confidence Conversations
+
+Use the analytics dashboard to find:
+- Questions with low confidence scores
+- Repeated questions not well-answered
+- Topics users ask about that aren't documented
+
+<Screenshot src="/screenshots/analytics.png" alt="Analytics" />
+
+### Create Q&A Pairs
+
+For frequently asked questions not well-covered:
+
+<Screenshot src="/screenshots/qa-sources.png" alt="Q&A sources" />
+
+1. Go to **Knowledge Base → Q&A**
+2. Add the exact question users ask
+3. Provide the ideal answer
+4. These get high priority in searches
+
+## Integration with Doc Platforms
+
+### GitBook, Docusaurus, Mintlify
+
+Web crawl your public docs URL. Ensure:
+- Content is server-rendered
+- No robots.txt blocking
+- Sitemap available for best coverage
+
+### Notion, Confluence
+
+For internal docs:
+1. Export as PDF or markdown
+2. Upload via file sources
+3. Set up periodic re-uploads for updates
+
+### API Reference (OpenAPI)
+
+Upload your OpenAPI/Swagger spec as a file source. The agent will understand:
+- Endpoints and methods
+- Request/response schemas
+- Authentication requirements
+
+## See Also
+
+- [Knowledge Base](/agents/knowledge-base) — Source types and configuration
+- [Widget Customization](/widget/customization) — Suggested messages, themes
+- [Confidence Scores](/user-guides/confidence-scores) — Understanding answer quality
+- [Q&A Sources](/agents/knowledge-base#qa-pairs) — Adding vetted answers

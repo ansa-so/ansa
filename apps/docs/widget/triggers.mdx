@@ -1,0 +1,357 @@
+---
+title: Widget Triggers
+description: "Automate chat actions based on user behavior"
+---
+
+Triggers let you automatically engage users based on their behavior — like opening the chat after they've been on the page for a while, showing a form when they scroll down, or displaying a message when they're about to leave.
+
+## Creating Triggers
+
+### In the Dashboard
+
+1. Go to **Agents** → select your agent
+2. Click **Triggers** in the sidebar
+3. Click **Add Trigger**
+4. Configure the trigger type, conditions, and action
+
+### Via API
+
+See the [Triggers API](/api-reference/triggers) for programmatic trigger management.
+
+## Trigger Types
+
+### Time on Page
+
+Fire after the user has been on the page for a specified duration.
+
+| Setting | Description |
+|---------|-------------|
+| **Seconds** | Time to wait before triggering |
+
+**Use cases:**
+- Show help message after 30 seconds
+- Offer assistance to browsing users
+- Prompt for newsletter signup
+
+```javascript
+// Configuration
+{
+  triggerType: "time_on_page",
+  conditions: { timeOnPage: 30 }  // 30 seconds
+}
+```
+
+### Scroll Depth
+
+Fire when the user scrolls past a certain percentage of the page.
+
+| Setting | Description |
+|---------|-------------|
+| **Percentage** | 0-100% scroll depth threshold |
+
+**Use cases:**
+- Show CTA after reading content
+- Capture leads who engage with content
+- Offer demos on product pages
+
+```javascript
+// Configuration
+{
+  triggerType: "scroll_depth",
+  conditions: { scrollDepth: 50 }  // 50% scroll
+}
+```
+
+### Exit Intent
+
+Fire when the user moves their mouse toward the browser's close/back button (desktop only).
+
+**Use cases:**
+- Prevent cart abandonment
+- Offer discounts before leaving
+- Capture feedback
+
+```javascript
+// Configuration
+{
+  triggerType: "exit_intent",
+  conditions: {}
+}
+```
+
+<Tip>
+Exit intent only works on desktop browsers. Mobile users won't trigger this.
+</Tip>
+
+### Page View
+
+Fire when the user visits a specific page or pages matching a pattern.
+
+| Setting | Description |
+|---------|-------------|
+| **Page** | URL path or glob pattern |
+
+**Pattern examples:**
+
+| Pattern | Matches |
+|---------|---------|
+| `/pricing` | Exact `/pricing` path |
+| `/pricing/*` | `/pricing/starter`, `/pricing/pro` |
+| `/blog/**` | Any path under `/blog/` |
+| `/docs/**/api` | `/docs/v1/api`, `/docs/guides/api` |
+
+```javascript
+// Configuration
+{
+  triggerType: "page_view",
+  conditions: { page: "/pricing/*" }
+}
+```
+
+### Custom Event
+
+Fire when your code triggers a custom event.
+
+| Setting | Description |
+|---------|-------------|
+| **Event** | Event name to listen for |
+| **Event Data** | Optional: conditions on event payload |
+
+```javascript
+// Configuration
+{
+  triggerType: "custom_event",
+  conditions: {
+    event: "cart_abandoned",
+    eventData: { cartValue: { "$gt": 100 } }
+  }
+}
+```
+
+Fire from your code:
+
+```javascript
+ansa.trigger("cart_abandoned", { cartValue: 150 });
+```
+
+## Actions
+
+When a trigger fires, it performs one of these actions:
+
+### Open Chat
+
+Opens the chat widget, optionally with a pre-filled message.
+
+| Setting | Description |
+|---------|-------------|
+| **Message** | Optional message to pre-fill in input |
+
+```javascript
+{
+  actionType: "open_chat",
+  actionConfig: {
+    message: "I have a question about pricing"
+  }
+}
+```
+
+### Show Form
+
+Displays a form tool in the chat widget.
+
+| Setting | Description |
+|---------|-------------|
+| **Tool ID** | The form tool to display |
+
+```javascript
+{
+  actionType: "show_form",
+  actionConfig: {
+    toolId: "tool_abc123"
+  }
+}
+```
+
+### Show Bubble
+
+Shows a floating notification bubble near the chat button.
+
+| Setting | Description |
+|---------|-------------|
+| **Message** | Text to display in bubble |
+| **Duration** | Seconds before auto-hide (optional) |
+
+```javascript
+{
+  actionType: "show_bubble",
+  actionConfig: {
+    message: "👋 Need help finding something?",
+    duration: 10
+  }
+}
+```
+
+## Trigger Options
+
+### Trigger Once
+
+When enabled, the trigger only fires once per session (stored in localStorage).
+
+| Value | Behavior |
+|-------|----------|
+| `true` | Fire once, remember in browser |
+| `false` | Fire every time conditions match |
+
+### Priority
+
+Controls execution order when multiple triggers could fire simultaneously. Lower numbers execute first.
+
+| Priority | Use Case |
+|----------|----------|
+| 0-10 | High priority (welcome messages) |
+| 10-50 | Normal priority |
+| 50+ | Low priority (exit intent) |
+
+### Enabled
+
+Toggle triggers on/off without deleting them.
+
+## Example Configurations
+
+### Welcome Message (30 seconds)
+
+```json
+{
+  "name": "Welcome Message",
+  "triggerType": "time_on_page",
+  "conditions": { "timeOnPage": 30 },
+  "actionType": "show_bubble",
+  "actionConfig": {
+    "message": "👋 Hi! I'm here if you have any questions.",
+    "duration": 15
+  },
+  "triggerOnce": true,
+  "priority": 0
+}
+```
+
+### Pricing Page Help
+
+```json
+{
+  "name": "Pricing Assistance",
+  "triggerType": "page_view",
+  "conditions": { "page": "/pricing" },
+  "actionType": "show_bubble",
+  "actionConfig": {
+    "message": "Questions about our plans? I can help you choose!"
+  },
+  "triggerOnce": true,
+  "priority": 5
+}
+```
+
+### Lead Capture on Scroll
+
+```json
+{
+  "name": "Scroll Lead Capture",
+  "triggerType": "scroll_depth",
+  "conditions": { "scrollDepth": 60 },
+  "actionType": "show_form",
+  "actionConfig": { "toolId": "tool_lead_form" },
+  "triggerOnce": true,
+  "priority": 20
+}
+```
+
+### Exit Intent Offer
+
+```json
+{
+  "name": "Exit Intent Discount",
+  "triggerType": "exit_intent",
+  "conditions": {},
+  "actionType": "open_chat",
+  "actionConfig": {
+    "message": "Wait! Get 10% off before you go"
+  },
+  "triggerOnce": true,
+  "priority": 100
+}
+```
+
+### Cart Abandonment
+
+```json
+{
+  "name": "Cart Recovery",
+  "triggerType": "custom_event",
+  "conditions": {
+    "event": "cart_idle",
+    "eventData": { "itemCount": { "$gt": 0 } }
+  },
+  "actionType": "open_chat",
+  "actionConfig": {
+    "message": "Need help completing your order?"
+  },
+  "triggerOnce": true,
+  "priority": 30
+}
+```
+
+## Trigger Analytics
+
+View trigger performance in the dashboard:
+
+| Metric | Description |
+|--------|-------------|
+| **Fired** | Times trigger activated |
+| **Converted** | Times user engaged after trigger |
+| **Conversion Rate** | Percentage of fires that converted |
+
+Access via **Agents** → **Triggers** → **Analytics**.
+
+## Programmatic Triggers
+
+You can also trigger actions programmatically from your code:
+
+```javascript
+// Show a bubble
+ansa.showBubbles("Need help?", 10);
+
+// Open chat with message
+ansa.open("I have a question");
+
+// Show a form
+ansa.showForm("contact_form");
+
+// Fire custom event (for custom_event triggers)
+ansa.trigger("pricing_viewed", { plan: "enterprise" });
+```
+
+See [Widget API](/developer-guides/widget-api) for all available methods.
+
+## Best Practices
+
+<Tip>
+**Less is more.** Too many triggers can overwhelm users. Start with 1-2 triggers and measure their effectiveness before adding more.
+</Tip>
+
+1. **Start subtle** — Use bubbles before auto-opening chat
+2. **Respect user intent** — Don't fire on every page load
+3. **Use trigger once** — Avoid annoying repeat prompts
+4. **Set priorities** — Ensure the most important triggers fire first
+5. **Test on mobile** — Exit intent doesn't work on mobile
+6. **Monitor analytics** — Disable triggers with low conversion
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Trigger Templates" icon="copy" href="/integrations/trigger-templates">
+    Start with pre-built trigger configurations
+  </Card>
+  <Card title="Custom Events" icon="bolt" href="/developer-guides/custom-events">
+    Fire triggers from your application code
+  </Card>
+</CardGroup>

@@ -1,0 +1,260 @@
+---
+title: Billing & Usage
+description: "Manage your subscription and monitor usage"
+---
+
+Ansa offers flexible plans to match your needs, from a free tier for getting started to enterprise plans for high-volume production workloads. Manage your subscription, track usage, and upgrade or downgrade as needed.
+
+## Plans Overview
+
+| Plan | Messages | Agents | Best For |
+|------|----------|--------|----------|
+| **Free** | 100/month | 1 | Trying Ansa |
+| **Starter** | 1,000/month | 3 | Individuals & small projects |
+| **Growth** | 10,000/month | 10 | Growing teams |
+| **Pro** | 50,000/month | Unlimited | High-volume production |
+| **Enterprise** | Unlimited | Unlimited | Large organizations |
+
+### Feature Comparison
+
+| Feature | Free | Starter | Growth | Pro | Enterprise |
+|---------|------|---------|--------|-----|------------|
+| Messages/month | 100 | 1,000 | 10,000 | 50,000 | Unlimited |
+| Agents | 1 | 3 | 10 | Unlimited | Unlimited |
+| Tools per agent | 3 | 5 | 10 | Unlimited | Unlimited |
+| Document storage | 10 MB | 100 MB | 1 GB | 10 GB | Unlimited |
+| AI models | Basic | Standard | All | All | All |
+| Remove branding | ❌ | ❌ | ✅ | ✅ | ✅ |
+| Support | Community | Email | Priority | Dedicated | Custom SLA |
+| API access | ❌ | ❌ | ✅ | ✅ | ✅ |
+
+## Viewing Your Usage
+
+1. Go to **Usage** in the sidebar
+2. See your current usage:
+   - Messages used this period
+   - Messages remaining
+   - Storage used
+   - Agents created
+
+### Usage Breakdown
+
+The usage page shows:
+- **Current period** usage vs limit
+- **Historical** usage trends
+- **Per-agent** breakdown
+- **Days remaining** in billing cycle
+
+## Managing Your Subscription
+
+### Upgrade Your Plan
+
+1. Go to **Usage** → **Manage Plan**
+2. Select a higher plan
+3. Click **Upgrade**
+4. Complete payment in Stripe
+
+Upgrades take effect immediately. You'll be prorated for the remainder of your billing period.
+
+### Downgrade Your Plan
+
+1. Go to **Usage** → **Manage Plan**
+2. Select a lower plan
+3. Click **Downgrade**
+4. Confirm the change
+
+<Warning>
+Downgrades take effect at the end of your current billing period. Make sure you're within the new plan's limits before it starts.
+</Warning>
+
+### Cancel Subscription
+
+1. Go to **Usage** → **Manage Billing**
+2. Opens Stripe customer portal
+3. Click **Cancel subscription**
+4. Confirm cancellation
+
+You retain access until the end of your paid period.
+
+## Billing Portal
+
+Access the Stripe billing portal to:
+- Update payment method
+- View invoices
+- Download receipts
+- Manage subscription
+- Update billing address
+
+Click **Manage Billing** on the Usage page.
+
+## Payment Methods
+
+We accept:
+- Credit and debit cards (Visa, Mastercard, Amex)
+- PayPal (select regions)
+- Bank transfers (Enterprise only)
+
+### Updating Payment Method
+
+1. Go to **Usage** → **Manage Billing**
+2. Click **Payment methods**
+3. Add new payment method
+4. Set as default
+5. Remove old method if desired
+
+## Invoices & Receipts
+
+### View Invoices
+
+1. Go to **Usage** → **Manage Billing**
+2. Click **Billing history**
+3. View all past invoices
+
+### Download Receipts
+
+Each invoice includes:
+- Date and amount
+- Plan details
+- Payment method used
+- Download link (PDF)
+
+## Message Limits
+
+### How Messages Are Counted
+
+Each message from a user or the agent counts toward your limit:
+- User message = 1 message
+- Agent response = 1 message
+- Form displayed = 0 messages (forms don't count)
+
+### What Happens at Limit
+
+When you reach your message limit:
+1. Agents stop responding to new messages
+2. Existing conversations are preserved
+3. You can still access the dashboard
+4. Upgrade or wait for reset
+
+<Tip>
+Set up usage alerts to get notified before hitting limits.
+</Tip>
+
+### Limit Reset
+
+Message limits reset at the start of each billing period:
+- Monthly plans: Reset on billing anniversary
+- Unused messages don't roll over
+
+## Storage Limits
+
+### What Counts as Storage
+
+- Knowledge base documents
+- Uploaded files
+- Cached embeddings
+
+### Checking Storage
+
+1. Go to **Usage**
+2. View **Storage** section
+3. See per-agent breakdown
+
+### Managing Storage
+
+To free up space:
+1. Remove unused documents from knowledge bases
+2. Delete old agents you no longer need
+3. Clean up test content
+
+## Enterprise Plans
+
+For organizations with custom needs:
+
+### Features
+
+- Unlimited messages
+- Unlimited agents and tools
+- Unlimited storage
+- Custom SLA
+- Dedicated account manager
+- SSO integration
+- Advanced security options
+- Custom contracts
+
+### Contact Sales
+
+1. Go to **Pricing**
+2. Click **Contact Sales** on Enterprise
+3. Fill out the form
+4. Our team will reach out
+
+Or email: sales@ansa.so
+
+## FAQ
+
+### Can I try before I buy?
+
+Yes! The free plan gives you 100 messages/month with 1 agent. No credit card required.
+
+### What happens if I go over my limit?
+
+Your agent stops responding to new messages until your billing period resets or you upgrade.
+
+### Do unused messages roll over?
+
+No, message limits reset at the start of each billing period. Unused messages don't carry over.
+
+### Can I switch plans anytime?
+
+Yes. Upgrades are immediate (prorated). Downgrades take effect at the end of your billing period.
+
+### Do you offer annual billing?
+
+Yes, annual billing is available with a discount. Select "Annual" on the pricing page.
+
+### Can I get a refund?
+
+We offer refunds within 14 days of purchase for annual plans. Monthly plans are non-refundable but can be cancelled anytime.
+
+### How do I update my billing email?
+
+1. Go to **Usage** → **Manage Billing**
+2. Update your billing information
+3. Save changes
+
+## Troubleshooting
+
+### Payment Failed
+
+**Check:**
+- Card hasn't expired
+- Sufficient funds available
+- Card allows international transactions
+- Billing address matches card
+
+**Solution:** Update payment method in billing portal.
+
+### Wrong Plan Active
+
+If your plan doesn't match what you expected:
+1. Check for pending changes (downgrades apply at period end)
+2. Verify payment completed
+3. Check for failed payment emails
+4. Contact support
+
+### Missing Invoice
+
+1. Check spam folder
+2. Verify billing email is correct
+3. Download from billing portal
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Team Management" icon="users" href="/user-guides/team">
+    Add team members to your account
+  </Card>
+  <Card title="Analytics" icon="chart-bar" href="/user-guides/analytics">
+    Track your usage patterns
+  </Card>
+</CardGroup>

@@ -1,0 +1,195 @@
+---
+title: "Sales"
+description: "Convert website visitors into leads with AI-powered conversations, lead capture forms, and CRM integrations."
+---
+
+import { Screenshot } from '/snippets/screenshot.mdx'
+
+## Overview
+
+Ansa helps sales teams:
+- Engage website visitors at the right moment
+- Qualify leads through conversational AI
+- Capture contact information with smart forms
+- Route leads to your CRM automatically
+- Identify returning visitors for personalized follow-up
+
+<Screenshot src="/screenshots/chat.png" alt="Sales chat conversation" />
+
+## Recommended Configuration
+
+### 1. Knowledge Base Setup
+
+Train your agent on sales-relevant content:
+
+**Recommended sources:**
+- Product/service pages
+- Pricing information
+- Case studies and testimonials
+- Competitor comparisons
+- FAQs about your offering
+
+<Tip>
+Keep pricing and feature information up-to-date. Outdated information can lose deals.
+</Tip>
+
+### 2. Agent Settings
+
+| Setting | Recommended Value | Why |
+|---------|-------------------|-----|
+| **Model** | Claude 3.5 Sonnet or GPT-4o | Natural conversational flow |
+| **Temperature** | 0.5 - 0.7 | Slightly higher for more engaging responses |
+| **System Prompt** | Sales-focused with qualification questions | See example below |
+
+**Example System Prompt:**
+```
+You are a helpful sales assistant for [Company Name].
+
+Your goals:
+- Answer questions about our products/services accurately
+- Understand the visitor's needs and use case
+- Highlight relevant features and benefits
+- When appropriate, offer to schedule a demo or collect contact info
+
+Qualification questions to naturally work into conversations:
+- What problem are you trying to solve?
+- What's your timeline for implementing a solution?
+- How large is your team?
+
+Be helpful first, sales-focused second. Don't be pushy.
+```
+
+### 3. Lead Capture Form Tool
+
+Create a form to capture qualified leads:
+
+```json
+{
+  "name": "schedule_demo",
+  "description": "Use this when a visitor expresses interest in learning more, wants a demo, or asks about pricing for their specific use case.",
+  "executionType": "form",
+  "formSchema": {
+    "fields": [
+      { "name": "name", "label": "Your Name", "type": "text", "validation": { "required": { "value": true, "message": "Name is required" } } },
+      { "name": "email", "label": "Work Email", "type": "email", "validation": { "required": { "value": true, "message": "Email is required" } } },
+      { "name": "company", "label": "Company", "type": "text" },
+      { "name": "team_size", "label": "Team Size", "type": "select", "options": [
+        { "label": "1-10", "value": "1-10" },
+        { "label": "11-50", "value": "11-50" },
+        { "label": "51-200", "value": "51-200" },
+        { "label": "200+", "value": "200+" }
+      ]}
+    ],
+    "submitLabel": "Request Demo",
+    "successMessage": "Thanks! Our team will reach out within 24 hours to schedule your demo."
+  },
+  "formPostActions": [
+    { "type": "webhook", "url": "https://hooks.zapier.com/...", "headers": { "Authorization": "Bearer ..." } },
+    { "type": "slack", "webhookUrl": "https://hooks.slack.com/...", "messageTemplate": "🎯 New demo request!\n\nName: {{name}}\nEmail: {{email}}\nCompany: {{company}}\nTeam size: {{team_size}}" }
+  ]
+}
+```
+
+### 4. Exit-Intent Triggers
+
+Capture leaving visitors with strategic triggers:
+
+| Trigger | Configuration | Action |
+|---------|---------------|--------|
+| **Pricing page exit** | Exit intent on `/pricing` | Show form: "Before you go, want a custom quote?" |
+| **Time on page** | 45 seconds on product pages | Open chat: "Have any questions about [Product]?" |
+| **Scroll depth** | 50% on landing page | Show bubble: "Want to see how this works for your team?" |
+
+<Screenshot src="/screenshots/widget.png" alt="Widget triggers" />
+
+<CodeGroup>
+```javascript Vanilla JS
+// Custom event for high-intent actions
+window.ansa.trigger('viewed_pricing', { plan: 'enterprise' });
+```
+
+```javascript ES Module
+import { triggerEvent } from '@ansa-so/sdk';
+triggerEvent('viewed_pricing', { plan: 'enterprise' });
+```
+</CodeGroup>
+
+### 5. Identify Returning Visitors
+
+Use visitor identification for personalized conversations:
+
+<CodeGroup>
+```javascript Vanilla JS
+// When user logs in or is identified
+window.ansa.identify({
+  userId: 'user_123',
+  userMetadata: {
+    name: 'Jane Smith',
+    email: 'jane@company.com',
+    plan: 'trial',
+    company: 'Acme Inc'
+  }
+});
+```
+
+```javascript ES Module
+import { identifyUser } from '@ansa-so/sdk';
+
+identifyUser({
+  userId: 'user_123',
+  userMetadata: {
+    name: 'Jane Smith',
+    email: 'jane@company.com',
+    plan: 'trial',
+    company: 'Acme Inc'
+  }
+});
+```
+</CodeGroup>
+
+With identification, your agent can:
+- Greet visitors by name
+- Reference their company and use case
+- Pre-fill form fields with known information
+- Provide contextual responses based on their plan/status
+
+## CRM Integration
+
+Connect form submissions to your CRM using webhooks:
+
+**Popular integrations via webhooks:**
+- Salesforce (via Zapier or direct API)
+- HubSpot
+- Pipedrive
+- Close.io
+
+See [Webhooks](/developer-guides/webhooks) for payload structure and configuration.
+
+## Tracking Conversions
+
+### Trigger Analytics
+
+Monitor which triggers drive the most conversions:
+
+| Metric | What it Shows |
+|--------|---------------|
+| **Fired Count** | How many times the trigger activated |
+| **Converted Count** | How many led to form submissions |
+| **Conversion Rate** | Effectiveness of your engagement strategy |
+
+### Lead Analytics
+
+Track in the Leads view:
+- Form submissions over time
+- Conversion by page/trigger
+- Lead quality indicators
+
+<Screenshot src="/screenshots/history.png" alt="Lead tracking" />
+
+## See Also
+
+- [Form Tools](/tools/form-tools) — Creating lead capture forms
+- [Submission Actions](/tools/post-actions) — CRM webhook configuration
+- [Triggers](/widget/triggers) — Setting up exit-intent and engagement triggers
+- [Identity & Personalization](/developer-guides/identity) — Visitor identification
+- [Custom Events](/developer-guides/custom-events) — Tracking custom user actions

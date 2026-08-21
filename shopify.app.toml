@@ -1,0 +1,58 @@
+# Shopify App Configuration
+# Learn more: https://shopify.dev/docs/apps/build/cli-for-apps/app-configuration
+
+name = "Ansa"
+client_id = "b175e95d60624d16c7d0ba4e2861f746"
+application_url = "https://ansa.so/dashboard"
+embedded = true
+
+[app_preferences]
+url = "https://api.ansa.so/integrations/shopify"
+
+[access_scopes]
+scopes = "read_customers,read_orders,write_orders,write_payment_terms,read_products"
+
+[auth]
+redirect_urls = [
+  "https://api.ansa.so/shopify/callback",
+  "https://api.ansa.so/api/auth/magic-link/verify",
+  "https://ansa.so/",
+  "https://ansa.so/shopify/auth",
+  "http://localhost:3001/shopify/callback"
+]
+
+[webhooks]
+api_version = "2026-01"
+
+  # Mandatory compliance webhooks for GDPR/CCPA
+  [[webhooks.subscriptions]]
+  compliance_topics = ["customers/data_request", "customers/redact", "shop/redact"]
+  uri = "https://api.ansa.so/shopify/webhooks"
+
+  # App lifecycle webhooks
+  [[webhooks.subscriptions]]
+  topics = ["app/uninstalled", "app_subscriptions/update"]
+  uri = "https://api.ansa.so/shopify/webhooks"
+
+  # Order webhooks
+  [[webhooks.subscriptions]]
+  topics = ["orders/create", "orders/updated", "refunds/create"]
+  uri = "https://api.ansa.so/shopify/webhooks"
+
+  # Customer webhooks
+  [[webhooks.subscriptions]]
+  topics = ["customers/create", "customers/update"]
+  uri = "https://api.ansa.so/shopify/webhooks"
+
+  # Product webhooks
+  [[webhooks.subscriptions]]
+  topics = ["products/create", "products/update", "products/delete"]
+  uri = "https://api.ansa.so/shopify/webhooks"
+
+[app_proxy]
+url = "https://api.ansa.so/shopify/proxy"
+subpath = "ansa"
+prefix = "apps"
+
+[pos]
+embedded = false

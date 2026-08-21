@@ -1,0 +1,232 @@
+---
+title: "Multi-Language Support"
+description: "Configure your AI assistant to communicate with visitors in their preferred language"
+---
+
+Ansa supports **26+ languages** out of the box, allowing your AI assistant to communicate with visitors in their preferred language. The widget automatically detects the visitor's language and displays appropriate messages.
+
+## Supported Languages
+
+| Language | Code | Language | Code |
+|----------|------|----------|------|
+| English | `en` | Japanese | `ja` |
+| Spanish | `es` | Korean | `ko` |
+| French | `fr` | Chinese | `zh` |
+| German | `de` | Arabic | `ar` |
+| Italian | `it` | Hindi | `hi` |
+| Portuguese | `pt` | Turkish | `tr` |
+| Dutch | `nl` | Vietnamese | `vi` |
+| Polish | `pl` | Thai | `th` |
+| Russian | `ru` | Indonesian | `id` |
+| Swedish | `sv` | Malay | `ms` |
+| Danish | `da` | Czech | `cs` |
+| Norwegian | `no` | Ukrainian | `uk` |
+| Finnish | `fi` | Hebrew | `he` |
+
+---
+
+## How Language Detection Works
+
+The widget uses a **priority-based detection system** to determine which language to display:
+
+### Detection Priority
+
+<Steps>
+  <Step title="data-lang attribute (Highest Priority)">
+    Explicitly set the language on your embed script:
+
+    ```html
+    <script
+      src="https://widget.ansa.com/embed.js"
+      data-agent-id="your-agent-id"
+      data-lang="fr"
+    ></script>
+    ```
+  </Step>
+  <Step title="HTML lang attribute">
+    The widget reads your page's declared language:
+
+    ```html
+    <html lang="es">
+    ```
+  </Step>
+  <Step title="Browser Language (Lowest Priority)">
+    Falls back to the visitor's browser language preference (`navigator.language`), e.g., `en-US`, `fr-CA`.
+  </Step>
+</Steps>
+
+### Cascade Fallback
+
+When a language is detected, Ansa uses **smart fallback** to find the best matching translation:
+
+1. **Exact match** — `fr-CA` (Canadian French)
+2. **Base language** — `fr` (French)
+3. **Default language** — Your configured default (e.g., `en`)
+
+This ensures visitors always see appropriate content, even if you haven't created a specific regional translation.
+
+---
+
+## Adding Translations
+
+You can customize all visitor-facing messages for each language.
+
+### Step 1: Navigate to Translations
+
+1. Go to your agent's **Embed** page
+2. Scroll down to the **Translations** section
+
+### Step 2: Add a New Language
+
+1. Click the **language dropdown** and select a language
+2. Click **"Add Translation"**
+
+### Step 3: Customize Messages
+
+For each language, you can customize:
+
+| Field | Description |
+|-------|-------------|
+| **Display Name** | The assistant's name shown in the chat header |
+| **Initial Message** | The greeting message when the chat opens |
+| **Suggested Messages** | Quick-reply buttons shown to visitors (one per line) |
+| **Message Placeholder** | Placeholder text in the input field |
+| **Dismissible Message** | Text shown before the chat is opened |
+| **Welcome Bubbles** | Preview messages shown on the chat bubble (one per line) |
+
+### Step 4: Set Default Language
+
+Choose which language to use when no translation matches the visitor's language.
+
+---
+
+## Dynamic Language Switching
+
+For websites with language switchers, you can change the widget language at runtime using JavaScript:
+
+### Set Language
+
+```javascript
+// Switch to French
+window.ansa.setLanguage('fr');
+
+// Switch to Spanish
+window.ansa.setLanguage('es');
+```
+
+### Get Current Language
+
+```javascript
+const currentLang = window.ansa.getLanguage();
+console.log(currentLang); // "fr"
+```
+
+### Example: Sync with Website Language Switcher
+
+```javascript
+// When user changes language on your website
+document.getElementById('language-select').addEventListener('change', (e) => {
+  const newLang = e.target.value;
+
+  // Update Ansa widget language
+  if (window.ansa) {
+    window.ansa.setLanguage(newLang);
+  }
+});
+```
+
+---
+
+## Automatic Detection During Onboarding
+
+When you create a new agent via onboarding, Ansa automatically:
+
+1. **Detects your website's primary language** from the `<html lang>` attribute
+2. **Sets default messages** in that language
+3. **Discovers alternate languages** from `<link rel="alternate" hreflang="...">` tags
+4. **Creates translation records** for each discovered language
+
+This means multilingual websites get pre-configured translations out of the box!
+
+---
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Always Set a Default Language">
+    Choose a default language that most of your visitors understand. This is used when no translation matches.
+  </Accordion>
+  <Accordion title="Use Regional Variants When Needed">
+    If you serve specific regions, create translations for regional variants:
+    - `es` — Spanish (general)
+    - `es-MX` — Mexican Spanish
+    - `es-AR` — Argentinian Spanish
+  </Accordion>
+  <Accordion title="Keep Messages Concise">
+    Translations may be longer in some languages. Keep your messages concise to ensure they display well across all languages.
+  </Accordion>
+  <Accordion title="Test Each Language">
+    Preview your widget in each language to ensure messages display correctly and feel natural.
+  </Accordion>
+  <Accordion title="Use data-lang for Multilingual Sites">
+    If your website has a language switcher, use the `data-lang` attribute or `window.ansa.setLanguage()` to ensure the widget matches the page language:
+
+    ```html
+    <!-- On French page -->
+    <script
+      src="https://widget.ansa.com/embed.js"
+      data-agent-id="your-agent-id"
+      data-lang="fr"
+    ></script>
+    ```
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## API Reference
+
+### Get Translations
+
+```bash
+GET /api/interface-settings/{agentId}/translations
+```
+
+Returns all translations for an agent.
+
+### Get Single Translation
+
+```bash
+GET /api/interface-settings/{agentId}/translations/{languageCode}
+```
+
+### Create/Update Translation
+
+```bash
+PUT /api/interface-settings/{agentId}/translations/{languageCode}
+
+{
+  "displayName": "Assistant",
+  "initialMessage": "Hello! How can I help?",
+  "suggestedMessages": ["Pricing", "Contact"],
+  "messagePlaceholder": "Type a message...",
+  "dismissibleMessage": "Chat with us",
+  "welcomeBubbles": ["Welcome!", "Ask me anything"]
+}
+```
+
+### Delete Translation
+
+```bash
+DELETE /api/interface-settings/{agentId}/translations/{languageCode}
+```
+
+### Update Default Language
+
+```bash
+PUT /api/interface-settings/{agentId}/default-language
+
+{
+  "defaultLanguage": "en"
+}
+```

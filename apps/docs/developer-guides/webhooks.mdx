@@ -1,0 +1,467 @@
+---
+title: Webhooks
+description: "Receive real-time notifications when conversations happen or forms are submitted"
+---
+
+Webhooks let you send data from Ansa to your server in real-time. When a form is submitted or a conversation event occurs, Ansa sends an HTTP POST request to your endpoint with the event payload.
+
+## Quick Start
+
+1. **Create an endpoint** on your server to receive webhook payloads
+2. **Configure the webhook URL** in your tool settings (dashboard or API)
+3. **Handle incoming requests** and process the data
+
+### Example Endpoint (Node.js / Express)
+
+```javascript
+app.post("/webhooks/ansa", express.json(), (req, res) => {
+  const { submissionId, toolName, formData, conversationId } = req.body;
+
+  console.log(`Form submitted: ${toolName}`);
+  console.log("Data:", formData);
+
+  // Process the submission (save to DB, send email, etc.)
+
+  // Respond with 200 to acknowledge receipt
+  res.status(200).json({ received: true });
+});
+```
+
+## Form Submission Webhooks
+
+When a form is submitted, Ansa sends the data to your configured webhook URL.
+
+### Payload Structure
+
+```json
+{
+  "submissionId": "sub_abc123",
+  "toolId": "tool_xyz789",
+  "toolName": "contact_form",
+  "conversationId": "conv_def456",
+  "formData": {
+    "name": "Jane Smith",
+    "email": "jane@example.com",
+    "message": "I have a question about pricing"
+  },
+  "submittedAt": "2024-12-23T14:30:00.000Z"
+}
+```
+
+### Payload Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `submissionId` | `string` | Unique identifier for this submission |
+| `toolId` | `string` | ID of the form tool |
+| `toolName` | `string` | Name of the form tool |
+| `conversationId` | `string` | ID of the conversation where the form was shown |
+| `formData` | `object` | Key-value pairs of submitted form fields |
+| `submittedAt` | `string` | ISO 8601 timestamp |
+
+### Configuring Form Webhooks
+
+Set the webhook URL when creating or updating a form tool:
+
+**In the Dashboard:**
+1. Go to **Agents** → **Tools**
+2. Edit your form tool
+3. Under **Post-Submission Actions**, set the **Webhook URL**
+
+**Via API:**
+
+```bash
+curl -X POST https://api.ansa.so/tools \
+  -H "Authorization: Bearer $ANSA_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "contact_form",
+    "type": "form",
+    "formWebhookUrl": "https://your-server.com/webhooks/ansa",
+    "formExecutionMode": "webhook",
+    "formFieldsSchema": [
+      { "name": "email", "label": "Email", "type": "email" },
+      { "name": "message", "label": "Message", "type": "textarea" }
+    ]
+  }'
+```
+
+### Execution Modes
+
+Control how form submissions are processed:
+
+| Mode | Behavior |
+|------|----------|
+| `webhook` | Data sent to webhook only (default) |
+| `client` | Data handled by client-side JavaScript only |
+| `both` | Data sent to both webhook and client handler |
+
+```json
+{
+  "formExecutionMode": "webhook",
+  "formWebhookUrl": "https://your-server.com/api/forms"
+}
+```
+
+## Handling Webhook Requests
+
+### Basic Handler
+
+```javascript
+// Express.js
+app.post("/webhooks/ansa", express.json(), async (req, res) => {
+  try {
+    const { submissionId, toolName, formData } = req.body;
+
+    // Process based on form type
+    switch (toolName) {
+      case "contact_form":
+        await handleContactForm(formData);
+        break;
+      case "quote_request":
+        await handleQuoteRequest(formData);
+        break;
+      default:
+        console.log(`Unknown form: ${toolName}`);
+    }
+
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error("Webhook error:", error);
+    res.status(500).json({ error: "Processing failed" });
+  }
+});
+
+async function handleContactForm(data) {
+  // Send email notification
+  await sendEmail({
+    to: "team@yourcompany.com",
+    subject: `New contact from ${data.name}`,
+    body: data.message
+  });
+
+  // Save to database
+  await db.insert("contacts", {
+    name: data.name,
+    email: data.email,
+    message: data.message,
+    createdAt: new Date()
+  });
+}
+```
+
+### Next.js API Route
+
+```typescript
+// app/api/webhooks/ansa/route.ts
+import { NextRequest, NextResponse } from "next/server";
+
+interface AnsaWebhookPayload {
+  submissionId: string;
+  toolId: string;
+  toolName: string;
+  conversationId: string;
+  formData: Record<string, unknown>;
+  submittedAt: string;
+}
+
+export async function POST(request: NextRequest) {
+  const payload: AnsaWebhookPayload = await request.json();
+
+  console.log("Received Ansa webhook:", payload.toolName);
+
+  // Process the form submission
+  if (payload.toolName === "lead_form") {
+    await createLead(payload.formData);
+  }
+
+  return NextResponse.json({ received: true });
+}
+
+async function createLead(data: Record<string, unknown>) {
+  // Add to your CRM, database, etc.
+}
+```
+
+### Python (Flask)
+
+```python
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+@app.route("/webhooks/ansa", methods=["POST"])
+def handle_ansa_webhook():
+    payload = request.json
+
+    submission_id = payload.get("submissionId")
+    tool_name = payload.get("toolName")
+    form_data = payload.get("formData", {})
+
+    print(f"Form submitted: {tool_name}")
+    print(f"Data: {form_data}")
+
+    # Process the submission
+    if tool_name == "contact_form":
+        handle_contact_form(form_data)
+
+    return jsonify({"received": True}), 200
+
+def handle_contact_form(data):
+    # Your processing logic here
+    pass
+```
+
+### PHP (Laravel)
+
+```php
+// routes/api.php
+Route::post('/webhooks/ansa', function (Request $request) {
+    $payload = $request->all();
+
+    Log::info('Ansa webhook received', [
+        'toolName' => $payload['toolName'],
+        'formData' => $payload['formData']
+    ]);
+
+    // Process based on form type
+    match ($payload['toolName']) {
+        'contact_form' => ContactSubmission::create($payload['formData']),
+        'quote_request' => QuoteRequest::create($payload['formData']),
+        default => null
+    };
+
+    return response()->json(['received' => true]);
+});
+```
+
+## Post-Submission Actions
+
+Beyond the primary webhook, you can configure additional actions:
+
+### Slack Notifications
+
+Send form submissions to a Slack channel:
+
+```json
+{
+  "formPostActions": [
+    {
+      "type": "slack",
+      "webhookUrl": "https://hooks.slack.com/services/T00/B00/xxx",
+      "message": "New {{_toolName}} submission!\nEmail: {{email}}\nMessage: {{message}}"
+    }
+  ]
+}
+```
+
+Template variables:
+- `{{fieldName}}` — Value of the form field
+- `{{_toolName}}` — Name of the form tool
+
+### Multiple Webhooks
+
+Send data to multiple endpoints:
+
+```json
+{
+  "formWebhookUrl": "https://your-server.com/primary",
+  "formPostActions": [
+    {
+      "type": "webhook",
+      "webhookUrl": "https://zapier.com/hooks/catch/xxx",
+      "payload": {
+        "email": "{{email}}",
+        "source": "ansa_chat"
+      }
+    },
+    {
+      "type": "webhook",
+      "webhookUrl": "https://your-crm.com/api/leads"
+    }
+  ]
+}
+```
+
+## Retry Logic
+
+Ansa automatically retries failed webhook deliveries:
+
+| Attempt | Delay |
+|---------|-------|
+| 1 | Immediate |
+| 2 | 1 minute |
+| 3 | 5 minutes |
+| 4 | 30 minutes |
+| 5 | 2 hours |
+
+After 5 failed attempts, the submission is marked as `webhook_failed`. You can:
+
+1. Fix your endpoint and manually retry from the dashboard
+2. Query failed submissions via API and reprocess
+
+### Checking Submission Status
+
+```bash
+curl https://api.ansa.so/form-submissions?status=webhook_failed \
+  -H "Authorization: Bearer $ANSA_API_KEY"
+```
+
+## Response Handling
+
+Ansa records your webhook response for debugging:
+
+### Success Response
+
+Return a 2xx status code:
+
+```javascript
+res.status(200).json({
+  success: true,
+  leadId: "lead_123"  // Your response is stored
+});
+```
+
+### Error Response
+
+Non-2xx responses trigger a retry:
+
+```javascript
+// This will trigger a retry
+res.status(500).json({
+  error: "Database unavailable"
+});
+```
+
+### Timeout
+
+Webhooks have a 30-second timeout. For long-running operations:
+
+1. Acknowledge immediately with 200
+2. Process asynchronously (queue, background job)
+
+```javascript
+app.post("/webhooks/ansa", (req, res) => {
+  // Acknowledge immediately
+  res.status(200).json({ received: true });
+
+  // Process in background
+  processSubmissionAsync(req.body).catch(console.error);
+});
+
+async function processSubmissionAsync(payload) {
+  // Slow operations here
+  await syncToCRM(payload);
+  await sendWelcomeEmail(payload.formData.email);
+}
+```
+
+## Integration Examples
+
+### HubSpot CRM
+
+```javascript
+app.post("/webhooks/ansa", async (req, res) => {
+  const { formData } = req.body;
+
+  await fetch("https://api.hubapi.com/crm/v3/objects/contacts", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${process.env.HUBSPOT_TOKEN}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      properties: {
+        email: formData.email,
+        firstname: formData.firstName,
+        lastname: formData.lastName,
+        company: formData.company
+      }
+    })
+  });
+
+  res.json({ success: true });
+});
+```
+
+### Airtable
+
+```javascript
+app.post("/webhooks/ansa", async (req, res) => {
+  const { formData, submittedAt } = req.body;
+
+  await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE}/Leads`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${process.env.AIRTABLE_TOKEN}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      fields: {
+        "Email": formData.email,
+        "Name": formData.name,
+        "Message": formData.message,
+        "Submitted": submittedAt
+      }
+    })
+  });
+
+  res.json({ success: true });
+});
+```
+
+### Google Sheets (via Apps Script)
+
+Deploy a Google Apps Script as a web app:
+
+```javascript
+function doPost(e) {
+  const payload = JSON.parse(e.postData.contents);
+  const sheet = SpreadsheetApp.openById(SHEET_ID).getActiveSheet();
+
+  sheet.appendRow([
+    new Date(),
+    payload.toolName,
+    payload.formData.email,
+    payload.formData.name,
+    payload.formData.message
+  ]);
+
+  return ContentService.createTextOutput(
+    JSON.stringify({ success: true })
+  ).setMimeType(ContentService.MimeType.JSON);
+}
+```
+
+## Best Practices
+
+<Tip>
+**Respond quickly, process later.** Acknowledge webhooks immediately with a 200 response, then process data asynchronously to avoid timeouts.
+</Tip>
+
+1. **Return 200 quickly** — Acknowledge receipt before processing
+2. **Use idempotency** — Handle duplicate deliveries gracefully using `submissionId`
+3. **Log everything** — Store payloads for debugging
+4. **Handle errors** — Return appropriate status codes so Ansa can retry
+5. **Secure your endpoint** — Use HTTPS and consider IP allowlisting
+
+## Debugging
+
+Check webhook delivery status in the dashboard:
+
+1. Go to **Leads** or **Form Submissions**
+2. Find the submission
+3. View **Webhook Response** for success/error details
+
+You can also view the raw response your server returned.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Form Tools" icon="file-lines" href="/tools/form-tools">
+    Configure form tools with webhooks
+  </Card>
+  <Card title="Post Actions" icon="bolt" href="/tools/post-actions">
+    Set up Slack and email notifications
+  </Card>
+</CardGroup>

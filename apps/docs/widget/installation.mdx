@@ -1,0 +1,204 @@
+---
+title: Widget Installation
+description: "Add the Ansa chat widget to your website"
+---
+
+## Quick Installation
+
+Add the chat widget to any website with a simple script tag.
+
+<Steps>
+  <Step title="Get your embed code">
+    Go to **Settings > Widget** in your dashboard and copy the embed code.
+  </Step>
+  <Step title="Add to your website">
+    Paste the code before the closing `</body>` tag on your website.
+  </Step>
+</Steps>
+
+## Embed Code
+
+There are two ways to configure the widget:
+
+### Option 1: Script URL Parameters (Recommended)
+
+The simplest approach - pass the agent ID directly in the script URL:
+
+```html
+<script src="https://cdn.ansa.so/embed.js?agentId=your-agent-id"></script>
+```
+
+### Option 2: Window Config Object
+
+Alternatively, set configuration before loading the script:
+
+```html
+<script>
+  window.__ansa_config = {
+    agentId: "your-agent-id"
+  };
+</script>
+<script src="https://cdn.ansa.so/embed.js"></script>
+```
+
+<Note>
+  Most display settings (colors, display name, profile picture, etc.) are automatically fetched from your agent configuration in the dashboard. You only need to provide the `agentId`.
+</Note>
+
+## Platform Guides
+
+<AccordionGroup>
+  <Accordion title="WordPress">
+    Add to your theme's `footer.php` or use a plugin like "Insert Headers and Footers":
+
+    1. Go to **Settings > Insert Headers and Footers**
+    2. Paste the embed code in the "Scripts in Footer" section
+    3. Save changes
+  </Accordion>
+
+  <Accordion title="Shopify">
+    For manual installation:
+
+    1. Go to **Online Store > Themes**
+    2. Click **Actions > Edit code**
+    3. Find `theme.liquid`
+    4. Paste embed code before `</body>`
+    5. Save
+
+    <Tip>
+      For a seamless experience with customer data and order tracking, use the [Shopify Native Integration](/integrations/shopify) instead.
+    </Tip>
+  </Accordion>
+
+  <Accordion title="Webflow">
+    1. Go to **Project Settings > Custom Code**
+    2. Paste in "Footer Code" section
+    3. Publish your site
+  </Accordion>
+
+  <Accordion title="React / Next.js">
+    Create a component:
+
+    ```jsx
+    'use client';
+
+    import { useEffect } from 'react';
+
+    export default function AnsaWidget() {
+      useEffect(() => {
+        const script = document.createElement('script');
+        script.src = `https://cdn.ansa.so/embed.js?agentId=${process.env.NEXT_PUBLIC_ANSA_AGENT_ID}`;
+        script.async = true;
+        document.body.appendChild(script);
+
+        return () => {
+          document.body.removeChild(script);
+        };
+      }, []);
+
+      return null;
+    }
+    ```
+
+    Add to your layout:
+
+    ```jsx
+    import AnsaWidget from '@/components/AnsaWidget';
+
+    export default function RootLayout({ children }) {
+      return (
+        <html>
+          <body>
+            {children}
+            <AnsaWidget />
+          </body>
+        </html>
+      );
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="Vue / Nuxt">
+    ```vue
+    <script setup>
+    onMounted(() => {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.ansa.so/embed.js?agentId=your-agent-id';
+      script.async = true;
+      document.body.appendChild(script);
+    });
+    </script>
+
+    <template>
+      <div></div>
+    </template>
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Shopify Native Integration
+
+If you're running a Shopify store, we recommend using the **native Shopify integration** instead of the manual embed code. The native integration offers several advantages:
+
+<CardGroup cols={2}>
+  <Card title="One-Click Install" icon="bolt">
+    Install the widget directly from your Shopify admin—no code editing required.
+  </Card>
+  <Card title="Customer Context" icon="user">
+    Automatically identify logged-in customers in conversations.
+  </Card>
+  <Card title="Order Data" icon="package">
+    Access order history, tracking, and status directly in the chat.
+  </Card>
+  <Card title="Product Sync" icon="database">
+    Sync your product catalog so the AI can answer product questions.
+  </Card>
+</CardGroup>
+
+### User Identification
+
+With the native integration, customer information is automatically passed to conversations:
+
+- **Name and email** of logged-in customers
+- **Order history** for context-aware support
+- **Customer tags** for personalized responses
+
+This means your AI agent can greet returning customers by name, reference their recent orders, and provide personalized support without any additional configuration.
+
+<Card title="Get Started with Shopify" icon="shopify" href="/integrations/shopify">
+  Learn how to connect your Shopify store and enable all native features.
+</Card>
+
+## Cache Busting
+
+To ensure your visitors always get the latest widget version, add a timestamp parameter to the script URL:
+
+```html
+<script src="https://cdn.ansa.so/embed.js"></script>
+```
+
+For dynamic sites (React, Vue, etc.), generate the timestamp at runtime:
+
+```javascript
+const script = document.createElement('script');
+script.src = `https://cdn.ansa.so/embed.js`;
+```
+
+<Tip>
+  The dashboard embed code automatically includes a cache-busting timestamp.
+</Tip>
+
+## Verifying Installation
+
+1. Visit your website
+2. Look for the chat button in the bottom-right corner
+3. Click to open the widget
+4. Send a test message
+
+<Warning>
+  If the widget doesn't appear:
+  - Check browser console for errors
+  - Verify your agent ID is correct
+  - Ensure the embed code is before `</body>`
+  - Check that your domain is not blocked
+</Warning>

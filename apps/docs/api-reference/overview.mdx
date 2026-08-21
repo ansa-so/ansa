@@ -1,0 +1,94 @@
+---
+title: API Overview
+description: "Integrate Ansa into your applications"
+---
+
+## Base URL
+
+```
+https://api.ansa.so
+```
+
+For self-hosted instances, use your configured API URL.
+
+## Authentication
+
+Most endpoints require authentication via Bearer token. Get your API key from the dashboard:
+
+1. Go to **Settings > API**
+2. Click **Generate API Key**
+3. Copy and store securely
+
+Include in requests:
+
+```bash
+Authorization: Bearer your-api-key
+```
+
+## Response Format
+
+All responses return JSON:
+
+```json
+{
+  "data": { ... },
+  "error": null
+}
+```
+
+Error responses:
+
+```json
+{
+  "data": null,
+  "error": {
+    "code": "UNAUTHORIZED",
+    "message": "Invalid API key"
+  }
+}
+```
+
+## Rate Limits
+
+Rate limits depend on your plan:
+
+| Plan | Requests/minute |
+|------|-----------------|
+| Free | 20 |
+| Starter | 60 |
+| Growth | 200 |
+| Pro | 1000 |
+
+Rate limit headers are included in responses:
+
+```
+X-RateLimit-Limit: 60
+X-RateLimit-Remaining: 59
+X-RateLimit-Reset: 1699900000
+```
+
+## Streaming
+
+The chat endpoint uses Server-Sent Events (SSE) for real-time streaming:
+
+```bash
+curl -X POST https://api.ansa.so/chat \
+  -H "Content-Type: application/json" \
+  -d '{"agentId": "xxx", "messages": [{"role": "user", "content": "Hello"}]}'
+```
+
+Response events:
+
+```
+event: message_start
+data: {"type":"message_start"}
+
+event: content_block_delta
+data: {"type":"content_block_delta","delta":{"text":"Hello"}}
+
+event: content_block_delta
+data: {"type":"content_block_delta","delta":{"text":"! How can I help?"}}
+
+event: message_stop
+data: {"type":"message_stop"}
+```

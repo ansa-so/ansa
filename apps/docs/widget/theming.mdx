@@ -1,0 +1,128 @@
+---
+title: "Theme & Dark Mode"
+description: "Configure light, dark, or system-based theming for your chat widget"
+---
+
+The Ansa widget supports **light**, **dark**, and **system** (auto-detect) themes, ensuring your chat widget matches your website's appearance or your visitors' preferences.
+
+## Theme Options
+
+| Theme | Description |
+|-------|-------------|
+| `light` | Always use light mode with white backgrounds |
+| `dark` | Always use dark mode with dark backgrounds |
+| `system` | Auto-detect based on visitor's system preference (default) |
+
+---
+
+## Configuring Theme in Dashboard
+
+1. Go to your agent's **Embed** page
+2. Under **Appearance**, find the **Theme** dropdown
+3. Select your preferred theme:
+   - **Light** — Forces light mode
+   - **Dark** — Forces dark mode
+   - **System (auto-detect)** — Matches visitor's OS preference
+
+<Info>
+New agents default to **System** theme, which automatically adapts to your visitors' light/dark mode preference.
+</Info>
+
+---
+
+## How System Theme Detection Works
+
+When theme is set to `system`, the widget:
+
+1. Checks the visitor's OS preference using `prefers-color-scheme` media query
+2. Listens for real-time changes (e.g., when user toggles system dark mode)
+3. Automatically updates the widget appearance without page refresh
+
+This provides the best experience for visitors who prefer dark mode on their devices.
+
+---
+
+## JavaScript API
+
+You can control the widget theme programmatically using JavaScript:
+
+### Set Theme
+
+```javascript
+// Force dark mode
+window.ansa.setTheme('dark');
+
+// Force light mode
+window.ansa.setTheme('light');
+
+// Auto-detect from system preference
+window.ansa.setTheme('system');
+```
+
+### Get Current Theme
+
+```javascript
+const theme = window.ansa.getTheme();
+console.log(theme); // "light" | "dark" | "system"
+```
+
+### Example: Sync with Website Theme Toggle
+
+```javascript
+// When user toggles dark mode on your website
+document.getElementById('dark-mode-toggle').addEventListener('click', () => {
+  const isDark = document.body.classList.toggle('dark');
+
+  // Update Ansa widget to match
+  if (window.ansa) {
+    window.ansa.setTheme(isDark ? 'dark' : 'light');
+  }
+});
+```
+
+### Example: Match Website Theme on Load
+
+```javascript
+// Set widget theme based on your website's current theme
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.ansa) {
+    const websiteTheme = document.body.classList.contains('dark') ? 'dark' : 'light';
+    window.ansa.setTheme(websiteTheme);
+  }
+});
+```
+
+---
+
+## Dark Mode Colors
+
+When in dark mode, the widget uses these colors:
+
+| Element | Light Mode | Dark Mode |
+|---------|------------|-----------|
+| Background | `#ffffff` | `#111827` |
+| Text | `#1f2937` | `#f3f4f6` |
+| Borders | `#e5e7eb` | `#374151` |
+| Input background | `#f9fafb` | `#1f2937` |
+| Assistant bubbles | `#f6f9fc` | `#374151` |
+
+Your **primary color** and **chat bubble color** (configured in Appearance settings) remain consistent across both themes.
+
+---
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Use System for Best UX">
+    The `system` theme provides the best user experience as it respects visitors' preferences. Many users enable dark mode system-wide, and matching this preference reduces eye strain.
+  </Accordion>
+  <Accordion title="Match Your Website">
+    If your website has a fixed light or dark theme, set the widget to match. Use `setTheme()` if your website has a theme toggle.
+  </Accordion>
+  <Accordion title="Test Both Modes">
+    Always preview your widget in both light and dark modes to ensure your branding colors (primary color, chat bubble color) look good in both contexts.
+  </Accordion>
+  <Accordion title="Consider Contrast">
+    If using a very light primary color, it will automatically use dark text for contrast. The widget handles this automatically.
+  </Accordion>
+</AccordionGroup>

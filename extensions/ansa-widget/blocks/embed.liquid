@@ -1,0 +1,51 @@
+<!-- Ansa Chat Widget Embed Block -->
+<!-- Resolves agent ID from shop domain to avoid Shopify metafield caching issues -->
+<script>
+  (function() {
+    var shop = {{ shop.permanent_domain | json }};
+    var apiUrl = 'https://api.ansa.so';
+
+    fetch(apiUrl + '/shopify/resolve-agent?shop=' + encodeURIComponent(shop))
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (!data.agentId) return;
+
+        // Load the widget script
+        var s = document.createElement('script');
+        s.src = 'https://cdn.ansa.so/embed.js?agentId=' + data.agentId;
+        s.defer = true;
+        document.head.appendChild(s);
+
+        {% if customer %}
+        // Identify logged-in customer once widget is ready
+        var customerData = {
+          userId: {{ customer.id | json }},
+          userMetadata: {
+            email: {{ customer.email | json }},
+            firstName: {{ customer.first_name | json }},
+            lastName: {{ customer.last_name | json }},
+            shopifyCustomerId: {{ customer.id | json }}
+          }
+        };
+
+        function waitForWidget() {
+          if (window.ansa && window.ansa.isReady && window.ansa.isReady()) {
+            window.ansa.identify(customerData);
+          } else {
+            setTimeout(waitForWidget, 100);
+          }
+        }
+        s.onload = waitForWidget;
+        {% endif %}
+      })
+      .catch(function() { /* silently fail */ });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Ansa Chat Widget",
+  "target": "body",
+  "settings": []
+}
+{% endschema %}

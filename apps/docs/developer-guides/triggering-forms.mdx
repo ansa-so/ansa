@@ -1,0 +1,530 @@
+---
+title: Triggering Forms
+description: "Display forms programmatically and handle submissions with custom callbacks"
+---
+
+Forms let you collect structured data from users during conversations. You can trigger forms programmatically from your application code, define forms client-side with custom schemas, or use server-side forms created in the dashboard.
+
+## Quick Start
+
+### Trigger a Server-Side Form
+
+Forms created in the dashboard can be triggered by their tool name:
+
+```javascript
+// Show a form defined in the dashboard
+ansa.showForm("contact_form");
+```
+
+### Trigger a Client-Side Form
+
+Define and display forms entirely in your frontend code:
+
+```javascript
+ansa.showForm({
+  fields: [
+    { name: "email", label: "Email", type: "email" },
+    { name: "message", label: "How can we help?", type: "textarea" }
+  ],
+  submitButtonText: "Send Message"
+}, {
+  onSubmit: (data) => {
+    console.log("Form submitted:", data);
+    // { email: "user@example.com", message: "I need help with..." }
+  }
+});
+```
+
+## Form Schema Reference
+
+Client-side forms are defined using a schema object:
+
+```typescript
+interface FormSchema {
+  fields: FormField[];
+  title?: string;
+  description?: string;
+  submitButtonText?: string;
+  showLabels?: boolean;
+  successMessage?: string;
+  errorMessage?: string;
+}
+```
+
+### Field Types
+
+| Type | Description | Example Use |
+|------|-------------|-------------|
+| `text` | Single-line text input | Name, company |
+| `email` | Email with validation | Contact email |
+| `tel` | Phone number | Phone callback |
+| `number` | Numeric input | Quantity, budget |
+| `textarea` | Multi-line text | Message, description |
+| `select` | Dropdown single select | Category, plan |
+| `multiselect` | Dropdown multi-select | Interests, features |
+| `date` | Date picker | Appointment date |
+| `datetime` | Date and time picker | Meeting schedule |
+| `file` | File upload | Documents |
+| `image` | Image upload | Profile photo |
+
+### Field Definition
+
+```typescript
+interface FormField {
+  name: string;           // Field identifier (used in form data)
+  label: string;          // Display label
+  type: FormFieldType;    // One of the types above
+  placeholder?: string;   // Input placeholder text
+  defaultValue?: string;  // Pre-filled value
+  options?: FormFieldOption[];  // For select/multiselect
+  validation?: FormFieldValidation;
+  disabled?: boolean;
+}
+
+interface FormFieldOption {
+  label: string;  // Display text
+  value: string;  // Submitted value
+}
+```
+
+### Validation Rules
+
+```typescript
+interface FormFieldValidation {
+  required?: { value: boolean; message: string };
+  minLength?: { value: number; message: string };
+  maxLength?: { value: number; message: string };
+  min?: { value: number; message: string };
+  max?: { value: number; message: string };
+  pattern?: { value: string; message: string };  // Regex pattern
+}
+```
+
+## Complete Examples
+
+### Contact Form
+
+```javascript
+ansa.showForm({
+  title: "Contact Us",
+  description: "We'll get back to you within 24 hours",
+  fields: [
+    {
+      name: "name",
+      label: "Full Name",
+      type: "text",
+      placeholder: "John Smith",
+      validation: {
+        required: { value: true, message: "Name is required" }
+      }
+    },
+    {
+      name: "email",
+      label: "Email Address",
+      type: "email",
+      validation: {
+        required: { value: true, message: "Email is required" }
+      }
+    },
+    {
+      name: "company",
+      label: "Company",
+      type: "text",
+      placeholder: "Optional"
+    },
+    {
+      name: "message",
+      label: "Message",
+      type: "textarea",
+      placeholder: "How can we help?",
+      validation: {
+        required: { value: true, message: "Please enter a message" },
+        minLength: { value: 10, message: "Message must be at least 10 characters" }
+      }
+    }
+  ],
+  submitButtonText: "Send Message",
+  successMessage: "Thanks! We'll be in touch soon."
+}, {
+  onSubmit: async (data) => {
+    await fetch("/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+  }
+});
+```
+
+### Lead Qualification Form
+
+```javascript
+ansa.showForm({
+  title: "Get a Custom Quote",
+  fields: [
+    {
+      name: "email",
+      label: "Work Email",
+      type: "email",
+      validation: { required: { value: true, message: "Required" } }
+    },
+    {
+      name: "company_size",
+      label: "Company Size",
+      type: "select",
+      options: [
+        { label: "1-10 employees", value: "1-10" },
+        { label: "11-50 employees", value: "11-50" },
+        { label: "51-200 employees", value: "51-200" },
+        { label: "201-1000 employees", value: "201-1000" },
+        { label: "1000+ employees", value: "1000+" }
+      ]
+    },
+    {
+      name: "use_case",
+      label: "Primary Use Case",
+      type: "select",
+      options: [
+        { label: "Customer Support", value: "support" },
+        { label: "Sales", value: "sales" },
+        { label: "Internal Tools", value: "internal" },
+        { label: "E-commerce", value: "ecommerce" },
+        { label: "Other", value: "other" }
+      ]
+    },
+    {
+      name: "budget",
+      label: "Monthly Budget",
+      type: "select",
+      options: [
+        { label: "Under $100", value: "<100" },
+        { label: "$100 - $500", value: "100-500" },
+        { label: "$500 - $2000", value: "500-2000" },
+        { label: "$2000+", value: "2000+" }
+      ]
+    }
+  ],
+  submitButtonText: "Get Quote"
+}, {
+  onSubmit: (data) => {
+    // Send to CRM
+    analytics.track("Lead Qualified", data);
+  },
+  sendToAgent: true  // Agent can see the submitted data
+});
+```
+
+### Appointment Booking
+
+```javascript
+ansa.showForm({
+  title: "Schedule a Demo",
+  fields: [
+    {
+      name: "name",
+      label: "Your Name",
+      type: "text",
+      validation: { required: { value: true, message: "Required" } }
+    },
+    {
+      name: "email",
+      label: "Email",
+      type: "email",
+      validation: { required: { value: true, message: "Required" } }
+    },
+    {
+      name: "date",
+      label: "Preferred Date",
+      type: "date",
+      validation: { required: { value: true, message: "Please select a date" } }
+    },
+    {
+      name: "time",
+      label: "Preferred Time",
+      type: "select",
+      options: [
+        { label: "9:00 AM", value: "09:00" },
+        { label: "10:00 AM", value: "10:00" },
+        { label: "11:00 AM", value: "11:00" },
+        { label: "2:00 PM", value: "14:00" },
+        { label: "3:00 PM", value: "15:00" },
+        { label: "4:00 PM", value: "16:00" }
+      ]
+    },
+    {
+      name: "notes",
+      label: "Anything specific you'd like to discuss?",
+      type: "textarea"
+    }
+  ],
+  submitButtonText: "Book Demo"
+}, {
+  onSubmit: async (data) => {
+    await fetch("/api/book-demo", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+  }
+});
+```
+
+## Dynamic Forms
+
+### Using `registerFormSchema`
+
+Register form schema providers that generate forms dynamically based on context:
+
+```javascript
+ansa.registerFormSchema({
+  // Form name -> schema provider function
+  "product_inquiry": async (args, user) => {
+    // args: parameters from agent tool call
+    // user: { visitorId, userId?, userMetadata?, conversationId? }
+
+    // Fetch products from your API
+    const products = await fetch("/api/products").then(r => r.json());
+
+    return {
+      title: "Product Inquiry",
+      fields: [
+        {
+          name: "email",
+          label: "Email",
+          type: "email",
+          // Pre-fill from user identity
+          defaultValue: user.userMetadata?.email
+        },
+        {
+          name: "product",
+          label: "Product",
+          type: "select",
+          // Dynamic options from API
+          options: products.map(p => ({
+            label: `${p.name} - $${p.price}`,
+            value: p.id
+          })),
+          // Pre-select from agent args
+          defaultValue: args.productId
+        },
+        {
+          name: "quantity",
+          label: "Quantity",
+          type: "number",
+          defaultValue: "1",
+          validation: {
+            min: { value: 1, message: "Minimum 1" },
+            max: { value: 100, message: "Maximum 100" }
+          }
+        }
+      ],
+      submitButtonText: "Request Quote"
+    };
+  }
+});
+```
+
+The agent can then trigger this form:
+
+```
+Agent: I can help you get a quote for that product. Let me pull up the form.
+[Shows product_inquiry form with productId pre-selected]
+```
+
+### Context-Aware Pre-filling
+
+```javascript
+ansa.registerFormSchema({
+  "support_ticket": async (args, user) => {
+    // Get user's recent orders for context
+    let orders = [];
+    if (user.userId) {
+      orders = await fetch(`/api/users/${user.userId}/orders`).then(r => r.json());
+    }
+
+    return {
+      title: "Create Support Ticket",
+      fields: [
+        {
+          name: "email",
+          label: "Email",
+          type: "email",
+          defaultValue: user.userMetadata?.email,
+          disabled: !!user.userMetadata?.email  // Lock if known
+        },
+        {
+          name: "order",
+          label: "Related Order (optional)",
+          type: "select",
+          options: [
+            { label: "No specific order", value: "" },
+            ...orders.map(o => ({
+              label: `#${o.id} - ${o.date} ($${o.total})`,
+              value: o.id
+            }))
+          ]
+        },
+        {
+          name: "issue",
+          label: "Issue Type",
+          type: "select",
+          options: [
+            { label: "Order issue", value: "order" },
+            { label: "Product question", value: "product" },
+            { label: "Billing", value: "billing" },
+            { label: "Other", value: "other" }
+          ]
+        },
+        {
+          name: "description",
+          label: "Describe your issue",
+          type: "textarea",
+          validation: {
+            required: { value: true, message: "Please describe your issue" }
+          }
+        }
+      ]
+    };
+  }
+});
+```
+
+## Handling Submissions
+
+### Client-Side Callback
+
+```javascript
+ansa.showForm(schema, {
+  onSubmit: async (data) => {
+    // data is an object with field names as keys
+    console.log(data);
+    // { email: "user@example.com", message: "Hello..." }
+
+    // Send to your backend
+    const response = await fetch("/api/forms/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        formType: "contact",
+        data,
+        visitorId: ansa.getVisitorId()
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error("Submission failed");  // Shows error in widget
+    }
+  },
+  onCancel: () => {
+    console.log("User closed the form");
+  }
+});
+```
+
+### Send to Agent
+
+When `sendToAgent: true`, the form data is also sent to the agent as a chat message:
+
+```javascript
+ansa.showForm({
+  fields: [
+    { name: "email", label: "Email", type: "email" },
+    { name: "question", label: "Question", type: "textarea" }
+  ]
+}, {
+  sendToAgent: true,
+  onSubmit: (data) => {
+    // Still fires, but agent also receives the data
+    analytics.track("Form Submitted", data);
+  }
+});
+```
+
+The agent sees:
+```
+User submitted form:
+- Email: user@example.com
+- Question: How do I integrate with my CRM?
+```
+
+## Triggering Patterns
+
+### On Page Load (Delayed)
+
+```javascript
+// Show lead capture after 30 seconds on pricing page
+if (window.location.pathname === "/pricing") {
+  setTimeout(() => {
+    if (!ansa.isOpen()) {
+      ansa.open();
+      ansa.showForm("pricing_inquiry");
+    }
+  }, 30000);
+}
+```
+
+### On User Action
+
+```javascript
+// Trigger quote form when user clicks CTA
+document.querySelectorAll("[data-quote-form]").forEach(btn => {
+  btn.addEventListener("click", (e) => {
+    e.preventDefault();
+    const product = btn.dataset.product;
+    ansa.showForm({
+      fields: [
+        { name: "email", label: "Email", type: "email" },
+        { name: "product", label: "Product", type: "text", defaultValue: product, disabled: true }
+      ]
+    }, { sendToAgent: true });
+  });
+});
+```
+
+### Exit Intent
+
+```javascript
+let exitFormShown = false;
+
+document.addEventListener("mouseleave", (e) => {
+  if (e.clientY < 0 && !exitFormShown && !ansa.isOpen()) {
+    exitFormShown = true;
+    ansa.open();
+    ansa.showForm({
+      title: "Before you go...",
+      description: "Get 10% off your first order",
+      fields: [
+        { name: "email", label: "Email", type: "email" }
+      ],
+      submitButtonText: "Get Discount"
+    }, {
+      onSubmit: (data) => {
+        // Send discount code
+      }
+    });
+  }
+});
+```
+
+## Best Practices
+
+<Tip>
+**Keep forms short.** Each additional field reduces completion rates. Start with 2-3 essential fields.
+</Tip>
+
+1. **Progressive disclosure** — Ask for minimal info first, then follow up for details
+2. **Pre-fill when possible** — Use `identify()` to pass user data for pre-filling
+3. **Validate client-side** — Use validation rules to catch errors before submission
+4. **Provide context** — Use `title` and `description` to explain why you need the info
+5. **Handle errors gracefully** — Throw errors in `onSubmit` to show error state in form
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Custom Events" icon="bolt" href="/developer-guides/custom-events">
+    Trigger automations based on user actions
+  </Card>
+  <Card title="Identity" icon="user" href="/developer-guides/identity">
+    Pre-fill forms with user data
+  </Card>
+</CardGroup>

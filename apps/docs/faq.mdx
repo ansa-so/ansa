@@ -1,0 +1,402 @@
+---
+title: FAQ
+description: "Frequently asked questions about Ansa"
+---
+
+Quick answers to common questions about Ansa, AI agents, and getting the most from the platform.
+
+## General
+
+### What is Ansa?
+
+Ansa is an AI-powered chat platform that lets you create intelligent agents for customer support, lead generation, and sales. Deploy a customizable widget on your website, connect email support, or integrate via API.
+
+### How does Ansa work?
+
+1. **Create an agent** with a knowledge base (your docs, FAQs, product info)
+2. **Train it** with a system prompt defining personality and capabilities
+3. **Deploy it** via widget, email channel, or API
+4. **Monitor and improve** using analytics and conversation history
+
+### What AI models does Ansa use?
+
+Ansa supports multiple AI models:
+- GPT-4o (most capable)
+- GPT-4o-mini (fast and affordable)
+- Claude 3.5 Sonnet
+- More models coming soon
+
+You can switch models anytime in agent settings.
+
+### Is my data secure?
+
+Yes. Ansa takes security seriously:
+- All data encrypted in transit (TLS) and at rest
+- SOC 2 Type II compliant
+- GDPR compliant with EU data processing
+- No training on your data
+- Regular security audits
+
+See our [Security page](/security) for details.
+
+## Pricing & Billing
+
+### Is there a free plan?
+
+Yes! The free plan includes:
+- 100 messages/month
+- 1 agent
+- Basic AI model
+- 10 MB document storage
+
+No credit card required.
+
+### What counts as a message?
+
+Each message in a conversation counts:
+- User message = 1 message
+- Agent response = 1 message
+- Forms displayed = 0 messages (forms don't count)
+
+### What happens if I hit my message limit?
+
+Your agent stops responding to new messages. Existing conversations are preserved. You can:
+- Wait for the monthly reset
+- Upgrade to a higher plan
+
+### Do unused messages roll over?
+
+No, message allowances reset at the start of each billing period.
+
+### Can I downgrade my plan?
+
+Yes. Downgrades take effect at the end of your current billing period. Make sure you're within the new plan's limits before it starts.
+
+### Do you offer annual billing?
+
+Yes, with a discount. Select "Annual" on the pricing page.
+
+## Widget & Installation
+
+### How do I install the widget?
+
+Add this script to your website's `<head>`:
+
+```html
+<script
+  defer
+  src="https://cdn.ansa.so/embed.js"
+  data-agent-id="YOUR_AGENT_ID"
+></script>
+```
+
+Replace `YOUR_AGENT_ID` with your agent ID from the dashboard.
+
+### Can I customize the widget appearance?
+
+Yes. Customize:
+- Primary color
+- Position (left/right/bottom)
+- Launcher icon
+- Welcome message
+- And more
+
+Go to **Settings** → **Widget** to configure.
+
+### Does the widget slow down my site?
+
+No. The widget script:
+- Loads asynchronously (doesn't block page load)
+- Is under 50KB gzipped
+- Only loads chat UI when opened
+- Is served from a global CDN
+
+### Can I use Ansa with a single-page app (React, Vue, Next.js)?
+
+Yes. Install the SDK:
+
+```bash
+npm install @ansa-so/sdk
+```
+
+Then use the widget functions:
+
+```javascript
+import { loadWidget, openWidget } from "@ansa-so/sdk";
+
+loadWidget({ agentId: "xxx" });
+openWidget();
+```
+
+### How do I show the widget only on certain pages?
+
+Use the SDK for programmatic control:
+
+```javascript
+import { loadWidget, destroyWidget } from "@ansa-so/sdk";
+
+// Load on specific pages
+if (window.location.pathname.startsWith("/support")) {
+  loadWidget({ agentId: "xxx" });
+}
+
+// Clean up when navigating away
+destroyWidget();
+```
+
+## Knowledge Base
+
+### What file formats can I upload?
+
+Supported formats:
+- PDF
+- TXT
+- Markdown (.md)
+- Word documents (.docx)
+- Web pages (URL import)
+
+### How much content can I add?
+
+Depends on your plan:
+- Free: 10 MB
+- Starter: 100 MB
+- Growth: 1 GB
+- Pro: 10 GB
+- Enterprise: Unlimited
+
+### How often should I update my knowledge base?
+
+- **Weekly:** Review low-confidence conversations
+- **Monthly:** Update seasonal content
+- **Quarterly:** Full audit
+- **As needed:** Policy/product changes
+
+### Can the agent access external websites?
+
+Not automatically. You can:
+- Import specific URLs as knowledge base content
+- Use HTTP tools for API integrations
+- But the agent can't browse the web in real-time
+
+## Conversations & Messages
+
+### How do I view conversation history?
+
+Go to **Conversations** in the dashboard. You can:
+- Filter by agent, channel, feedback
+- Search conversations
+- View full message threads
+- See form submissions
+
+### Can I export conversations?
+
+Yes, via API:
+
+```bash
+curl "https://api.ansa.so/conversations?agentId=xxx" \
+  -H "Authorization: Bearer $ANSA_API_KEY"
+```
+
+### What is confidence score?
+
+Confidence indicates how well the user's question matched your knowledge base:
+- 80-100%: Strong match
+- 60-79%: Partial match
+- Below 60%: Weak match, may need more content
+
+### How do I handle low-confidence responses?
+
+Options:
+- Add more content to your knowledge base
+- Set confidence thresholds for email channel
+- Forward uncertain responses to humans
+
+## Forms & Lead Capture
+
+### How do I create a form?
+
+1. Go to **Tools** → **Add Tool**
+2. Select **Form** type
+3. Define your fields using JSON Schema
+4. Configure post-actions (webhook, email)
+5. Train your agent when to show it
+
+### Can I send form data to my CRM?
+
+Yes. Options:
+- **Webhook:** Send to any URL (including Zapier/Make)
+- **Email:** Notify your team
+- **API:** Build custom integrations
+
+### Why aren't users completing my forms?
+
+Common reasons:
+- Too many fields (keep to 3-4 max)
+- Required fields that seem optional
+- Form appears too early
+- Poor mobile experience
+
+See [Form Tools](/tools/form-tools) for optimization tips.
+
+## Triggers & Automation
+
+### What types of triggers are available?
+
+- **Time on page:** After X seconds
+- **Scroll depth:** After scrolling X%
+- **Exit intent:** When leaving the page
+- **Page view:** On specific URLs
+- **Custom event:** From your JavaScript
+
+### How many triggers should I use?
+
+Start with 2-3. Too many triggers can overwhelm visitors. Test and measure before adding more.
+
+### Can triggers fire multiple times?
+
+By default, triggers fire once per session. You can disable "trigger once" for repeated triggering.
+
+## Integrations
+
+### Does Ansa integrate with Shopify?
+
+Yes! The Shopify integration includes:
+- Automatic product sync
+- One-click widget install
+- Order lookups
+- Refund handling
+
+See [Shopify Integration](/integrations/shopify).
+
+### Can I use Ansa for email support?
+
+Yes. Enable the email channel to:
+- Receive emails at an agent address
+- Auto-respond using your knowledge base
+- Forward low-confidence emails to humans
+- Track email conversations in dashboard
+
+See [Email Channel](/integrations/email).
+
+### Does Ansa have a REST API?
+
+Yes. Full API access for:
+- Managing agents and tools
+- Listing conversations
+- Sending messages programmatically
+- Analytics and exports
+
+See [API Reference](/api-reference/overview).
+
+### Can I use Ansa with Zapier or Make?
+
+Yes. Use webhook URLs in your form post-actions to connect to Zapier, Make, or any automation platform.
+
+## Team & Account
+
+### How do I invite team members?
+
+1. Go to **Settings** → **Team**
+2. Click **Invite Member**
+3. Enter email and role
+4. Send invitation
+
+### What roles are available?
+
+- **Owner:** Full access including billing
+- **Member:** Access agents, conversations, analytics
+
+### Can multiple people manage the same agent?
+
+Yes. All team members can view and edit all agents.
+
+## Troubleshooting
+
+### My widget isn't appearing
+
+Check:
+1. Script is in `<head>` with correct agent ID
+2. No JavaScript errors in console
+3. Agent is published (not draft)
+4. Domain isn't blocked
+
+### Agent gives wrong answers
+
+Solutions:
+1. Check knowledge base for outdated content
+2. Make content more specific
+3. Review system prompt for clarity
+4. Check if similar content is conflicting
+
+### Forms aren't submitting
+
+Check:
+1. Required fields are filled
+2. Webhook URL is accessible
+3. Form tool is enabled
+4. No validation errors
+
+### Confidence is always low
+
+Add more content:
+1. Review low-confidence conversations
+2. Add answers for common questions
+3. Make content more specific
+4. Include question variations
+
+## Technical
+
+### What browsers are supported?
+
+The widget works on all modern browsers:
+- Chrome (last 2 versions)
+- Firefox (last 2 versions)
+- Safari (last 2 versions)
+- Edge (last 2 versions)
+- Mobile browsers
+
+### Is the widget accessible?
+
+Yes. The widget includes:
+- Keyboard navigation
+- Screen reader support
+- ARIA labels
+- Focus management
+
+### Can I self-host Ansa?
+
+Yes. See [Self-Hosting](/self-hosting) for Docker deployment instructions.
+
+### What's the API rate limit?
+
+- Standard: 100 requests/minute
+- Enterprise: Custom limits
+
+Contact support if you need higher limits.
+
+## Getting Help
+
+### How do I contact support?
+
+- **Email:** support@ansa.so
+- **Chat:** Use the widget on ansa.so
+- **Docs:** You're here!
+
+### Do you offer onboarding help?
+
+Yes. Growth and Pro plans include onboarding assistance. Enterprise includes dedicated onboarding.
+
+### Where can I request features?
+
+Email product@ansa.so with feature requests. We read every suggestion!
+
+## Still Have Questions?
+
+<CardGroup cols={2}>
+  <Card title="Documentation" icon="book" href="/introduction">
+    Browse full documentation
+  </Card>
+  <Card title="Contact Support" icon="headset" href="mailto:support@ansa.so">
+    Get help from our team
+  </Card>
+</CardGroup>

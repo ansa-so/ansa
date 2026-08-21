@@ -1,0 +1,161 @@
+---
+title: Agents
+description: "Manage your AI agents"
+api: "GET /agents"
+---
+
+## List Agents
+
+Get all agents for the authenticated user.
+
+<RequestExample>
+```bash cURL
+curl -X GET https://api.ansa.so/agents \
+  -H "Authorization: Bearer your-api-key"
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+{
+  "data": [
+    {
+      "id": "agent_xxx",
+      "name": "Support Bot",
+      "slug": "support-bot",
+      "model": "claude-sonnet-4-20250514",
+      "createdAt": "2024-01-15T10:00:00Z"
+    }
+  ]
+}
+```
+</ResponseExample>
+
+---
+
+## Get Agent
+
+<ParamField path="id" type="string" required>
+  The agent ID
+</ParamField>
+
+```
+GET /agents/:id
+```
+
+<RequestExample>
+```bash cURL
+curl -X GET https://api.ansa.so/agents/agent_xxx \
+  -H "Authorization: Bearer your-api-key"
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+{
+  "data": {
+    "id": "agent_xxx",
+    "name": "Support Bot",
+    "slug": "support-bot",
+    "model": "claude-sonnet-4-20250514",
+    "temperature": 50,
+    "systemPrompt": "You are a helpful support agent.",
+    "createdAt": "2024-01-15T10:00:00Z",
+    "updatedAt": "2024-01-20T14:30:00Z"
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## Create Agent
+
+```
+POST /agents
+```
+
+<ParamField body="name" type="string" required>
+  Agent display name
+</ParamField>
+
+<ParamField body="model" type="string">
+  AI model ID (default: claude-sonnet-4-20250514)
+</ParamField>
+
+<ParamField body="systemPrompt" type="string">
+  Instructions for the agent
+</ParamField>
+
+<ParamField body="temperature" type="number">
+  Response creativity (0-100)
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl -X POST https://api.ansa.so/agents \
+  -H "Authorization: Bearer your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Sales Bot",
+    "model": "claude-sonnet-4-20250514",
+    "systemPrompt": "You are a sales assistant.",
+    "temperature": 40
+  }'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+{
+  "data": {
+    "id": "agent_yyy",
+    "name": "Sales Bot",
+    "slug": "sales-bot",
+    "model": "claude-sonnet-4-20250514",
+    "temperature": 40,
+    "systemPrompt": "You are a sales assistant.",
+    "createdAt": "2024-01-22T09:00:00Z"
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## Update Agent
+
+```
+PATCH /agents/:id
+```
+
+<RequestExample>
+```bash cURL
+curl -X PATCH https://api.ansa.so/agents/agent_xxx \
+  -H "Authorization: Bearer your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Updated Name",
+    "temperature": 60
+  }'
+```
+</RequestExample>
+
+---
+
+## Delete Agent
+
+```
+DELETE /agents/:id
+```
+
+<Warning>
+  This permanently deletes the agent and all associated data including conversations, documents, and tools.
+</Warning>
+
+<RequestExample>
+```bash cURL
+curl -X DELETE https://api.ansa.so/agents/agent_xxx \
+  -H "Authorization: Bearer your-api-key"
+```
+</RequestExample>

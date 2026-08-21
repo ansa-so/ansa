@@ -1,0 +1,82 @@
+---
+title: Knowledge Base
+description: "Add documents and data sources to your agent"
+---
+
+## Overview
+
+The knowledge base powers your agent's ability to answer questions accurately. When a user asks a question, Ansa:
+
+1. Searches your knowledge base for relevant content
+2. Retrieves the most relevant chunks
+3. Provides them as context to the AI model
+4. Generates an accurate, grounded response
+
+## Document Upload
+
+### Supported Formats
+
+- **PDF** - Product manuals, documentation, reports
+- **TXT** - Plain text files
+- **DOCX** - Microsoft Word documents
+- **MD** - Markdown files
+
+### Uploading Documents
+
+<Steps>
+  <Step title="Navigate to Knowledge">
+    Go to your agent's **Knowledge** tab.
+  </Step>
+  <Step title="Upload files">
+    Drag and drop files or click to browse. You can upload multiple files at once.
+  </Step>
+  <Step title="Wait for processing">
+    Ansa chunks your documents, generates embeddings, and indexes them for search.
+  </Step>
+</Steps>
+
+### Storage Limits
+
+| Plan | Storage |
+|------|---------|
+| Free | 10 MB |
+| Starter | 100 MB |
+| Growth | 1 GB |
+| Pro | 10 GB |
+
+## Web Sources
+
+Sync content from websites automatically.
+
+### Adding a Web Source
+
+1. Go to **Knowledge > Web Sources**
+2. Enter the URL to crawl
+3. Configure crawl settings:
+   - **Depth**: How many links deep to follow
+   - **Max pages**: Maximum pages to index
+4. Click **Add Source**
+
+### Sync Schedule
+
+Web sources sync automatically:
+- Initial crawl happens immediately
+- Re-sync can be triggered manually
+- Content is updated when pages change
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Chunk size matters">
+    Ansa automatically chunks documents into ~500 token segments. For best results, use well-structured documents with clear headings.
+  </Accordion>
+  <Accordion title="Quality over quantity">
+    A smaller, high-quality knowledge base often performs better than a large one with irrelevant content.
+  </Accordion>
+  <Accordion title="Keep content updated">
+    Regularly update your documents to ensure your agent has accurate information.
+  </Accordion>
+  <Accordion title="Test your knowledge base">
+    After uploading, ask questions to verify your agent can find and use the information correctly.
+  </Accordion>
+</AccordionGroup>

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/ansa-so/ansa/security/advisories/new
+    about: Report privately. Please do not open a public issue.
+  - name: Commercial or enterprise licensing
+    url: https://ansa.so/enterprise
+    about: The licence forbids competing commercial use — get in touch instead.

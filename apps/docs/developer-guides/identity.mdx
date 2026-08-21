@@ -1,0 +1,569 @@
+---
+title: User Identity
+description: "Pass user context to personalize conversations and pre-fill forms"
+---
+
+User identity lets you connect chat conversations with your application's user accounts. When you identify a user, their conversations become linked to their profile, forms can be pre-filled with known data, and the agent can personalize responses.
+
+## Quick Start
+
+Identify a user when they log in:
+
+```javascript
+ansa.identify({
+  userId: "user_abc123",
+  userMetadata: {
+    name: "Jane Smith",
+    email: "jane@example.com",
+    plan: "pro"
+  }
+});
+```
+
+Clear identity when they log out:
+
+```javascript
+ansa.resetUser();
+```
+
+## Identity Object
+
+The identity object has two parts:
+
+```typescript
+interface Identity {
+  /** Your internal user ID */
+  userId?: string;
+  /** Additional user properties */
+  userMetadata?: Record<string, unknown>;
+}
+```
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `userId` | `string` | Your internal user identifier. Should be stable and unique. |
+| `userMetadata` | `object` | Key-value pairs of user attributes |
+
+### User ID
+
+The `userId` should be your internal identifier for the user:
+
+```javascript
+// Good - stable internal IDs
+ansa.identify({ userId: "user_abc123" });
+ansa.identify({ userId: "550e8400-e29b-41d4-a716-446655440000" });
+ansa.identify({ userId: "12345" });
+
+// Avoid - unstable or sensitive
+ansa.identify({ userId: "jane@example.com" }); // Use metadata for email
+ansa.identify({ userId: "session_xyz" });       // Sessions change
+```
+
+### User Metadata
+
+Pass any properties that help personalize the experience:
+
+```javascript
+ansa.identify({
+  userId: "user_123",
+  userMetadata: {
+    // Contact info
+    name: "Jane Smith",
+    email: "jane@example.com",
+    phone: "+1-555-123-4567",
+
+    // Account info
+    plan: "enterprise",
+    role: "admin",
+    company: "Acme Inc",
+
+    // Dates
+    signupDate: "2024-01-15",
+    lastLoginDate: "2024-12-20",
+
+    // Usage
+    totalOrders: 47,
+    lifetimeValue: 4999.99,
+
+    // Preferences
+    timezone: "America/New_York",
+    language: "en",
+
+    // Custom attributes
+    accountManager: "Bob Johnson",
+    industry: "Technology"
+  }
+});
+```
+
+## How Identity Is Used
+
+### 1. Conversation Linking
+
+Conversations are linked to the user ID, allowing:
+
+- **History continuity** — Users see their past conversations across devices
+- **Agent context** — The agent knows who they're talking to
+- **Analytics** — Track conversations per user in your dashboard
+
+### 2. Form Pre-filling
+
+Forms automatically use metadata to pre-fill fields when the field name exactly matches a key in `userMetadata`:
+
+```javascript
+// After identifying with email
+ansa.identify({
+  userId: "user_123",
+  userMetadata: {
+    email: "jane@example.com",
+    name: "Jane Smith",
+    company: "Acme Inc"
+  }
+});
+
+// This form will have fields pre-filled
+ansa.showForm({
+  fields: [
+    { name: "email", label: "Email", type: "email" },      // → jane@example.com
+    { name: "name", label: "Name", type: "text" },          // → Jane Smith
+    { name: "company", label: "Company", type: "text" }     // → Acme Inc
+  ]
+});
+```
+
+<Note>
+Field names must **exactly match** the keys in `userMetadata`. For example, a field named `user_email` will only be pre-filled if you have `userMetadata.user_email`, not `userMetadata.email`.
+</Note>
+
+### 3. Agent Personalization
+
+The agent receives user metadata and can use it in responses:
+
+```
+User: What's my current plan?
+Agent: Hi Jane! You're on the Enterprise plan with Acme Inc.
+       You've been with us since January 2024.
+```
+
+<Note>
+For security, sensitive fields are automatically excluded from the agent's context. Fields containing tokens, passwords, secrets, API keys, or credentials are filtered out. See [Personalized Responses](#6-personalized-responses) for details.
+</Note>
+
+### 4. Dynamic Form Schemas
+
+Form schema providers receive user context:
+
+```javascript
+ansa.registerFormSchema({
+  "support_ticket": async (args, user) => {
+    // user.userId = "user_123"
+    // user.userMetadata = { name: "Jane", email: "...", plan: "enterprise" }
+
+    return {
+      fields: [
+        {
+          name: "email",
+          label: "Email",
+          type: "email",
+          defaultValue: user.userMetadata?.email,
+          disabled: true  // Lock the field since we know it
+        },
+        {
+          name: "priority",
+          label: "Priority",
+          type: "select",
+          // Enterprise users get priority options
+          options: user.userMetadata?.plan === "enterprise"
+            ? [
+                { label: "Critical", value: "critical" },
+                { label: "High", value: "high" },
+                { label: "Normal", value: "normal" }
+              ]
+            : [
+                { label: "High", value: "high" },
+                { label: "Normal", value: "normal" },
+                { label: "Low", value: "low" }
+              ]
+        }
+      ]
+    };
+  }
+});
+```
+
+### 5. HTTP Tool Authentication
+
+Identity data can be passed to HTTP tools for authenticated API calls. This is useful when your tools need to access user-specific data from your backend.
+
+```javascript
+// Identify with an auth token
+ansa.identify({
+  userId: "user_123",
+  userMetadata: {
+    authToken: "eyJhbGciOiJIUzI1NiIs...",  // User's JWT
+    email: "jane@example.com"
+  }
+});
+```
+
+Then configure your HTTP tool to use the token:
+
+```json
+{
+  "name": "get_my_orders",
+  "description": "Get the user's recent orders",
+  "httpUrl": "https://api.yourstore.com/users/{{userId}}/orders",
+  "httpMethod": "GET",
+  "httpHeaders": {
+    "Authorization": "Bearer {{userMetadata.authToken}}"
+  }
+}
+```
+
+The `{{userId}}` and `{{userMetadata.path}}` placeholders are replaced with the user's identity data at runtime.
+
+<Info>
+See [HTTP Tools - User Context Variables](/tools/http-tools#user-context-variables) for complete documentation on this feature.
+</Info>
+
+### 6. Personalized Responses
+
+The agent receives sanitized user context to personalize its responses. This enables greetings, contextual answers, and tailored recommendations based on user data.
+
+#### Initial Message Templating
+
+The widget's initial message supports template variables:
+
+```javascript
+// Agent configuration
+{
+  initialMessage: "Hello {{userMetadata.name}}! How can I help you today?"
+}
+```
+
+If the user is identified:
+```
+Hello Jane! How can I help you today?
+```
+
+If no identity or the field is missing:
+```
+Hello ! How can I help you today?
+```
+
+<Tip>
+Use conditional phrasing for optional fields: "Welcome back!" works whether or not you have the user's name.
+</Tip>
+
+#### Template Syntax
+
+| Template | Description | Example Output |
+|----------|-------------|----------------|
+| `{{userId}}` | The user's ID | `user_123` |
+| `{{userMetadata.name}}` | Top-level metadata field | `Jane Smith` |
+| `{{userMetadata.company.name}}` | Nested field (dot notation) | `Acme Inc` |
+
+If a field is undefined, it renders as an empty string.
+
+#### Security: Excluded Fields
+
+To protect sensitive data, certain fields are automatically **excluded** from the agent's context. Fields with keys matching these patterns (case-insensitive) are filtered:
+
+- `token`
+- `secret`
+- `password`
+- `apikey` / `api_key`
+- `accesstoken` / `access_token`
+- `refreshtoken` / `refresh_token`
+- `auth`
+- `credential`
+- `private`
+
+```javascript
+// What you pass to identify()
+ansa.identify({
+  userId: "user_123",
+  userMetadata: {
+    name: "Jane Smith",
+    email: "jane@example.com",
+    authToken: "eyJhbGciOiJIUzI1NiIs...",  // Contains "auth" + "token"
+    apiKey: "sk-1234567890",               // Contains "apikey"
+    plan: "enterprise"
+  }
+});
+
+// What the agent sees
+{
+  userId: "user_123",
+  userMetadata: {
+    name: "Jane Smith",
+    email: "jane@example.com",
+    plan: "enterprise"
+  }
+}
+```
+
+<Warning>
+Sensitive fields are only filtered from the **agent's LLM context**. They are still available for HTTP tool substitution (see section 5) and are sent to your backend.
+</Warning>
+
+## Implementation Patterns
+
+### On Login
+
+```javascript
+async function onLoginSuccess(authResult) {
+  // Fetch user profile from your API
+  const user = await fetch("/api/me", {
+    headers: { Authorization: `Bearer ${authResult.token}` }
+  }).then(r => r.json());
+
+  // Identify in Ansa
+  ansa.identify({
+    userId: user.id,
+    userMetadata: {
+      name: user.name,
+      email: user.email,
+      plan: user.subscription?.plan,
+      company: user.company?.name,
+      role: user.role
+    }
+  });
+}
+```
+
+### On Logout
+
+```javascript
+function logout() {
+  // Clear Ansa identity
+  ansa.resetUser();
+
+  // Rest of logout logic
+  auth.signOut();
+  router.push("/login");
+}
+```
+
+### React Context
+
+```tsx
+import { createContext, useContext, useEffect } from "react";
+import { useAuth } from "./auth";
+
+const AnsaContext = createContext(null);
+
+export function AnsaProvider({ children }) {
+  const { user, isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      window.ansa?.identify({
+        userId: user.id,
+        userMetadata: {
+          name: user.name,
+          email: user.email,
+          plan: user.plan
+        }
+      });
+    } else {
+      window.ansa?.resetUser();
+    }
+  }, [isAuthenticated, user]);
+
+  return (
+    <AnsaContext.Provider value={null}>
+      {children}
+    </AnsaContext.Provider>
+  );
+}
+```
+
+### Next.js App Router
+
+```tsx
+// app/providers.tsx
+"use client";
+
+import { useEffect } from "react";
+import { useSession } from "next-auth/react";
+
+export function AnsaIdentityProvider({ children }) {
+  const { data: session, status } = useSession();
+
+  useEffect(() => {
+    if (status === "authenticated" && session?.user) {
+      window.ansa?.identify({
+        userId: session.user.id,
+        userMetadata: {
+          name: session.user.name,
+          email: session.user.email,
+          image: session.user.image
+        }
+      });
+    } else if (status === "unauthenticated") {
+      window.ansa?.resetUser();
+    }
+  }, [session, status]);
+
+  return children;
+}
+```
+
+### Vue Composition API
+
+```vue
+<script setup>
+import { watch } from 'vue';
+import { useUserStore } from '@/stores/user';
+
+const userStore = useUserStore();
+
+watch(
+  () => userStore.isLoggedIn,
+  (isLoggedIn) => {
+    if (isLoggedIn) {
+      window.ansa?.identify({
+        userId: userStore.user.id,
+        userMetadata: {
+          name: userStore.user.name,
+          email: userStore.user.email,
+          plan: userStore.user.plan
+        }
+      });
+    } else {
+      window.ansa?.resetUser();
+    }
+  },
+  { immediate: true }
+);
+</script>
+```
+
+## Visitors vs Users
+
+Ansa tracks two types of identities:
+
+| Type | Identifier | Persistence | Use Case |
+|------|------------|-------------|----------|
+| **Visitor** | `visitorId` | LocalStorage | Anonymous users, stored per browser |
+| **User** | `userId` | Your identity | Logged-in users, cross-device |
+
+### Getting Visitor ID
+
+```javascript
+const visitorId = ansa.getVisitorId();
+// "v_1703347200000_abc123def"
+```
+
+Visitor IDs are:
+- Generated automatically on first visit
+- Stored in localStorage
+- Persisted until cleared
+- Unique per browser/device
+
+### Linking Visitors to Users
+
+When a visitor logs in, their anonymous conversations become linked to their user account:
+
+```javascript
+// Before login: conversations stored under visitorId
+// User browses, asks questions...
+
+// On login
+ansa.identify({
+  userId: "user_123",
+  userMetadata: { name: "Jane" }
+});
+
+// After login: previous conversations now linked to user_123
+// Future conversations also linked to user_123
+```
+
+## Privacy Considerations
+
+<Warning>
+Only pass data that's necessary for personalization. Avoid sensitive information like passwords, SSNs, or financial details.
+</Warning>
+
+### What to Include
+
+- Name, email (for personalization)
+- Account type, plan (for context)
+- Preferences (for customization)
+- Non-sensitive IDs
+
+### What to Avoid
+
+- Passwords or secrets
+- Full credit card numbers
+- Social security numbers
+- Health information
+- Any data you wouldn't want logged
+
+### GDPR Compliance
+
+If a user requests data deletion:
+
+1. Use the API to delete their conversations
+2. Their identity data is automatically cleared
+3. Consider calling `clearIdentity()` to clear client state
+
+## SDK Usage
+
+The SDK provides the same identity functions:
+
+```typescript
+import { identify, clearIdentity } from "@ansa-so/sdk";
+
+// Identify
+identify({
+  userId: "user_123",
+  userMetadata: {
+    name: "Jane Smith",
+    email: "jane@example.com"
+  }
+});
+
+// Clear identity
+clearIdentity();
+```
+
+## Debugging
+
+Check the current identity state in the console:
+
+```javascript
+// Identity is sent with each request
+// Check Network tab for X-Ansa-User-Id header
+
+// Or listen for identity events
+window.addEventListener("message", (e) => {
+  if (e.data.type === "ansa:identityUpdate") {
+    console.log("Identity updated:", e.data.data);
+  }
+});
+```
+
+## Best Practices
+
+<Tip>
+**Identify early, update often.** Call `identify()` as soon as you know who the user is, and update metadata when it changes.
+</Tip>
+
+1. **Use stable IDs** — Don't use session IDs or emails as `userId`
+2. **Keep metadata current** — Update when user profile changes
+3. **Reset on logout** — Always call `resetUser()` when signing out
+4. **Be selective** — Only pass metadata you'll actually use
+5. **Match field names** — Use standard names for automatic form pre-fill
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Triggering Forms" icon="file-lines" href="/developer-guides/triggering-forms">
+    Pre-fill forms with user data
+  </Card>
+  <Card title="Webhooks" icon="webhook" href="/developer-guides/webhooks">
+    Send user data to external systems
+  </Card>
+</CardGroup>

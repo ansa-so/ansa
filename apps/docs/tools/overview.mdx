@@ -1,0 +1,173 @@
+---
+title: "Tools Overview"
+description: "Extend your AI agent's capabilities with custom tools that connect to APIs, display rich content, and collect data through forms."
+---
+
+import { Screenshot } from '/snippets/screenshot.mdx'
+
+## What Are Tools?
+
+Tools extend what your AI agent can do beyond answering questions. With tools, your agent can:
+
+- **Fetch data** from external APIs (product info, order status, weather)
+- **Display rich content** (product cards, carousels, tables)
+- **Collect information** through interactive forms
+- **Trigger actions** in your systems (create tickets, send notifications)
+
+<Screenshot src="/screenshots/tools.png" alt="Tools dashboard" />
+
+## Tool Types
+
+Ansa supports three types of tool execution:
+
+| Type | Description | Use Case |
+|------|-------------|----------|
+| **`http`** | Makes HTTP requests to APIs | Fetch data, trigger webhooks |
+| **`form`** | Displays interactive forms | Collect user information |
+| **`mock`** | Returns static/templated responses | Testing, demos |
+
+## Creating a Tool
+
+Navigate to **Agent → Tools → Create Tool**:
+
+### Basic Configuration
+
+Every tool needs:
+
+| Field | Description | Example |
+|-------|-------------|---------|
+| **Name** | Unique identifier (lowercase, underscores) | `search_products` |
+| **Description** | When should the AI use this tool? | "Search for products when user asks about items" |
+| **Input Schema** | Parameters the tool accepts | See below |
+
+### Naming Conventions
+
+Tool names must:
+- Start with a letter or underscore
+- Use only lowercase letters, numbers, and underscores
+- Be unique within the agent
+
+Pattern: `/^[a-z_][a-z0-9_]*$/`
+
+✅ `search_products`, `get_order_status`, `contact_form`
+❌ `Search Products`, `get-order`, `123tool`
+
+### Input Schema
+
+Define what parameters the AI should provide:
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "query": {
+      "type": "string",
+      "description": "The search term to look for"
+    },
+    "category": {
+      "type": "string",
+      "description": "Product category to filter by",
+      "enum": ["electronics", "clothing", "home"]
+    },
+    "limit": {
+      "type": "number",
+      "description": "Maximum number of results"
+    }
+  },
+  "required": ["query"]
+}
+```
+
+<Tip>
+Write clear descriptions for each property. The AI uses these to understand what values to provide.
+</Tip>
+
+## How the AI Uses Tools
+
+When a user sends a message, the AI:
+
+1. **Analyzes** the user's request
+2. **Decides** if a tool would help answer it
+3. **Extracts** the required parameters from the conversation
+4. **Calls** the tool with those parameters
+5. **Processes** the result and responds naturally
+
+The AI decides to use a tool based on the tool's **description**. Write descriptions that clearly explain when the tool should be used:
+
+**Good descriptions:**
+- "Search for products when the user asks about items, prices, or availability"
+- "Look up order status when user provides an order number or asks about shipping"
+- "Show the contact form when user wants to reach support or has an issue you cannot resolve"
+
+**Poor descriptions:**
+- "Product search" (too vague)
+- "Use this tool" (no context)
+
+## Tool Execution Flow
+
+```
+User Message
+    ↓
+AI analyzes request
+    ↓
+AI decides to use tool
+    ↓
+Ansa executes tool
+    ├── HTTP: Makes API request
+    ├── Form: Returns schema to widget
+    └── Mock: Returns templated response
+    ↓
+Result returned to AI
+    ↓
+AI generates natural response
+    ↓
+Response + rich display sent to user
+```
+
+## Enabling/Disabling Tools
+
+Toggle tools on/off without deleting them:
+
+- **Enabled** — AI can use this tool
+- **Disabled** — Tool is hidden from AI
+
+Useful for:
+- Seasonal tools (holiday promotions)
+- A/B testing different tools
+- Temporarily disabling broken integrations
+
+## Tool Categories
+
+Organize your tools by purpose:
+
+| Category | Examples |
+|----------|----------|
+| **Data Lookup** | Product search, order status, user info |
+| **Forms** | Contact, lead capture, surveys |
+| **Actions** | Create ticket, send notification |
+| **Display** | Show pricing table, feature comparison |
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="HTTP Tools" icon="globe" href="/tools/http-tools">
+    Connect to external APIs
+  </Card>
+  <Card title="Form Tools" icon="square-check" href="/tools/form-tools">
+    Collect user information
+  </Card>
+  <Card title="Display Configuration" icon="table-layout" href="/tools/display-config">
+    Show rich content
+  </Card>
+  <Card title="Marketplace" icon="store" href="/tools/marketplace">
+    Install pre-built tools
+  </Card>
+</CardGroup>
+
+## See Also
+
+- [HTTP Tools](/tools/http-tools) — API integration configuration
+- [Form Tools](/tools/form-tools) — Form fields and validation
+- [Display Configuration](/tools/display-config) — Rich response formatting
+- [Submission Actions](/tools/post-actions) — Webhooks and notifications
+- [Marketplace](/tools/marketplace) — Pre-built tool templates

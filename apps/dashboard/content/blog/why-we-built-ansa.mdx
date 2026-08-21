@@ -1,0 +1,156 @@
+---
+title: "Why We Built Ansa — And What Makes It Different"
+slug: "why-we-built-ansa"
+description: "The AI support market is broken — unpredictable pricing, walled-off APIs, and chatbots that can't take action. Here's why we built Ansa and the five things we do differently."
+date: "2026-02-18"
+author: "Ansa Team"
+coverImage: "/blog/why-we-built-ansa.jpg"
+tags: ["Ansa", "Product", "AI Agents"]
+---
+
+Every few years, a technology shift reshapes how businesses talk to their customers. Email replaced phone trees. Live chat replaced email forms. And now, AI agents are replacing the scripted chatbots that have frustrated customers for the past decade.
+
+But here's the problem: most AI support tools today are either overpriced black boxes or glorified FAQ bots. We built Ansa because we believe there's a better way.
+
+## The Problem with Today's AI Support Tools
+
+If you've evaluated AI support platforms recently, you've probably noticed a pattern:
+
+- **Unpredictable pricing** — Intercom charges $0.99 per AI resolution. Sounds cheap until your agent handles 10,000 conversations a month and you're staring at a $10K bill you didn't budget for. Drift starts at $2,500/month, and that's just the entry point.
+- **AI as an upsell** — Zendesk charges $50/agent/month for their AI add-on. Freshdesk gates their AI behind a $29/agent Freddy add-on. The AI isn't the product — it's the extra charge.
+- **No real integrations** — Most platforms offer a handful of pre-built connectors. Want to connect your own API or internal tool? That's a six-figure professional services engagement.
+- **Chatbots that can't act** — Most tools can answer questions (sometimes). Very few can actually _do_ things — track an order, process a refund, book a demo, update a CRM record.
+
+We didn't build Ansa to be another entry in this category. We built it to be the opposite.
+
+## What Ansa Actually Is
+
+Ansa is an AI agent platform. Not a chatbot — an agent. The difference matters.
+
+A chatbot follows a script. It matches keywords to pre-written responses, walks users through rigid decision trees, and breaks the moment someone asks something slightly unexpected. You've seen it — "Sorry, I didn't understand that. Would you like to speak to an agent?"
+
+An AI agent _reasons_. It reads your documentation, understands what the customer actually means (not just the words they typed), decides which tools to use, and takes real action — all in the same conversation.
+
+Here's what that looks like in practice:
+
+- **Understanding** — Chatbots match keywords and follow decision trees. Ansa understands _intent_ through LLMs — even when customers phrase things in unexpected ways.
+- **Knowledge** — Chatbots rely on manually written flows and canned responses. Ansa indexes your actual documentation via RAG — auto-synced, auto-chunked, always current.
+- **Actions** — Chatbots can only answer or transfer. Ansa calls APIs mid-conversation — Shopify, Stripe, or your own endpoints.
+- **Languages** — Chatbots need one bot per language. Ansa handles 95+ languages automatically, no configuration needed.
+- **When it's stuck** — Chatbots hit a dead end: "Sorry, I can't help." Ansa detects low confidence and hands off to your team with full conversation context.
+- **Engagement** — Chatbots wait for users to click. Ansa reaches out proactively based on exit intent, scroll depth, or cart abandonment.
+- **Improvement** — Chatbots require manual flow rewriting. Ansa's analytics surface knowledge gaps and tell you exactly what to fix.
+- **Off-script questions** — Chatbots break. Ansa reasons over your knowledge base to handle novel queries.
+
+The difference isn't incremental — it's architectural. A chatbot is a flowchart. An agent is a reasoning engine connected to your tools and data.
+
+Think of Ansa as a complete AI stack for customer-facing interactions:
+
+1. **Knowledge layer** — Upload docs, connect URLs, add Q&A pairs. Ansa chunks, embeds, and indexes everything for semantic search. It stays in sync automatically when your content changes.
+2. **Action layer** — 50+ pre-built tools in the marketplace. Native Shopify, Stripe, Slack, Zendesk, Salesforce, and Notion integrations. Custom HTTP API tools for anything else. Interactive forms with 11 field types.
+3. **Intelligence layer** — Confidence scoring, sentiment detection, automatic escalation when the agent isn't sure. Full conversation context passed to your team on handoff.
+4. **Engagement layer** — Proactive triggers based on exit intent, scroll depth, time on page, cart abandonment, or custom JavaScript events. Not just reactive — anticipatory.
+5. **Analytics layer** — Knowledge gap detection, confidence distribution, trusted answer rates, and actionable recommendations. The system tells you exactly where to improve.
+
+You can use it through our no-code dashboard or programmatically via the SDK and REST API.
+
+## Five Things We Do Differently
+
+### 1. Connect Your Own API in Minutes
+
+This is the big one. Most platforms treat integrations as a controlled, gated experience. You get whatever pre-built connectors they decided to ship — and if you need something custom, you're looking at months of professional services.
+
+Ansa's [API Connect](/features/api-connect) lets you wire up any HTTP endpoint in a few clicks. Define the URL, set the method, map your parameters, and your agent can call it mid-conversation. No code deployment needed. No waiting for vendor support.
+
+Want your agent to check inventory in your warehouse system? Pull a customer's subscription status from your billing API? Look up a tracking number from your 3PL? Just point it at the endpoint.
+
+<Callout variant="info">
+API Connect supports GET, POST, PUT, and DELETE methods with custom headers, query parameters, and JSON body mapping. Your agent decides when to call each tool based on conversation context.
+</Callout>
+
+And for common use cases, the [Marketplace](/marketplace) has 50+ pre-built tools — Shopify, Stripe, Slack, Zendesk, Salesforce, Notion, Linear, and more. Install in one click, configure in seconds.
+
+### 2. Flat Pricing, No Per-Resolution Fees
+
+Our pricing is simple: pick a plan, get a set number of AI responses per month. No surprise bills. No per-resolution charges that scale unpredictably with your success.
+
+Let's say your agent handles 15,000 conversations in a month:
+
+- **Ansa Growth** — $99/mo. Fixed. That's it.
+- **Intercom** — $0.99 per resolution × 15,000 = ~$14,850/mo. And it grows every month your agent gets better.
+- **Zendesk** — $55/agent/mo + $50/agent AI add-on. Varies by team size, but never predictable.
+
+When your AI agent gets better and handles more conversations, your bill stays the same. With per-resolution pricing, success literally costs you more — which creates a perverse incentive to keep your AI less capable.
+
+### 3. Multi-Model, No Vendor Lock-In
+
+Most platforms are hard-wired to a single LLM provider. If that provider has an outage, raises prices, or degrades quality — you're stuck.
+
+Ansa supports OpenAI, Anthropic Claude, and local models via Ollama. Switch between them without retraining, reconfiguring, or redeploying. Run a local model for development and testing, Claude for production, or whatever combination fits your needs.
+
+<Callout variant="tip">
+Switch models anytime from the dashboard. No retraining, no reconfiguration — your knowledge base and tools work the same across all providers.
+</Callout>
+
+### 4. Developer-First, Not Enterprise-Gated
+
+With most platforms, API access is locked behind enterprise plans that start at five figures. We think that's backwards.
+
+Ansa ships with a full SDK, REST API, and webhook system. Build custom integrations, embed the agent in your own UI, trigger workflows programmatically, pipe conversation data to your analytics stack. On every plan.
+
+```typescript
+import { AnsaClient } from "@ansa/sdk";
+
+const client = new AnsaClient({
+  apiKey: process.env.ANSA_API_KEY,
+});
+
+// Create a conversation and send a message
+const conversation = await client.conversations.create({
+  agentId: "your-agent-id",
+});
+
+const response = await client.messages.create({
+  conversationId: conversation.id,
+  content: "What's your return policy?",
+});
+
+console.log(response.content);
+// → "We offer a 30-day return policy for all unused items..."
+```
+
+Whether you're a solo developer prototyping an integration or an enterprise team building a custom support experience — same API, same capabilities.
+
+### 5. AI That Acts, Not Just Answers
+
+This is the one that matters most. An AI agent that can only answer questions is just a fancier search bar.
+
+Ansa agents take action. They look up orders in Shopify, check subscription status in Stripe, create tickets in Linear, notify your team in Slack, collect structured data through forms, and display rich content like product carousels and comparison cards.
+
+The [Marketplace](/marketplace) has 50+ pre-built tools ready to install. And for anything custom, [API Connect](/features/api-connect) lets you wire up any endpoint in minutes — define the schema, map the parameters, and your agent calls it mid-conversation. No code deployment required.
+
+This is the difference between "Let me look that up for you... I'd suggest contacting our support team" and "Your order #4521 shipped yesterday via FedEx. Here's your tracking link."
+
+## Who It's For
+
+We built Ansa to work across industries, but these are the teams getting the most value today:
+
+- **E-commerce teams** (especially Shopify) — Order tracking, product recommendations, cart abandonment recovery, return processing. The Shopify integration handles all of it natively.
+- **SaaS support teams** — Documentation-trained agents that resolve 80%+ of tickets automatically, with intelligent handoff for the rest.
+- **Agencies** — Multi-tenant setup, white-label options, and a dashboard that lets you manage agents across client accounts.
+- **Developers** — Full API/SDK access for building custom AI experiences, embedded chats, and automated workflows.
+
+## What's Next
+
+We're shipping fast. Here's what's coming:
+
+- **WhatsApp Business** and **Instagram DM** channels — Same agent, more surfaces
+- **Expanded marketplace** — More pre-built integrations, community-contributed tools
+- **Advanced analytics** — Revenue attribution, ROI tracking, conversation flow visualization
+- **Team collaboration** — Shared inboxes, internal notes, assignment rules
+
+Join the [Discord](https://discord.gg/6keP65Vb) or just [sign up and start building](https://ansa.so/signup). The free plan includes everything you need to evaluate the platform — no credit card, no sales call.
+
+---
+
+We think the best AI support tools should be predictable, extensible, and actually capable of taking action. That's what we're building with Ansa.

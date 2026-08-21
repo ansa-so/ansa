@@ -1,0 +1,143 @@
+---
+title: Conversations
+description: "Access conversation history"
+api: "GET /conversations"
+---
+
+## List Conversations
+
+Get conversations for an agent.
+
+<ParamField query="agentId" type="string" required>
+  Filter by agent ID
+</ParamField>
+
+<ParamField query="limit" type="number">
+  Number of results (default: 20, max: 100)
+</ParamField>
+
+<ParamField query="offset" type="number">
+  Pagination offset
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl -X GET "https://api.ansa.so/conversations?agentId=agent_xxx&limit=10" \
+  -H "Authorization: Bearer your-api-key"
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+{
+  "data": [
+    {
+      "id": "conv_xxx",
+      "agentId": "agent_xxx",
+      "title": "Question about pricing",
+      "messageCount": 5,
+      "createdAt": "2024-01-22T14:30:00Z",
+      "updatedAt": "2024-01-22T14:35:00Z"
+    }
+  ],
+  "pagination": {
+    "total": 150,
+    "limit": 10,
+    "offset": 0
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## Get Conversation
+
+Get a single conversation with all messages.
+
+```
+GET /conversations/:id
+```
+
+<ParamField path="id" type="string" required>
+  Conversation ID
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl -X GET https://api.ansa.so/conversations/conv_xxx \
+  -H "Authorization: Bearer your-api-key"
+```
+</RequestExample>
+
+<ResponseExample>
+```json Response
+{
+  "data": {
+    "id": "conv_xxx",
+    "agentId": "agent_xxx",
+    "title": "Question about pricing",
+    "messages": [
+      {
+        "id": "msg_1",
+        "role": "user",
+        "content": "What's your pricing?",
+        "createdAt": "2024-01-22T14:30:00Z"
+      },
+      {
+        "id": "msg_2",
+        "role": "assistant",
+        "content": "We offer three plans: Starter at $29/mo, Growth at $99/mo, and Pro at $299/mo.",
+        "createdAt": "2024-01-22T14:30:05Z"
+      }
+    ],
+    "createdAt": "2024-01-22T14:30:00Z"
+  }
+}
+```
+</ResponseExample>
+
+---
+
+## Delete Conversation
+
+```
+DELETE /conversations/:id
+```
+
+<RequestExample>
+```bash cURL
+curl -X DELETE https://api.ansa.so/conversations/conv_xxx \
+  -H "Authorization: Bearer your-api-key"
+```
+</RequestExample>
+
+---
+
+## Add Feedback
+
+Submit thumbs up/down feedback for a message.
+
+```
+POST /conversations/:id/feedback
+```
+
+<ParamField body="messageId" type="string" required>
+  The message to rate
+</ParamField>
+
+<ParamField body="rating" type="string" required>
+  `"up"` or `"down"`
+</ParamField>
+
+<RequestExample>
+```bash cURL
+curl -X POST https://api.ansa.so/conversations/conv_xxx/feedback \
+  -H "Authorization: Bearer your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "messageId": "msg_2",
+    "rating": "up"
+  }'
+```
+</RequestExample>

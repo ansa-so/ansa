@@ -1,0 +1,80 @@
+{
+	"$schema": "https://turbo.build/schema.json",
+	"ui": "tui",
+	"globalEnv": [
+		"ALLOW_REMOTE_SEED",
+		"ANTHROPIC_API_KEY",
+		"API_URL",
+		"BASE_URL",
+		"BETTER_AUTH_SECRET",
+		"CDN_URL",
+		"CHROME_PATH",
+		"DASHBOARD_AGENT_ID",
+		"DASHBOARD_URL",
+		"DATABASE_URL",
+		"DEFAULT_MODEL",
+		"DOCS_URL",
+		"EMAIL_FROM",
+		"EMAIL_INBOUND_DOMAIN",
+		"FACEBOOK_APP_ID",
+		"FACEBOOK_APP_SECRET",
+		"GITHUB_CLIENT_ID",
+		"GITHUB_CLIENT_SECRET",
+		"GOOGLE_API_KEY",
+		"GOOGLE_CLIENT_ID",
+		"GOOGLE_CLIENT_SECRET",
+		"MODEL_BALANCED",
+		"MODEL_FAST",
+		"MODEL_HIGH_QUALITY",
+		"NODE_ENV",
+		"OLLAMA_API_BASE",
+		"OPENAI_API_KEY",
+		"PORT",
+		"POSTHOG_API_KEY",
+		"POSTHOG_HOST",
+		"POSTHOG_KEY",
+		"PROJECT_NAME",
+		"PROXY_BLOCKED_IPS",
+		"PROXY_BLOCKED_PATTERNS",
+		"RESEND_API_KEY",
+		"RESEND_WEBHOOK_SECRET",
+		"SCREENSHOT_EMAIL",
+		"SCREENSHOT_PASSWORD",
+		"SELF_HOSTED",
+		"SHOPIFY_CLIENT_ID",
+		"SHOPIFY_CLIENT_SECRET",
+		"SHOPIFY_SCOPES",
+		"STRIPE_PRICE_GROWTH_MONTHLY",
+		"STRIPE_PRICE_GROWTH_YEARLY",
+		"STRIPE_PRICE_PRO_MONTHLY",
+		"STRIPE_PRICE_PRO_YEARLY",
+		"STRIPE_PRICE_STARTER_MONTHLY",
+		"STRIPE_PRICE_STARTER_YEARLY",
+		"STRIPE_SECRET_KEY",
+		"STRIPE_WEBHOOK_SECRET",
+		"TEST_EMAIL",
+		"TEST_PASSWORD",
+		"UPLOADS_DIR",
+		"WIDGET_URL"
+	],
+	"tasks": {
+		"build": {
+			"dependsOn": ["^build"],
+			"inputs": ["$TURBO_DEFAULT$", ".env*"],
+			"outputs": [".next/**", "!.next/cache/**", "dist/**"]
+		},
+		"dev": {
+			"cache": false,
+			"persistent": true
+		},
+		"lint": {
+			"dependsOn": ["^build"]
+		},
+		"type-check": {
+			"dependsOn": ["^build"]
+		},
+		"clean": {
+			"cache": false
+		}
+	}
+}

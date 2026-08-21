@@ -1,0 +1,421 @@
+---
+title: "HTTP Tools"
+description: "Connect your AI agent to external APIs with HTTP tools for real-time data fetching and actions."
+---
+
+import { Screenshot } from '/snippets/screenshot.mdx'
+
+## Overview
+
+HTTP tools allow your agent to:
+- Fetch data from external APIs
+- Send data to webhooks
+- Integrate with any REST API
+- Display results with rich formatting
+
+## Configuration
+
+### Basic HTTP Tool
+
+```json
+{
+  "name": "get_weather",
+  "description": "Get current weather when user asks about weather conditions.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "city": {
+        "type": "string",
+        "description": "City name to get weather for"
+      }
+    },
+    "required": ["city"]
+  },
+  "executionType": "http",
+  "httpUrl": "https://api.weatherapi.com/v1/current.json?key=YOUR_KEY&q=${city}",
+  "httpMethod": "GET"
+}
+```
+
+### HTTP Configuration Options
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `httpUrl` | Yes | The API endpoint URL |
+| `httpMethod` | Yes | `GET`, `POST`, `PUT`, or `DELETE` |
+| `httpHeaders` | No | Custom headers (auth, content-type) |
+
+## Parameter Substitution
+
+Use `${paramName}` to insert input parameters into URLs, headers, and bodies:
+
+### URL Parameters
+
+```json
+{
+  "httpUrl": "https://api.example.com/products/${productId}?include=${include}"
+}
+```
+
+If the AI calls with `{"productId": "123", "include": "reviews"}`, the URL becomes:
+```
+https://api.example.com/products/123?include=reviews
+```
+
+### Header Parameters
+
+```json
+{
+  "httpHeaders": {
+    "Authorization": "Bearer ${api_key}",
+    "X-User-ID": "${user_id}"
+  }
+}
+```
+
+### Request Body (POST/PUT)
+
+For POST and PUT requests, the input schema parameters are sent as the JSON body:
+
+```json
+{
+  "name": "create_ticket",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "title": { "type": "string" },
+      "description": { "type": "string" },
+      "priority": { "type": "string", "enum": ["low", "medium", "high"] }
+    }
+  },
+  "executionType": "http",
+  "httpUrl": "https://api.ticketing.com/tickets",
+  "httpMethod": "POST",
+  "httpHeaders": {
+    "Authorization": "Bearer ${api_token}",
+    "Content-Type": "application/json"
+  }
+}
+```
+
+## User Context Variables
+
+In addition to AI-generated parameters (`${param}`), you can access user identity data using `{{context}}` syntax. This is useful for passing authentication tokens or user information to your APIs.
+
+### Available Variables
+
+| Variable | Description |
+|----------|-------------|
+| `{{userId}}` | The user ID passed via `ansa.identify()` |
+| `{{userMetadata.key}}` | Top-level metadata value |
+| `{{userMetadata.nested.path}}` | Nested metadata value (supports deep paths) |
+
+### Setting Up User Identity
+
+First, identify your user in your website's JavaScript:
+
+```javascript
+ansa.identify({
+  userId: 'user_123',
+  userMetadata: {
+    authToken: 'eyJhbG...',
+    email: 'user@example.com',
+    plan: 'premium',
+    organization: {
+      id: 'org_456',
+      name: 'Acme Inc'
+    }
+  }
+});
+```
+
+### Using Identity in Headers
+
+Pass the user's auth token to your API:
+
+```json
+{
+  "name": "get_user_orders",
+  "description": "Get the user's recent orders",
+  "httpUrl": "https://api.yourstore.com/orders",
+  "httpMethod": "GET",
+  "httpHeaders": {
+    "Authorization": "Bearer {{userMetadata.authToken}}",
+    "X-User-ID": "{{userId}}",
+    "X-Organization-ID": "{{userMetadata.organization.id}}"
+  }
+}
+```
+
+### Using Identity in URLs
+
+```json
+{
+  "httpUrl": "https://api.yourstore.com/users/{{userId}}/orders?status=${status}"
+}
+```
+
+<Note>
+The `{{context}}` syntax is for user identity data (set via `identify()`), while `${param}` is for AI-generated input values. You can use both in the same tool configuration.
+</Note>
+
+### Security Considerations
+
+- User identity is passed from the client-side widget, so treat it as **untrusted input**
+- Your backend API should validate any auth tokens (JWT signature verification, etc.)
+- Don't rely solely on `{{userId}}` for authorization - verify it against your session/token
+- The identity data is not stored by Ansa - it's passed through to your APIs at runtime
+
+## Authentication
+
+### API Key in Header
+
+```json
+{
+  "httpHeaders": {
+    "Authorization": "Bearer YOUR_API_KEY"
+  }
+}
+```
+
+### API Key in URL
+
+```json
+{
+  "httpUrl": "https://api.example.com/data?api_key=YOUR_API_KEY"
+}
+```
+
+### Basic Auth
+
+```json
+{
+  "httpHeaders": {
+    "Authorization": "Basic BASE64_ENCODED_CREDENTIALS"
+  }
+}
+```
+
+<Tip>
+Use the Marketplace to install pre-configured tools that handle authentication setup for popular services.
+</Tip>
+
+## Examples
+
+### Product Search (GET)
+
+```json
+{
+  "name": "search_products",
+  "description": "Search for products when user asks about items, availability, or prices.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "query": {
+        "type": "string",
+        "description": "Search term"
+      },
+      "category": {
+        "type": "string",
+        "description": "Category to filter by"
+      },
+      "maxResults": {
+        "type": "number",
+        "description": "Maximum results to return"
+      }
+    },
+    "required": ["query"]
+  },
+  "executionType": "http",
+  "httpUrl": "https://api.store.com/products?q=${query}&category=${category}&limit=${maxResults}",
+  "httpMethod": "GET",
+  "httpHeaders": {
+    "Authorization": "Bearer ${STORE_API_KEY}"
+  },
+  "displayConfig": {
+    "type": "product_carousel",
+    "fieldMappings": {
+      "title": "$.products[*].name",
+      "price": "$.products[*].price",
+      "image": "$.products[*].image_url"
+    }
+  }
+}
+```
+
+### Order Lookup (GET)
+
+```json
+{
+  "name": "lookup_order",
+  "description": "Look up order status when user provides an order number.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "orderNumber": {
+        "type": "string",
+        "description": "The order number to look up"
+      }
+    },
+    "required": ["orderNumber"]
+  },
+  "executionType": "http",
+  "httpUrl": "https://api.store.com/orders/${orderNumber}",
+  "httpMethod": "GET",
+  "displayConfig": {
+    "type": "product_card",
+    "fieldMappings": {
+      "title": "Order #${orderNumber}",
+      "status": "$.status",
+      "tracking": "$.tracking_url"
+    }
+  }
+}
+```
+
+### Create Support Ticket (POST)
+
+```json
+{
+  "name": "create_ticket",
+  "description": "Create a support ticket when user has an issue that needs human help.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "subject": {
+        "type": "string",
+        "description": "Brief description of the issue"
+      },
+      "description": {
+        "type": "string",
+        "description": "Detailed description"
+      },
+      "priority": {
+        "type": "string",
+        "enum": ["low", "medium", "high"],
+        "description": "Issue priority"
+      },
+      "email": {
+        "type": "string",
+        "description": "User's email for follow-up"
+      }
+    },
+    "required": ["subject", "description", "email"]
+  },
+  "executionType": "http",
+  "httpUrl": "https://api.zendesk.com/api/v2/tickets",
+  "httpMethod": "POST",
+  "httpHeaders": {
+    "Authorization": "Bearer ${ZENDESK_TOKEN}",
+    "Content-Type": "application/json"
+  }
+}
+```
+
+### Update Record (PUT)
+
+```json
+{
+  "name": "update_preferences",
+  "description": "Update user preferences when they want to change settings.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "userId": { "type": "string" },
+      "notifications": { "type": "boolean" },
+      "theme": { "type": "string", "enum": ["light", "dark"] }
+    },
+    "required": ["userId"]
+  },
+  "executionType": "http",
+  "httpUrl": "https://api.example.com/users/${userId}/preferences",
+  "httpMethod": "PUT",
+  "httpHeaders": {
+    "Authorization": "Bearer ${API_KEY}",
+    "Content-Type": "application/json"
+  }
+}
+```
+
+## Response Handling
+
+### Successful Responses
+
+The API response is:
+1. Passed to the AI for interpretation
+2. Formatted according to `displayConfig` (if specified)
+3. Included in the agent's response
+
+### Error Handling
+
+If the API returns an error:
+- 4xx errors: Agent acknowledges the issue
+- 5xx errors: Agent apologizes for technical difficulties
+- Timeout: Agent suggests trying again
+
+## Display Configuration
+
+Pair HTTP tools with display config for rich responses:
+
+```json
+{
+  "displayConfig": {
+    "type": "product_carousel",
+    "fieldMappings": {
+      "title": "$.items[*].name",
+      "price": "$.items[*].price",
+      "image": "$.items[*].image"
+    },
+    "textFallback": "Found {{count}} items matching your search."
+  }
+}
+```
+
+See [Display Configuration](/tools/display-config) for all options.
+
+## Testing HTTP Tools
+
+### Mock Mode
+
+Before connecting to live APIs, test with mock mode:
+
+```json
+{
+  "executionType": "mock",
+  "mockResponse": "Found 3 products matching '${query}': Widget A ($19.99), Widget B ($24.99), Widget C ($29.99)"
+}
+```
+
+### Live Testing
+
+1. Create the tool with your API configuration
+2. Open the chat playground
+3. Ask a question that should trigger the tool
+4. Check the response and refine as needed
+
+## Best Practices
+
+### API Design
+
+- **Keep responses concise** — Large responses slow down processing
+- **Return only needed fields** — Use API filtering when available
+- **Handle pagination** — Consider limits for list endpoints
+
+### Security
+
+- **Never expose secrets in URLs** — Use headers for auth tokens
+- **Use HTTPS** — All external APIs should use HTTPS
+- **Rotate keys** — Update API keys regularly
+
+### Reliability
+
+- **Handle errors gracefully** — Write descriptions that help AI explain failures
+- **Set timeouts** — APIs should respond within 30 seconds
+- **Monitor usage** — Track API calls to stay within limits
+
+## See Also
+
+- [Display Configuration](/tools/display-config) — Rich response formatting
+- [Tools Overview](/tools/overview) — Tool types and AI integration
+- [Marketplace](/tools/marketplace) — Pre-built tool templates
+- [Webhooks](/developer-guides/webhooks) — Receiving data from Ansa

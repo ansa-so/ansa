@@ -1,0 +1,430 @@
+---
+title: Custom Events
+description: "Track user actions and trigger automations based on custom events"
+---
+
+Custom events let you track user behavior on your site and trigger automations when specific actions occur. Use events to open the chat, show forms, or display messages based on what users are doing.
+
+## Quick Start
+
+Fire a custom event from your application:
+
+```javascript
+// Simple event
+ansa.trigger("pricing_viewed");
+
+// Event with data
+ansa.trigger("product_added_to_cart", {
+  productId: "prod_123",
+  productName: "Premium Widget",
+  price: 99.99,
+  quantity: 2
+});
+```
+
+## Event Structure
+
+Events have a name and optional data payload:
+
+```javascript
+ansa.trigger(eventName, eventData);
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `eventName` | `string` | Unique identifier for the event (e.g., `checkout_started`) |
+| `eventData` | `object?` | Optional key-value data associated with the event |
+
+### Naming Conventions
+
+Use descriptive, snake_case names that follow a consistent pattern:
+
+```javascript
+// Good ✓
+ansa.trigger("product_viewed");
+ansa.trigger("cart_updated");
+ansa.trigger("checkout_completed");
+ansa.trigger("support_requested");
+
+// Avoid ✗
+ansa.trigger("click");           // Too generic
+ansa.trigger("ProductViewed");   // Inconsistent casing
+ansa.trigger("user-did-thing");  // Use underscores
+```
+
+## Setting Up Triggers
+
+Triggers in the dashboard can listen for custom events and perform actions. Create a trigger with:
+
+1. **Trigger Type:** `Custom Event`
+2. **Event Name:** The exact event name you fire (e.g., `checkout_abandoned`)
+3. **Action:** What happens when the event fires
+
+### Trigger Actions
+
+| Action | Description |
+|--------|-------------|
+| **Open Chat** | Opens the widget, optionally with a message |
+| **Show Form** | Displays a specific form |
+| **Show Bubble** | Shows a notification bubble |
+
+### Conditional Triggers
+
+Use event data to conditionally trigger actions:
+
+```javascript
+// Fire event with context
+ansa.trigger("cart_value_changed", {
+  cartTotal: 450,
+  itemCount: 3
+});
+```
+
+In the dashboard, configure the trigger to only fire when `cartTotal > 200`.
+
+## Common Use Cases
+
+### E-commerce Events
+
+```javascript
+// Product viewed
+ansa.trigger("product_viewed", {
+  productId: "prod_123",
+  productName: "Wireless Headphones",
+  category: "electronics",
+  price: 149.99
+});
+
+// Added to cart
+ansa.trigger("add_to_cart", {
+  productId: "prod_123",
+  quantity: 1,
+  cartTotal: 149.99
+});
+
+// Checkout started
+ansa.trigger("checkout_started", {
+  cartTotal: 299.99,
+  itemCount: 2,
+  hasDiscount: false
+});
+
+// Checkout abandoned (fire after timeout)
+let checkoutTimeout;
+function onCheckoutStart() {
+  checkoutTimeout = setTimeout(() => {
+    ansa.trigger("checkout_abandoned", {
+      cartTotal: 299.99,
+      step: "payment"
+    });
+  }, 60000); // 1 minute
+}
+
+function onCheckoutComplete() {
+  clearTimeout(checkoutTimeout);
+  ansa.trigger("purchase_completed", {
+    orderId: "order_789",
+    total: 299.99
+  });
+}
+```
+
+### SaaS Events
+
+```javascript
+// Feature used
+ansa.trigger("feature_used", {
+  feature: "export_data",
+  plan: "free"
+});
+
+// Upgrade prompt
+ansa.trigger("upgrade_prompt_shown", {
+  trigger: "export_limit",
+  currentPlan: "free"
+});
+
+// Trial milestones
+ansa.trigger("trial_milestone", {
+  day: 3,
+  actionsCompleted: 5,
+  totalActions: 10
+});
+
+// Usage limit approaching
+ansa.trigger("usage_limit_warning", {
+  resource: "api_calls",
+  used: 900,
+  limit: 1000,
+  percentUsed: 90
+});
+```
+
+### Content & Engagement
+
+```javascript
+// Article read
+ansa.trigger("article_read", {
+  articleId: "post_123",
+  title: "Getting Started Guide",
+  category: "tutorials",
+  readTime: 5
+});
+
+// Video watched
+ansa.trigger("video_watched", {
+  videoId: "vid_456",
+  title: "Product Demo",
+  percentWatched: 75,
+  duration: 180
+});
+
+// Search performed
+ansa.trigger("search_performed", {
+  query: "pricing",
+  resultsCount: 12,
+  hasClicked: false
+});
+
+// Help doc viewed
+ansa.trigger("help_doc_viewed", {
+  docId: "doc_789",
+  title: "API Authentication",
+  fromSearch: true
+});
+```
+
+### User Journey Events
+
+```javascript
+// Signup flow
+ansa.trigger("signup_started");
+ansa.trigger("signup_step_completed", { step: 1, stepName: "email" });
+ansa.trigger("signup_step_completed", { step: 2, stepName: "profile" });
+ansa.trigger("signup_completed", { method: "email" });
+
+// Onboarding
+ansa.trigger("onboarding_started");
+ansa.trigger("onboarding_step_completed", {
+  step: "connect_integration",
+  integration: "slack"
+});
+ansa.trigger("onboarding_completed", {
+  completedSteps: 5,
+  skippedSteps: 1
+});
+
+// Feature discovery
+ansa.trigger("feature_discovered", {
+  feature: "keyboard_shortcuts",
+  method: "tooltip"
+});
+```
+
+## Implementation Patterns
+
+### React Integration
+
+```tsx
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+
+// Track page views
+function usePageTracking() {
+  const location = useLocation();
+
+  useEffect(() => {
+    window.ansa?.trigger("page_viewed", {
+      path: location.pathname,
+      referrer: document.referrer
+    });
+  }, [location]);
+}
+
+// Track component interactions
+function PricingCard({ plan }) {
+  const handleClick = () => {
+    window.ansa?.trigger("pricing_plan_selected", {
+      plan: plan.name,
+      price: plan.price,
+      interval: plan.interval
+    });
+  };
+
+  return (
+    <button onClick={handleClick}>
+      Select {plan.name}
+    </button>
+  );
+}
+
+// Track form submissions
+function ContactForm() {
+  const handleSubmit = (data) => {
+    window.ansa?.trigger("contact_form_submitted", {
+      hasCompany: !!data.company,
+      messageLength: data.message.length
+    });
+  };
+
+  return <form onSubmit={handleSubmit}>...</form>;
+}
+```
+
+### Vue Integration
+
+```vue
+<script setup>
+import { onMounted, watch } from 'vue';
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
+
+// Track page views
+watch(() => route.path, (newPath) => {
+  window.ansa?.trigger('page_viewed', {
+    path: newPath
+  });
+});
+
+// Track button clicks
+function trackClick(action) {
+  window.ansa?.trigger('button_clicked', {
+    action,
+    page: route.path
+  });
+}
+</script>
+
+<template>
+  <button @click="trackClick('signup')">Sign Up</button>
+</template>
+```
+
+### Vanilla JavaScript
+
+```javascript
+// Track all CTA button clicks
+document.querySelectorAll("[data-track-event]").forEach(el => {
+  el.addEventListener("click", () => {
+    const eventName = el.dataset.trackEvent;
+    const eventData = JSON.parse(el.dataset.trackData || "{}");
+    ansa.trigger(eventName, eventData);
+  });
+});
+
+// Usage in HTML:
+// <button data-track-event="cta_clicked" data-track-data='{"location":"header"}'>
+//   Get Started
+// </button>
+```
+
+### Scroll Depth Tracking
+
+```javascript
+// Track how far users scroll
+let maxScroll = 0;
+const milestones = [25, 50, 75, 100];
+const firedMilestones = new Set();
+
+window.addEventListener("scroll", () => {
+  const scrollPercent = Math.round(
+    (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100
+  );
+
+  if (scrollPercent > maxScroll) {
+    maxScroll = scrollPercent;
+
+    for (const milestone of milestones) {
+      if (maxScroll >= milestone && !firedMilestones.has(milestone)) {
+        firedMilestones.add(milestone);
+        ansa.trigger("scroll_depth_reached", {
+          depth: milestone,
+          page: window.location.pathname
+        });
+      }
+    }
+  }
+});
+```
+
+### Time on Page
+
+```javascript
+// Track time spent on page
+const startTime = Date.now();
+const timeEvents = [30, 60, 120, 300]; // seconds
+const firedTimeEvents = new Set();
+
+setInterval(() => {
+  const secondsOnPage = Math.floor((Date.now() - startTime) / 1000);
+
+  for (const threshold of timeEvents) {
+    if (secondsOnPage >= threshold && !firedTimeEvents.has(threshold)) {
+      firedTimeEvents.add(threshold);
+      ansa.trigger("time_on_page", {
+        seconds: threshold,
+        page: window.location.pathname
+      });
+    }
+  }
+}, 5000);
+```
+
+## Combining with Identity
+
+Events are more powerful when combined with user identity:
+
+```javascript
+// Identify the user first
+ansa.identify({
+  userId: "user_123",
+  userMetadata: {
+    name: "Jane Smith",
+    email: "jane@example.com",
+    plan: "pro",
+    signupDate: "2024-01-15"
+  }
+});
+
+// Events are now associated with this user
+ansa.trigger("feature_used", {
+  feature: "advanced_analytics"
+});
+// Server knows: user_123 (Pro plan) used advanced_analytics
+```
+
+## Debugging Events
+
+Check the browser console for event confirmation:
+
+```javascript
+// Events log to console in development
+ansa.trigger("test_event", { key: "value" });
+// Console: [ansa] Event triggered: test_event { key: "value" }
+```
+
+Use the **Conversations** view in the dashboard to see which events triggered during a session.
+
+## Best Practices
+
+<Tip>
+**Be specific but not excessive.** Track meaningful actions, not every click. Focus on events that indicate intent or value.
+</Tip>
+
+1. **Use consistent naming** — Establish a naming convention and stick to it
+2. **Include relevant context** — Add data that helps understand the event
+3. **Avoid PII in event data** — Don't include emails, names, or sensitive info in event payloads (use `identify()` instead)
+4. **Test triggers** — Verify events fire correctly before deploying
+5. **Document your events** — Maintain a list of events and their meanings
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Identity" icon="user" href="/developer-guides/identity">
+    Associate events with user profiles
+  </Card>
+  <Card title="Webhooks" icon="webhook" href="/developer-guides/webhooks">
+    Send event data to external systems
+  </Card>
+</CardGroup>

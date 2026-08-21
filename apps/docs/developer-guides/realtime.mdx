@@ -1,0 +1,144 @@
+---
+title: Real-time Features
+description: "WebSocket integration for typing indicators, presence, and live updates"
+---
+
+Ansa uses WebSocket connections (via Socket.IO) to provide real-time features like typing indicators, agent presence, and instant message delivery.
+
+## Features
+
+| Feature | Description |
+|---------|-------------|
+| **Typing Indicators** | Show when users or agents are typing |
+| **Agent Presence** | See when human agents join conversations |
+| **Message Delivery** | Instant message updates without polling |
+| **Reconnection** | Automatic reconnect with message replay |
+
+## How It Works
+
+The widget automatically establishes a WebSocket connection when opened. The connection handles:
+
+1. **Bi-directional typing indicators** between users and dashboard agents
+2. **Real-time message delivery** for human agent responses
+3. **Presence updates** when agents join or leave conversations
+4. **Automatic reconnection** with message history replay
+
+## Events
+
+### Client → Server
+
+| Event | Payload | Description |
+|-------|---------|-------------|
+| `join-conversation` | `{ conversationId }` | Subscribe to conversation updates |
+| `typing-start` | `{ conversationId }` | User started typing |
+| `typing-stop` | `{ conversationId }` | User stopped typing |
+
+### Server → Client
+
+| Event | Payload | Description |
+|-------|---------|-------------|
+| `typing` | `{ conversationId, isTyping, userId }` | Typing indicator update |
+| `agent-joined` | `{ conversationId, agentName }` | Human agent joined |
+| `message-replay` | `Message[]` | Messages since disconnect |
+
+## Rate Limiting
+
+To prevent abuse, WebSocket events are rate-limited:
+
+| Event Type | Limit |
+|------------|-------|
+| Messages | 10 per minute |
+| Typing | 3 per second |
+| Overall | 50 events per minute |
+
+When rate limits are exceeded, a `rate-limit-exceeded` event is sent:
+
+```json
+{
+  "type": "rate-limit-exceeded",
+  "retryAfter": 5000
+}
+```
+
+## Custom Integration
+
+If you're building a custom chat interface, you can connect directly to the WebSocket:
+
+```javascript
+import { io } from "socket.io-client";
+
+const socket = io("wss://api.ansa.so", {
+  path: "/socket",
+  auth: {
+    token: "your-api-key",
+    conversationId: "conv_xxx"
+  }
+});
+
+// Join a conversation
+socket.emit("join-conversation", { conversationId: "conv_xxx" });
+
+// Listen for typing indicators
+socket.on("typing", ({ isTyping, userId }) => {
+  if (isTyping) {
+    showTypingIndicator(userId);
+  } else {
+    hideTypingIndicator(userId);
+  }
+});
+
+// Send typing status
+let typingTimeout;
+input.addEventListener("input", () => {
+  socket.emit("typing-start", { conversationId });
+  clearTimeout(typingTimeout);
+  typingTimeout = setTimeout(() => {
+    socket.emit("typing-stop", { conversationId });
+  }, 2000);
+});
+
+// Handle agent joining
+socket.on("agent-joined", ({ agentName }) => {
+  showSystemMessage(`${agentName} joined the conversation`);
+});
+
+// Handle reconnection
+socket.on("message-replay", (messages) => {
+  messages.forEach(appendMessage);
+});
+```
+
+## Connection States
+
+| State | Description |
+|-------|-------------|
+| `connecting` | Initial connection attempt |
+| `connected` | WebSocket active |
+| `disconnected` | Connection lost, will retry |
+| `reconnecting` | Attempting to reconnect |
+| `failed` | Max retries exceeded |
+
+The widget handles connection management automatically, including:
+
+- Exponential backoff for reconnection attempts
+- Message queuing during disconnection
+- Automatic replay of missed messages
+
+## Dashboard Integration
+
+Human agents in the dashboard see:
+
+- **User typing indicators** — When customers are typing
+- **Connection status** — Whether the user is online
+- **Read receipts** — When messages are delivered
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Widget API" icon="comment" href="/developer-guides/widget-api">
+    Control widget programmatically
+  </Card>
+  <Card title="Webhooks" icon="webhook" href="/developer-guides/webhooks">
+    Server-side event notifications
+  </Card>
+</CardGroup>

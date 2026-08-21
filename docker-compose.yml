@@ -1,0 +1,157 @@
+services:
+  postgres:
+    # Using PG 17 - Drizzle Kit doesn't support PG 18's new NOT NULL constraint format yet
+    image: pgvector/pgvector:pg17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-ansa}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-ansa}
+    # SECURITY: No external port exposure - only accessible from other Docker services
+    # Other containers connect via hostname "postgres" on port 5432
+    # To access locally for debugging, use: docker compose exec postgres psql -U ansa -d ansa
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      # Core
+      - NODE_ENV=${NODE_ENV:-production}
+      - SELF_HOSTED=${SELF_HOSTED:-true}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-ansa}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-ansa}
+      - UPLOADS_DIR=${UPLOADS_DIR:-/app/uploads/attachments}
+      # URLs
+      - API_URL=${API_URL:-http://localhost:3001}
+      - DASHBOARD_URL=${DASHBOARD_URL:-http://localhost:3000}
+      - WIDGET_URL=${WIDGET_URL:-http://localhost:3002}
+      - CDN_URL=${CDN_URL:-http://localhost:3002}
+      - DOCS_URL=${DOCS_URL:-https://docs.ansa.so}
+      # LLM Providers (set one or more)
+      - DEFAULT_MODEL=${DEFAULT_MODEL:-gpt-4o-mini}
+      - MODEL_FAST=${MODEL_FAST:-gpt-4o-mini}
+      - MODEL_BALANCED=${MODEL_BALANCED:-gpt-4o}
+      - MODEL_HIGH_QUALITY=${MODEL_HIGH_QUALITY:-claude-sonnet-4-20250514}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-}
+      - OLLAMA_API_BASE=${OLLAMA_API_BASE:-}
+      # Auth
+      # No default: a shared fallback would mean every deployment that skips this
+      # step signs sessions with a secret published in this repo.
+      - "BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET:?BETTER_AUTH_SECRET is required, generate one with: openssl rand -hex 32}"
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
+      - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID:-}
+      - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET:-}
+      # Email
+      - RESEND_API_KEY=${RESEND_API_KEY:-}
+      - EMAIL_FROM=${EMAIL_FROM:-}
+      - EMAIL_INBOUND_DOMAIN=${EMAIL_INBOUND_DOMAIN:-mail.ansa.so}
+      - RESEND_WEBHOOK_SECRET=${RESEND_WEBHOOK_SECRET:-}
+      # Stripe (optional - for billing)
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET:-}
+      - STRIPE_PRICE_STARTER_MONTHLY=${STRIPE_PRICE_STARTER_MONTHLY:-}
+      - STRIPE_PRICE_STARTER_YEARLY=${STRIPE_PRICE_STARTER_YEARLY:-}
+      - STRIPE_PRICE_GROWTH_MONTHLY=${STRIPE_PRICE_GROWTH_MONTHLY:-}
+      - STRIPE_PRICE_GROWTH_YEARLY=${STRIPE_PRICE_GROWTH_YEARLY:-}
+      - STRIPE_PRICE_PRO_MONTHLY=${STRIPE_PRICE_PRO_MONTHLY:-}
+      - STRIPE_PRICE_PRO_YEARLY=${STRIPE_PRICE_PRO_YEARLY:-}
+      # Shopify (optional)
+      - SHOPIFY_CLIENT_ID=${SHOPIFY_CLIENT_ID:-}
+      - SHOPIFY_CLIENT_SECRET=${SHOPIFY_CLIENT_SECRET:-}
+      - SHOPIFY_SCOPES=${SHOPIFY_SCOPES:-read_orders,write_orders,read_customers,read_products}
+      # Facebook Messenger (optional)
+      - FACEBOOK_APP_ID=${FACEBOOK_APP_ID:-}
+      - FACEBOOK_APP_SECRET=${FACEBOOK_APP_SECRET:-}
+      # PostHog Analytics (optional)
+      - POSTHOG_API_KEY=${POSTHOG_API_KEY:-}
+      - POSTHOG_HOST=${POSTHOG_HOST:-https://us.i.posthog.com}
+      # Request blocking (optional)
+      - PROXY_BLOCKED_IPS=${PROXY_BLOCKED_IPS:-}
+      - PROXY_BLOCKED_PATTERNS=${PROXY_BLOCKED_PATTERNS:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - uploads_data:/app/uploads
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://localhost:3001/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: apps/dashboard/Dockerfile
+      # No build args: client configuration is resolved at container start, so
+      # this image is reusable across environments.
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - API_URL=${API_URL:-http://localhost:3001}
+      - DASHBOARD_URL=${DASHBOARD_URL:-http://localhost:3000}
+      - WIDGET_URL=${WIDGET_URL:-http://localhost:3002}
+      - CDN_URL=${CDN_URL:-http://localhost:3002}
+      - DOCS_URL=${DOCS_URL:-https://docs.ansa.so}
+      - DASHBOARD_AGENT_ID=${DASHBOARD_AGENT_ID:-}
+      - EMAIL_INBOUND_DOMAIN=${EMAIL_INBOUND_DOMAIN:-}
+      - PROJECT_NAME=${PROJECT_NAME:-Ansa}
+      - SHOPIFY_CLIENT_ID=${SHOPIFY_CLIENT_ID:-}
+      - POSTHOG_KEY=${POSTHOG_KEY:-}
+      - POSTHOG_HOST=${POSTHOG_HOST:-https://us.i.posthog.com}
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://localhost:3000').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))\""]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  widget:
+    build:
+      context: .
+      dockerfile: apps/widget/Dockerfile
+      args:
+        - API_URL=${API_URL:-http://localhost:3001}
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3002 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  ollama:
+    image: ollama/ollama:latest
+    profiles: ["ollama"]
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+
+volumes:
+  postgres_data:
+  ollama_data:
+  uploads_data:

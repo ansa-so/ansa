@@ -1,0 +1,76 @@
+// Map ISO 639-3 codes to full language names
+const LANGUAGE_NAMES: Record<string, string> = {
+	eng: "English",
+	spa: "Spanish",
+	fra: "French",
+	deu: "German",
+	ita: "Italian",
+	por: "Portuguese",
+	nld: "Dutch",
+	rus: "Russian",
+	zho: "Chinese",
+	jpn: "Japanese",
+	kor: "Korean",
+	ara: "Arabic",
+	hin: "Hindi",
+	ben: "Bengali",
+	tur: "Turkish",
+	vie: "Vietnamese",
+	tha: "Thai",
+	pol: "Polish",
+	ukr: "Ukrainian",
+	ces: "Czech",
+	ron: "Romanian",
+	hun: "Hungarian",
+	ell: "Greek",
+	heb: "Hebrew",
+	swe: "Swedish",
+	dan: "Danish",
+	nor: "Norwegian",
+	fin: "Finnish",
+	ind: "Indonesian",
+	msa: "Malay",
+	fil: "Filipino",
+	cat: "Catalan",
+	hrv: "Croatian",
+	srp: "Serbian",
+	slk: "Slovak",
+	slv: "Slovenian",
+	bul: "Bulgarian",
+	lit: "Lithuanian",
+	lav: "Latvian",
+	est: "Estonian",
+	fas: "Persian",
+	urd: "Urdu",
+	tam: "Tamil",
+	tel: "Telugu",
+	mar: "Marathi",
+	guj: "Gujarati",
+	kan: "Kannada",
+	mal: "Malayalam",
+	pan: "Punjabi",
+	nep: "Nepali",
+	sin: "Sinhala",
+	mya: "Burmese",
+	khm: "Khmer",
+	lao: "Lao",
+	afr: "Afrikaans",
+	swa: "Swahili",
+	amh: "Amharic",
+	hau: "Hausa",
+	yor: "Yoruba",
+	ibo: "Igbo",
+	zul: "Zulu",
+	xho: "Xhosa",
+};
+
+/**
+ * Gets the full language name from an ISO 639-3 code.
+ * Returns "Unknown" if the code is not recognized or null.
+ */
+export function getLanguageName(code: string | null | undefined): string {
+	if (!code) {
+		return "Unknown";
+	}
+	return LANGUAGE_NAMES[code] || "Unknown";
+}
