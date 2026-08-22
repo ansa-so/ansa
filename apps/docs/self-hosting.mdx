@@ -1,19 +1,89 @@
 ---
 title: Self-Hosting
-description: "Deploy Ansa on your own infrastructure"
+description: "Run Ansa on your own infrastructure with Docker"
 ---
 
 ## Overview
 
-Self-hosting Ansa on your own infrastructure is possible for enterprise customers who require full control over their data and deployment.
+Ansa can run on infrastructure you control. The source code is public, and the repository includes a Docker Compose setup for the dashboard, API, embeddable widget, and PostgreSQL with pgvector.
 
-## Interested in Self-Hosting?
+<Card title="Ansa on GitHub" icon="github" href="https://github.com/ansa-so/ansa">
+  Browse the source code, follow releases, report issues, and contribute to Ansa.
+</Card>
 
-If you'd like to self-host Ansa, please [contact us](mailto:support@ansa.ai) for more information about:
+<Info>
+  Ansa is distributed under the [Functional Source License 1.1, Apache 2.0 Future License](https://github.com/ansa-so/ansa/blob/main/LICENSE). You can inspect, run, modify, and self-host the software, but you cannot use it to offer a competing commercial service. Each release converts to Apache 2.0 two years after publication.
+</Info>
 
-- Deployment requirements and architecture
-- Licensing and pricing
-- Technical support and maintenance
-- Custom integrations
+## Requirements
 
-Our team will work with you to understand your needs and provide the appropriate guidance for your self-hosted deployment.
+- Docker Engine with Docker Compose
+- An AI provider API key, or a local provider such as Ollama
+- For a public deployment: a domain name, HTTPS, and a reverse proxy
+
+## Quickstart
+
+<Steps>
+  <Step title="Clone the repository">
+    ```bash
+    git clone https://github.com/ansa-so/ansa.git
+    cd ansa
+    ```
+  </Step>
+
+  <Step title="Configure the environment">
+    Copy the example configuration:
+
+    ```bash
+    cp .env.example .env
+    ```
+
+    Generate secure values for `BETTER_AUTH_SECRET` and `POSTGRES_PASSWORD`:
+
+    ```bash
+    openssl rand -hex 32
+    openssl rand -hex 24
+    ```
+
+    Add those values to `.env`, then configure at least one AI provider. The example file documents the available variables.
+  </Step>
+
+  <Step title="Start Ansa">
+    ```bash
+    docker compose up -d
+    docker compose exec postgres psql -U ansa -d ansa -c "CREATE EXTENSION IF NOT EXISTS vector;"
+    docker compose exec api pnpm db:push
+    docker compose restart api
+    ```
+
+    To include the default marketplace agents, run:
+
+    ```bash
+    docker compose exec api npx tsx apps/api/scripts/seed-marketplace.ts
+    ```
+  </Step>
+
+  <Step title="Open the dashboard">
+    Visit [http://localhost:3000](http://localhost:3000). The API runs on port `3001` and the widget server on port `3002` by default.
+  </Step>
+</Steps>
+
+## Production configuration
+
+Before exposing Ansa publicly:
+
+- Set `DASHBOARD_URL`, `API_URL`, `WIDGET_URL`, and `CDN_URL` to their public HTTPS URLs
+- Keep PostgreSQL private and preserve the `postgres_data` and `uploads_data` volumes
+- Store secrets outside version control and use long, unique production values
+- Put the dashboard, API, and widget behind an HTTPS reverse proxy
+- Back up the database and uploaded files before each upgrade
+
+<Warning>
+  Do not deploy with the example secrets or expose PostgreSQL directly to the internet.
+</Warning>
+
+## Updates and support
+
+Review the [release history](https://github.com/ansa-so/ansa/releases) before upgrading, then pull the version you want and rebuild the containers. Use [GitHub Issues](https://github.com/ansa-so/ansa/issues) for reproducible bugs and the [contributing guide](https://github.com/ansa-so/ansa/blob/main/CONTRIBUTING.md) for patches.
+
+Report security vulnerabilities privately through [GitHub Security Advisories](https://github.com/ansa-so/ansa/security/advisories/new), not through a public issue.

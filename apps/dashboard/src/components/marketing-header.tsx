@@ -67,6 +67,8 @@ export function MarketingHeader({ activePage }: MarketingHeaderProps) {
 	const { data: session } = useSession();
 	const pathname = usePathname();
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+	const isPathActive = (href: string) =>
+		href.startsWith("/") && (pathname === href || pathname?.startsWith(`${href}/`));
 	// const [solutionsOpen, setSolutionsOpen] = useState(false); // Hidden with Solutions dropdown
 
 	const navItems = [
@@ -153,7 +155,7 @@ export function MarketingHeader({ activePage }: MarketingHeaderProps) {
 						//   );
 						// }
 
-						const isActive = item.active || pathname === item.href;
+						const isActive = item.active || isPathActive(item.href);
 						return (
 							<Link
 								key={item.label}
@@ -210,7 +212,7 @@ export function MarketingHeader({ activePage }: MarketingHeaderProps) {
 						<Link
 							href="/features"
 							className={`h-full py-3 text-xs font-mono uppercase tracking-widest transition-colors ${
-								pathname === "/features" ? "text-foreground font-bold" : "hover:text-[#666]"
+								isPathActive("/features") ? "text-foreground font-bold" : "hover:text-[#666]"
 							}`}
 							onClick={() => setMobileMenuOpen(false)}
 						>
@@ -239,7 +241,7 @@ export function MarketingHeader({ activePage }: MarketingHeaderProps) {
 							<Link
 								href="/pricing"
 								className={`py-3 text-xs font-mono uppercase tracking-widest transition-colors border-t border-[#D1D1D1] ${
-									pathname === "/pricing" ? "text-foreground font-bold" : "hover:text-[#666]"
+									isPathActive("/pricing") ? "text-foreground font-bold" : "hover:text-[#666]"
 								}`}
 								onClick={() => setMobileMenuOpen(false)}
 							>
@@ -249,7 +251,7 @@ export function MarketingHeader({ activePage }: MarketingHeaderProps) {
 						<Link
 							href="/developers"
 							className={`py-3 text-xs font-mono uppercase tracking-widest transition-colors border-t border-[#D1D1D1] ${
-								pathname === "/developers" ? "text-foreground font-bold" : "hover:text-[#666]"
+								isPathActive("/developers") ? "text-foreground font-bold" : "hover:text-[#666]"
 							}`}
 							onClick={() => setMobileMenuOpen(false)}
 						>
@@ -258,7 +260,7 @@ export function MarketingHeader({ activePage }: MarketingHeaderProps) {
 						<Link
 							href="/marketplace"
 							className={`py-3 text-xs font-mono uppercase tracking-widest transition-colors border-t border-[#D1D1D1] ${
-								pathname === "/marketplace" ? "text-foreground font-bold" : "hover:text-[#666]"
+								isPathActive("/marketplace") ? "text-foreground font-bold" : "hover:text-[#666]"
 							}`}
 							onClick={() => setMobileMenuOpen(false)}
 						>
@@ -267,7 +269,7 @@ export function MarketingHeader({ activePage }: MarketingHeaderProps) {
 						<Link
 							href="/shopify"
 							className={`py-3 text-xs font-mono uppercase tracking-widest transition-colors border-t border-[#D1D1D1] ${
-								pathname === "/shopify" ? "text-foreground font-bold" : "hover:text-[#666]"
+								isPathActive("/shopify") ? "text-foreground font-bold" : "hover:text-[#666]"
 							}`}
 							onClick={() => setMobileMenuOpen(false)}
 						>
@@ -276,9 +278,7 @@ export function MarketingHeader({ activePage }: MarketingHeaderProps) {
 						<Link
 							href="/free-tools"
 							className={`py-3 text-xs font-mono uppercase tracking-widest transition-colors border-t border-[#D1D1D1] ${
-								pathname?.startsWith("/free-tools")
-									? "text-foreground font-bold"
-									: "hover:text-[#666]"
+								isPathActive("/free-tools") ? "text-foreground font-bold" : "hover:text-[#666]"
 							}`}
 							onClick={() => setMobileMenuOpen(false)}
 						>

@@ -41,7 +41,7 @@ export function Footer() {
 						<LogoIcon size="sm" />
 					</div>
 					<p className="text-[#666] max-w-xs leading-relaxed mb-6">
-						The autonomous AI layer for modern enterprises.
+						Open-source AI support for teams that want control.
 					</p>
 					{/* Social Icons */}
 					<div className="flex items-center gap-4">

@@ -47,6 +47,7 @@ import {
 	type ToolTemplateDetail,
 } from "@/lib/api";
 import { authClient } from "@/lib/auth-client";
+import { useConfig } from "@/lib/config-context";
 import { formatCount } from "@/lib/utils";
 
 // Map icon names to Lucide components
@@ -78,6 +79,7 @@ export default function ToolDetailPage() {
 	const router = useRouter();
 	const slug = params.slug as string;
 	const { currentAgent } = useAgent();
+	const { docsUrl } = useConfig();
 
 	const [tool, setTool] = useState<ToolTemplateDetail | null>(null);
 	const [loading, setLoading] = useState(true);
@@ -176,6 +178,7 @@ export default function ToolDetailPage() {
 		label: tool.category,
 		color: "bg-gray-100 text-gray-800",
 	};
+	const selfHostingUrl = `${docsUrl.replace(/\/$/, "")}/self-hosting`;
 
 	return (
 		<div className="">
@@ -341,6 +344,55 @@ export default function ToolDetailPage() {
 					</div>
 				</div>
 			</div>
+
+			<section className="container px-4 md:px-8 mx-auto max-w-[1800px] pb-16">
+				<div className="grid overflow-hidden border border-[#1A1A1A] lg:grid-cols-[minmax(0,1fr)_minmax(320px,0.55fr)]">
+					<div className="bg-[#1A1A1A] px-6 py-10 text-white sm:px-10 md:py-14">
+						<div className="mb-8 flex items-center gap-4">
+							<div className="flex h-12 w-12 shrink-0 items-center justify-center border border-[#555] bg-[#242424]">
+								{icon}
+							</div>
+							<span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#A7A7A7]">
+								Marketplace tool
+							</span>
+						</div>
+						<h2 className="max-w-3xl text-3xl font-medium tracking-tight sm:text-4xl md:text-5xl">
+							Put {tool.name} to work.
+						</h2>
+						<p className="mt-5 max-w-2xl text-base leading-relaxed text-[#B8B8B8]">
+							Add it to an Ansa agent, connect your data, and test the first conversation.
+						</p>
+						<button
+							type="button"
+							onClick={isAuthenticated ? handleInstallClick : () => router.push("/signup")}
+							className="mt-8 inline-flex min-h-12 items-center justify-center bg-white px-7 py-3 text-xs font-bold uppercase tracking-widest text-[#1A1A1A] transition-colors hover:bg-[#DCDCD8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1A1A1A]"
+						>
+							{isAuthenticated ? `Install ${tool.name}` : "Create a free account"}
+						</button>
+					</div>
+
+					<div className="flex flex-col justify-between bg-[#E8FF65] px-6 py-10 sm:px-10 md:py-14">
+						<div>
+							<span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#555]">
+								Run it yourself
+							</span>
+							<h3 className="mt-5 text-2xl font-medium tracking-tight md:text-3xl">
+								Keep Ansa on your infrastructure.
+							</h3>
+							<p className="mt-4 leading-relaxed text-[#4A4A36]">
+								Deploy the dashboard, API, widget, and PostgreSQL with Docker Compose.
+							</p>
+						</div>
+						<a
+							href={selfHostingUrl}
+							className="mt-8 inline-flex min-h-12 items-center justify-between gap-5 border border-[#1A1A1A] px-5 py-3 font-mono text-xs font-bold uppercase tracking-widest transition-colors hover:bg-[#1A1A1A] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#E8FF65]"
+						>
+							Read the self-hosting guide
+							<ExternalLink className="h-4 w-4 shrink-0" />
+						</a>
+					</div>
+				</div>
+			</section>
 
 			{/* Install Dialog */}
 			<Dialog open={showInstallDialog} onOpenChange={setShowInstallDialog}>
