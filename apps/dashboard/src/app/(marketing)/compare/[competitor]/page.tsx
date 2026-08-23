@@ -235,8 +235,8 @@ export default async function ComparisonPage({ params }: PageProps) {
 								<span className="font-bold">75 responses</span>
 							</div>
 							<div className="flex justify-between items-center py-3 border-b border-[#333]">
-								<span>Pro</span>
-								<span className="font-bold">$29/month</span>
+								<span>Starter</span>
+								<span className="font-bold">$38/month</span>
 							</div>
 							<div className="flex justify-between items-center py-3 border-b border-[#333]">
 								<span>Enterprise</span>

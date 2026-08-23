@@ -8,7 +8,7 @@ import { ScrollProgressBar } from "@/components/scroll-progress-bar";
 export const metadata: Metadata = {
 	title: "Ansa - AI Agents for Customer Support & Sales",
 	description:
-		"Build AI agents that resolve 80%+ of support tickets automatically. No-code dashboard or SDK/API. Train on your docs, connect Shopify & 20+ tools. Start free, Pro from $29/mo.",
+		"Build AI agents that resolve 80%+ of support tickets automatically. No-code dashboard or SDK/API. Train on your docs, connect Shopify & 20+ tools. Start free, paid plans from $38/mo.",
 };
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {

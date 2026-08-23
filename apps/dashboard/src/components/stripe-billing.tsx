@@ -457,7 +457,7 @@ export function StripeBilling() {
 										<span
 											className={`text-[8px] px-1 py-0.5 rounded ${isAnnual ? "bg-green-500 text-white" : "bg-green-100 text-green-700"}`}
 										>
-											Save 17%
+											Save up to 24%
 										</span>
 									</button>
 								</div>

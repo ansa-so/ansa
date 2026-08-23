@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
 	title: "AI Agent Features: RAG Knowledge Base, Shopify, SDK/API | Ansa",
 	description:
-		"Resolve 80%+ of support tickets with AI agents. RAG-powered knowledge base, 24/7 automation, Shopify integration, tool marketplace, SDK/API access. Pro from $29/mo.",
+		"Resolve 80%+ of support tickets with AI agents. RAG-powered knowledge base, 24/7 automation, Shopify integration, tool marketplace, SDK/API access. Paid plans from $38/mo.",
 	keywords: [
 		"AI agent features",
 		"RAG knowledge base",

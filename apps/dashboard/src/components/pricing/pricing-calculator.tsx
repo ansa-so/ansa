@@ -58,7 +58,7 @@ function pickAnsaPlan(
 		if (plan.messages === -1 || plan.messages >= volume) {
 			return {
 				name: plan.name,
-				price: plan.price,
+				price: Math.round(plan.price * 1.3),
 				note: `${plan.name} — ${plan.messages === -1 ? "unlimited" : plan.messages.toLocaleString()} msgs/mo`,
 			};
 		}
@@ -139,9 +139,9 @@ export function PricingCalculator() {
 									<div className="font-mono text-[10px] uppercase tracking-widest text-green-400 mb-1">
 										Ansa
 									</div>
-									<div className="text-3xl md:text-4xl font-bold">$29</div>
+									<div className="text-3xl md:text-4xl font-bold">$38</div>
 								</div>
-								<div className="text-[10px] text-[#888] font-mono mt-3">From $29/mo</div>
+								<div className="text-[10px] text-[#888] font-mono mt-3">From $38/mo</div>
 							</>
 						)}
 					</div>
@@ -149,7 +149,7 @@ export function PricingCalculator() {
 					{/* Competitors */}
 					{externalCompetitors.map((comp) => {
 						const cost = comp.calculate(volume);
-						const ansaPrice = ansa?.price ?? 29;
+						const ansaPrice = ansa?.price ?? 38;
 						const savings = ansaPrice > 0 ? cost - ansaPrice : cost;
 						return (
 							<div

@@ -218,3 +218,13 @@ export async function listMarketplaceTools(): Promise<ToolTemplate[]> {
 
 	return response.json();
 }
+
+export async function getMarketplaceTool(slug: string): Promise<ToolTemplate | null> {
+	const response = await fetch(`${API_BASE}/marketplace/tools/${encodeURIComponent(slug)}`);
+
+	if (!response.ok) {
+		return null;
+	}
+
+	return response.json();
+}

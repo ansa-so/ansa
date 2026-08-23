@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 		default: "Ansa - Build AI Agents for Support, Sales & More",
 	},
 	description:
-		"Build AI agents that resolve 80%+ of support tickets automatically. SDK/API or no-code dashboard. Train on your docs, connect any tool. Start free, Pro from $29/mo.",
+		"Build AI agents that resolve 80%+ of support tickets automatically. SDK/API or no-code dashboard. Train on your docs, connect any tool. Start free, paid plans from $38/mo.",
 	keywords: [
 		"AI agents",
 		"conversational AI",
@@ -59,7 +59,7 @@ export const metadata: Metadata = {
 		siteName: "Ansa",
 		title: "Ansa - AI Agents for Customer Support & Sales",
 		description:
-			"Build AI agents that resolve 80%+ of support tickets. SDK/API or no-code. Train on your docs, connect any tool. Pro from $29/mo.",
+			"Build AI agents that resolve 80%+ of support tickets. SDK/API or no-code. Train on your docs, connect any tool. Paid plans from $38/mo.",
 		images: [
 			{
 				url: "/og-image.png",
@@ -73,7 +73,7 @@ export const metadata: Metadata = {
 		card: "summary_large_image",
 		title: "Ansa - AI Agents for Customer Support & Sales",
 		description:
-			"Build AI agents that resolve 80%+ of support tickets. SDK/API or no-code. Pro from $29/mo.",
+			"Build AI agents that resolve 80%+ of support tickets. SDK/API or no-code. Paid plans from $38/mo.",
 		creator: "@ansa_ai",
 		images: ["/og-image.png"],
 	},

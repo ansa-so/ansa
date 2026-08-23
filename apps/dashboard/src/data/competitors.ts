@@ -63,7 +63,7 @@ export const competitors: Record<string, Competitor> = {
 			"Smart triggers — exit intent, cart abandonment, scroll depth, time on page, custom JS events",
 			"Confidence-based human handoff — set a threshold and auto-escalate to Slack/email/helpdesk with full context",
 			"Advanced analytics — confidence scoring per response, auto-detected knowledge gaps, resolution tracking",
-			"Simple, transparent pricing from $29/mo",
+			"Simple, transparent pricing from $38/mo",
 		],
 		features: [
 			{ name: "AI-powered responses", ansa: "Unlimited", competitor: "$0.99/resolution" },
@@ -190,7 +190,7 @@ export const competitors: Record<string, Competitor> = {
 			"Chatbots",
 		],
 		limitations: [
-			"Starts at $2,500/mo — 85x more expensive than Ansa",
+			"Starts at $2,500/mo — over 65x more expensive than Ansa",
 			"Sales-only — no real customer support capabilities",
 			"No ecommerce features — no Shopify, no product catalog, no WISMO",
 			"Analytics focused on sales pipeline, not AI quality or resolution rates",
@@ -204,7 +204,7 @@ export const competitors: Record<string, Competitor> = {
 			"Advanced analytics — confidence scoring per response, knowledge gap detection, resolution tracking",
 			"Confidence-based human handoff — auto-escalate when AI isn't sure, with full context",
 			"Custom data rendering — cards, carousels, forms from your APIs, not just text bubbles",
-			"Start free, upgrade to $29/mo — not $2,500/mo",
+			"Start free, upgrade to $38/mo — not $2,500/mo",
 			"Self-serve signup, no sales calls required",
 		],
 		features: [
@@ -230,7 +230,7 @@ export const competitors: Record<string, Competitor> = {
 			{ name: "SDK/API access", ansa: "All plans", competitor: "Enterprise" },
 			{ name: "Lead qualification", ansa: true, competitor: true },
 		],
-		metaTitle: "Ansa vs Drift: Support + Sales + Ecommerce from $29/mo",
+		metaTitle: "Ansa vs Drift: Support + Sales + Ecommerce from $38/mo",
 		metaDescription:
 			"Compare Ansa vs Drift. Full support and ecommerce capabilities — not just sales pipeline — starting free, not $2,500/mo. AI confidence scoring, knowledge gap detection, and native Shopify.",
 	},

@@ -371,7 +371,7 @@ export default function ToolDetailPage() {
 						</button>
 					</div>
 
-					<div className="flex flex-col justify-between bg-[#E8FF65] px-6 py-10 sm:px-10 md:py-14">
+					<div className="flex flex-col justify-between bg-white px-6 py-10 sm:px-10 md:py-14">
 						<div>
 							<span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#555]">
 								Run it yourself
@@ -385,7 +385,7 @@ export default function ToolDetailPage() {
 						</div>
 						<a
 							href={selfHostingUrl}
-							className="mt-8 inline-flex min-h-12 items-center justify-between gap-5 border border-[#1A1A1A] px-5 py-3 font-mono text-xs font-bold uppercase tracking-widest transition-colors hover:bg-[#1A1A1A] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#E8FF65]"
+							className="mt-8 inline-flex min-h-12 items-center justify-between gap-5 border border-[#1A1A1A] px-5 py-3 font-mono text-xs font-bold uppercase tracking-widest transition-colors hover:bg-[#1A1A1A] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A] focus-visible:ring-offset-2 focus-visible:ring-offset-white"
 						>
 							Read the self-hosting guide
 							<ExternalLink className="h-4 w-4 shrink-0" />

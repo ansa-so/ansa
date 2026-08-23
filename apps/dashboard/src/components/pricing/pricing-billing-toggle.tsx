@@ -25,7 +25,7 @@ export function PricingBillingToggle({ isAnnual, setIsAnnual }: PricingBillingTo
 					}`}
 					onClick={() => setIsAnnual(true)}
 				>
-					Yearly (Save 17%)
+					Yearly (Save up to 24%)
 				</button>
 			</div>
 		</div>

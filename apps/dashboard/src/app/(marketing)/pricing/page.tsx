@@ -19,7 +19,7 @@ export default function PricingPage() {
 	const { plans, currentPlanId, hasSubscription, isLoading } = usePlansWithCurrent();
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
 	const [authLoading, setAuthLoading] = useState(true);
-	const [isAnnual, setIsAnnual] = useState(true);
+	const [isAnnual, setIsAnnual] = useState(false);
 
 	useEffect(() => {
 		async function checkAuth() {

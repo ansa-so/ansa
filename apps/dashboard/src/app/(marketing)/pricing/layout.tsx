@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { FAQSchema } from "@/components/seo/structured-data";
 
 export const metadata: Metadata = {
-	title: "Ansa Pricing: Free Plan + $29/mo Pro | No Per-Resolution Fees",
+	title: "Ansa Pricing: Free Plan + Paid Plans from $38/mo",
 	description:
-		"Simple, transparent pricing for Ansa AI agents. Start free with 75 AI responses, Pro from $29/month. No per-resolution fees. Enterprise self-hosted available.",
+		"Ansa plans start at $38/month or $348/year. Try 75 AI responses free, with no per-resolution fees. Enterprise and self-hosted options are available.",
 	keywords: [
 		"AI chatbot pricing",
 		"free AI support",
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 	openGraph: {
 		title: "Pricing - Ansa AI Agents",
 		description:
-			"Simple pricing. Start free with 75 AI responses, Pro from $29/month. No per-resolution fees.",
+			"Start free, then choose a paid plan from $38/month or $348/year. No per-resolution fees.",
 	},
 };
 
