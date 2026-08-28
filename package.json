@@ -30,7 +30,7 @@
 		"playwright": "^1.62.1",
 		"tsx": "^4.23.12",
 		"turbo": "^2.10.10",
-		"typescript": "^5.7.2"
+		"typescript": "^7.0.2"
 	},
 	"packageManager": "pnpm@9.14.4",
 	"engines": {
