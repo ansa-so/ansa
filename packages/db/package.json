@@ -30,7 +30,7 @@
 		"postgres": "^3.4.9"
 	},
 	"devDependencies": {
-		"@types/node": "^26.2.0",
+		"@types/node": "^26.3.0",
 		"drizzle-kit": "^0.31.10",
 		"tsup": "^8.5.1",
 		"tsx": "^4.23.12",
