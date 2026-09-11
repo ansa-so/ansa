@@ -23,14 +23,14 @@
 	"devDependencies": {
 		"@tailwindcss/postcss": "^4.3.3",
 		"@types/react": "^19.2.18",
-		"@types/react-dom": "^19.2.4",
-		"@vitejs/plugin-react": "^6.0.5",
-		"autoprefixer": "^10.5.4",
+		"@types/react-dom": "^19.2.7",
+		"@vitejs/plugin-react": "^6.1.1",
+		"autoprefixer": "^10.5.5",
 		"dotenv-cli": "^8.0.0",
-		"postcss": "^8.5.26",
+		"postcss": "^8.5.28",
 		"tailwindcss": "^4.3.3",
 		"typescript": "^5.7.2",
 		"vite": "^8.2.1",
-		"wrangler": "^4.124.0"
+		"wrangler": "^4.129.1"
 	}
 }
