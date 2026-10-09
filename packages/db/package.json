@@ -26,14 +26,14 @@
 	"dependencies": {
 		"@ansa/types": "workspace:*",
 		"dotenv": "^17.4.2",
-		"drizzle-orm": "^0.45.2",
+		"drizzle-orm": "^0.45.3",
 		"postgres": "^3.4.9"
 	},
 	"devDependencies": {
-		"@types/node": "^26.2.0",
-		"drizzle-kit": "^0.31.10",
+		"@types/node": "^26.6.4",
+		"drizzle-kit": "^0.31.11",
 		"tsup": "^8.5.1",
-		"tsx": "^4.23.12",
+		"tsx": "^4.23.15",
 		"typescript": "^5.7.2"
 	}
 }
